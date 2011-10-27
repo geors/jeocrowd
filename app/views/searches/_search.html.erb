@@ -1,3 +1,7 @@
 <div class="search_item">
   <%= link_to search.keywords, search %>
+  <%= link_to "[just show]", search_path(search, :display => 1) %>
+  <%= link_to "[restart]", search_path(search, :restart => 1) %>
+  <%= link_to "[x]", search, :method => :delete, :alert => "Are you sure?" %><br/>
+  <%= search.attributes.inspect %>
 </div>

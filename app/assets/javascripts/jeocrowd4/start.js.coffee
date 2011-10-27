@@ -1,0 +1,8 @@
+jQuery ->
+  Jeocrowd.buildMap('map')
+  
+  
+  
+  
+
+  
