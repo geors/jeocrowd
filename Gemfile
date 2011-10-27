@@ -6,7 +6,8 @@ gem 'rails', '3.1.1'
 # gem 'rails',     :git => 'git://github.com/rails/rails.git'
 
 gem 'couchrest_model'
-gem 'sqlite3'
+gem 'mysql2', :group => [:development, :test]
+gem 'pg', :group => [:production]
 
 # Gems used only for assets and not required
 # in production environments by default.

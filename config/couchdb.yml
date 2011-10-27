@@ -1,5 +1,5 @@
 development: &development
-  protocol: 'http'
+  protocol: http
   host: localhost
   port: 5984
   prefix: jeocrowd4s
@@ -11,11 +11,12 @@ test:
   <<: *development
   suffix: test
 
+# run heroku config --long to get details
 production:
-  protocol: 'https'
-  host: localhost
-  port: 5984
+  protocol: https
+  host: app1613810.heroku.cloudant.com
+  port: 443
   prefix: jeocrowd4s
   suffix: production
-  username: root
-  password: 123
+  username: app1613810.heroku
+  password: DCnQxbDfV7HoJ2tVl4T0TBlp
