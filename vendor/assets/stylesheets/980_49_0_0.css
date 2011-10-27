@@ -1,0 +1,432 @@
+/*
+980px grid system ~ Core CSS.
+49 Columns ~ Margin left: 0px ~ Margin right: 0px
+
+Based on the 960.gs grid system - http://960.gs/
+by Nathan Smith
+
+Created by the Grid System Generator - v1.04
+Learn more ~ http://www.gridsystemgenerator.com/
+*/
+
+/*
+Forces backgrounds to span full width,
+even if there is horizontal scrolling.
+Increase this if your layout is wider.
+
+Note: IE6 works fine without this fix.
+*/
+body {
+	min-width: 960px;
+}
+
+/* =Containers
+--------------------------------------------------------------------------------*/
+.container_49
+{
+	margin-left: auto;
+	margin-right: auto;
+	width: 980px;
+}
+
+/* =Grid >> Global
+--------------------------------------------------------------------------------*/
+.grid_1,
+.grid_2,
+.grid_3,
+.grid_4,
+.grid_5,
+.grid_6,
+.grid_7,
+.grid_8,
+.grid_9,
+.grid_10,
+.grid_11,
+.grid_12,
+.grid_13,
+.grid_14,
+.grid_15,
+.grid_16,
+.grid_17,
+.grid_18,
+.grid_19,
+.grid_20,
+.grid_21,
+.grid_22,
+.grid_23,
+.grid_24,
+.grid_25,
+.grid_26,
+.grid_27,
+.grid_28,
+.grid_29,
+.grid_30,
+.grid_31,
+.grid_32,
+.grid_33,
+.grid_34,
+.grid_35,
+.grid_36,
+.grid_37,
+.grid_38,
+.grid_39,
+.grid_40,
+.grid_41,
+.grid_42,
+.grid_43,
+.grid_44,
+.grid_45,
+.grid_46,
+.grid_47,
+.grid_48,
+.grid_49 {
+	display: inline;
+	float: left;
+	margin-left: 0px;
+	margin-right: 0px;
+}
+
+.push_1, .pull_1,
+.push_2, .pull_2,
+.push_3, .pull_3,
+.push_4, .pull_4,
+.push_5, .pull_5,
+.push_6, .pull_6,
+.push_7, .pull_7,
+.push_8, .pull_8,
+.push_9, .pull_9,
+.push_10, .pull_10,
+.push_11, .pull_11,
+.push_12, .pull_12,
+.push_13, .pull_13,
+.push_14, .pull_14,
+.push_15, .pull_15,
+.push_16, .pull_16,
+.push_17, .pull_17,
+.push_18, .pull_18,
+.push_19, .pull_19,
+.push_20, .pull_20,
+.push_21, .pull_21,
+.push_22, .pull_22,
+.push_23, .pull_23,
+.push_24, .pull_24,
+.push_25, .pull_25,
+.push_26, .pull_26,
+.push_27, .pull_27,
+.push_28, .pull_28,
+.push_29, .pull_29,
+.push_30, .pull_30,
+.push_31, .pull_31,
+.push_32, .pull_32,
+.push_33, .pull_33,
+.push_34, .pull_34,
+.push_35, .pull_35,
+.push_36, .pull_36,
+.push_37, .pull_37,
+.push_38, .pull_38,
+.push_39, .pull_39,
+.push_40, .pull_40,
+.push_41, .pull_41,
+.push_42, .pull_42,
+.push_43, .pull_43,
+.push_44, .pull_44,
+.push_45, .pull_45,
+.push_46, .pull_46,
+.push_47, .pull_47,
+.push_48, .pull_48 {
+	position: relative;
+}
+
+/* =Grid >> Children (Alpha ~ First, Omega ~ Last)
+--------------------------------------------------------------------------------*/
+.alpha {margin-left: 0;}
+.omega {margin-right: 0;}
+
+/* =Grid >> 49 Columns
+--------------------------------------------------------------------------------*/
+.container_49 .grid_1 {width: 20px;}
+.container_49 .grid_2 {width: 40px;}
+.container_49 .grid_3 {width: 60px;}
+.container_49 .grid_4 {width: 80px;}
+.container_49 .grid_5 {width: 100px;}
+.container_49 .grid_6 {width: 120px;}
+.container_49 .grid_7 {width: 140px;}
+.container_49 .grid_8 {width: 160px;}
+.container_49 .grid_9 {width: 180px;}
+.container_49 .grid_10 {width: 200px;}
+.container_49 .grid_11 {width: 220px;}
+.container_49 .grid_12 {width: 240px;}
+.container_49 .grid_13 {width: 260px;}
+.container_49 .grid_14 {width: 280px;}
+.container_49 .grid_15 {width: 300px;}
+.container_49 .grid_16 {width: 320px;}
+.container_49 .grid_17 {width: 340px;}
+.container_49 .grid_18 {width: 360px;}
+.container_49 .grid_19 {width: 380px;}
+.container_49 .grid_20 {width: 400px;}
+.container_49 .grid_21 {width: 420px;}
+.container_49 .grid_22 {width: 440px;}
+.container_49 .grid_23 {width: 460px;}
+.container_49 .grid_24 {width: 480px;}
+.container_49 .grid_25 {width: 500px;}
+.container_49 .grid_26 {width: 520px;}
+.container_49 .grid_27 {width: 540px;}
+.container_49 .grid_28 {width: 560px;}
+.container_49 .grid_29 {width: 580px;}
+.container_49 .grid_30 {width: 600px;}
+.container_49 .grid_31 {width: 620px;}
+.container_49 .grid_32 {width: 640px;}
+.container_49 .grid_33 {width: 660px;}
+.container_49 .grid_34 {width: 680px;}
+.container_49 .grid_35 {width: 700px;}
+.container_49 .grid_36 {width: 720px;}
+.container_49 .grid_37 {width: 740px;}
+.container_49 .grid_38 {width: 760px;}
+.container_49 .grid_39 {width: 780px;}
+.container_49 .grid_40 {width: 800px;}
+.container_49 .grid_41 {width: 820px;}
+.container_49 .grid_42 {width: 840px;}
+.container_49 .grid_43 {width: 860px;}
+.container_49 .grid_44 {width: 880px;}
+.container_49 .grid_45 {width: 900px;}
+.container_49 .grid_46 {width: 920px;}
+.container_49 .grid_47 {width: 940px;}
+.container_49 .grid_48 {width: 960px;}
+.container_49 .grid_49 {width: 980px;}
+
+/* =Prefix Extra Space >> 49 Columns
+--------------------------------------------------------------------------------*/
+.container_49 .prefix_1 {padding-left: 20px;}
+.container_49 .prefix_2 {padding-left: 40px;}
+.container_49 .prefix_3 {padding-left: 60px;}
+.container_49 .prefix_4 {padding-left: 80px;}
+.container_49 .prefix_5 {padding-left: 100px;}
+.container_49 .prefix_6 {padding-left: 120px;}
+.container_49 .prefix_7 {padding-left: 140px;}
+.container_49 .prefix_8 {padding-left: 160px;}
+.container_49 .prefix_9 {padding-left: 180px;}
+.container_49 .prefix_10 {padding-left: 200px;}
+.container_49 .prefix_11 {padding-left: 220px;}
+.container_49 .prefix_12 {padding-left: 240px;}
+.container_49 .prefix_13 {padding-left: 260px;}
+.container_49 .prefix_14 {padding-left: 280px;}
+.container_49 .prefix_15 {padding-left: 300px;}
+.container_49 .prefix_16 {padding-left: 320px;}
+.container_49 .prefix_17 {padding-left: 340px;}
+.container_49 .prefix_18 {padding-left: 360px;}
+.container_49 .prefix_19 {padding-left: 380px;}
+.container_49 .prefix_20 {padding-left: 400px;}
+.container_49 .prefix_21 {padding-left: 420px;}
+.container_49 .prefix_22 {padding-left: 440px;}
+.container_49 .prefix_23 {padding-left: 460px;}
+.container_49 .prefix_24 {padding-left: 480px;}
+.container_49 .prefix_25 {padding-left: 500px;}
+.container_49 .prefix_26 {padding-left: 520px;}
+.container_49 .prefix_27 {padding-left: 540px;}
+.container_49 .prefix_28 {padding-left: 560px;}
+.container_49 .prefix_29 {padding-left: 580px;}
+.container_49 .prefix_30 {padding-left: 600px;}
+.container_49 .prefix_31 {padding-left: 620px;}
+.container_49 .prefix_32 {padding-left: 640px;}
+.container_49 .prefix_33 {padding-left: 660px;}
+.container_49 .prefix_34 {padding-left: 680px;}
+.container_49 .prefix_35 {padding-left: 700px;}
+.container_49 .prefix_36 {padding-left: 720px;}
+.container_49 .prefix_37 {padding-left: 740px;}
+.container_49 .prefix_38 {padding-left: 760px;}
+.container_49 .prefix_39 {padding-left: 780px;}
+.container_49 .prefix_40 {padding-left: 800px;}
+.container_49 .prefix_41 {padding-left: 820px;}
+.container_49 .prefix_42 {padding-left: 840px;}
+.container_49 .prefix_43 {padding-left: 860px;}
+.container_49 .prefix_44 {padding-left: 880px;}
+.container_49 .prefix_45 {padding-left: 900px;}
+.container_49 .prefix_46 {padding-left: 920px;}
+.container_49 .prefix_47 {padding-left: 940px;}
+.container_49 .prefix_48 {padding-left: 960px;}
+
+/* =Suffix Extra Space >> 49 Columns
+--------------------------------------------------------------------------------*/
+.container_49 .suffix_1 {padding-right: 20px;}
+.container_49 .suffix_2 {padding-right: 40px;}
+.container_49 .suffix_3 {padding-right: 60px;}
+.container_49 .suffix_4 {padding-right: 80px;}
+.container_49 .suffix_5 {padding-right: 100px;}
+.container_49 .suffix_6 {padding-right: 120px;}
+.container_49 .suffix_7 {padding-right: 140px;}
+.container_49 .suffix_8 {padding-right: 160px;}
+.container_49 .suffix_9 {padding-right: 180px;}
+.container_49 .suffix_10 {padding-right: 200px;}
+.container_49 .suffix_11 {padding-right: 220px;}
+.container_49 .suffix_12 {padding-right: 240px;}
+.container_49 .suffix_13 {padding-right: 260px;}
+.container_49 .suffix_14 {padding-right: 280px;}
+.container_49 .suffix_15 {padding-right: 300px;}
+.container_49 .suffix_16 {padding-right: 320px;}
+.container_49 .suffix_17 {padding-right: 340px;}
+.container_49 .suffix_18 {padding-right: 360px;}
+.container_49 .suffix_19 {padding-right: 380px;}
+.container_49 .suffix_20 {padding-right: 400px;}
+.container_49 .suffix_21 {padding-right: 420px;}
+.container_49 .suffix_22 {padding-right: 440px;}
+.container_49 .suffix_23 {padding-right: 460px;}
+.container_49 .suffix_24 {padding-right: 480px;}
+.container_49 .suffix_25 {padding-right: 500px;}
+.container_49 .suffix_26 {padding-right: 520px;}
+.container_49 .suffix_27 {padding-right: 540px;}
+.container_49 .suffix_28 {padding-right: 560px;}
+.container_49 .suffix_29 {padding-right: 580px;}
+.container_49 .suffix_30 {padding-right: 600px;}
+.container_49 .suffix_31 {padding-right: 620px;}
+.container_49 .suffix_32 {padding-right: 640px;}
+.container_49 .suffix_33 {padding-right: 660px;}
+.container_49 .suffix_34 {padding-right: 680px;}
+.container_49 .suffix_35 {padding-right: 700px;}
+.container_49 .suffix_36 {padding-right: 720px;}
+.container_49 .suffix_37 {padding-right: 740px;}
+.container_49 .suffix_38 {padding-right: 760px;}
+.container_49 .suffix_39 {padding-right: 780px;}
+.container_49 .suffix_40 {padding-right: 800px;}
+.container_49 .suffix_41 {padding-right: 820px;}
+.container_49 .suffix_42 {padding-right: 840px;}
+.container_49 .suffix_43 {padding-right: 860px;}
+.container_49 .suffix_44 {padding-right: 880px;}
+.container_49 .suffix_45 {padding-right: 900px;}
+.container_49 .suffix_46 {padding-right: 920px;}
+.container_49 .suffix_47 {padding-right: 940px;}
+.container_49 .suffix_48 {padding-right: 960px;}
+
+/* `Push Space >> 49 Columns
+--------------------------------------------------------------------------------*/
+.container_49 .push_1 {left: 20px;}
+.container_49 .push_2 {left: 40px;}
+.container_49 .push_3 {left: 60px;}
+.container_49 .push_4 {left: 80px;}
+.container_49 .push_5 {left: 100px;}
+.container_49 .push_6 {left: 120px;}
+.container_49 .push_7 {left: 140px;}
+.container_49 .push_8 {left: 160px;}
+.container_49 .push_9 {left: 180px;}
+.container_49 .push_10 {left: 200px;}
+.container_49 .push_11 {left: 220px;}
+.container_49 .push_12 {left: 240px;}
+.container_49 .push_13 {left: 260px;}
+.container_49 .push_14 {left: 280px;}
+.container_49 .push_15 {left: 300px;}
+.container_49 .push_16 {left: 320px;}
+.container_49 .push_17 {left: 340px;}
+.container_49 .push_18 {left: 360px;}
+.container_49 .push_19 {left: 380px;}
+.container_49 .push_20 {left: 400px;}
+.container_49 .push_21 {left: 420px;}
+.container_49 .push_22 {left: 440px;}
+.container_49 .push_23 {left: 460px;}
+.container_49 .push_24 {left: 480px;}
+.container_49 .push_25 {left: 500px;}
+.container_49 .push_26 {left: 520px;}
+.container_49 .push_27 {left: 540px;}
+.container_49 .push_28 {left: 560px;}
+.container_49 .push_29 {left: 580px;}
+.container_49 .push_30 {left: 600px;}
+.container_49 .push_31 {left: 620px;}
+.container_49 .push_32 {left: 640px;}
+.container_49 .push_33 {left: 660px;}
+.container_49 .push_34 {left: 680px;}
+.container_49 .push_35 {left: 700px;}
+.container_49 .push_36 {left: 720px;}
+.container_49 .push_37 {left: 740px;}
+.container_49 .push_38 {left: 760px;}
+.container_49 .push_39 {left: 780px;}
+.container_49 .push_40 {left: 800px;}
+.container_49 .push_41 {left: 820px;}
+.container_49 .push_42 {left: 840px;}
+.container_49 .push_43 {left: 860px;}
+.container_49 .push_44 {left: 880px;}
+.container_49 .push_45 {left: 900px;}
+.container_49 .push_46 {left: 920px;}
+.container_49 .push_47 {left: 940px;}
+.container_49 .push_48 {left: 960px;}
+
+/* `Pull Space >> 49 Columns
+--------------------------------------------------------------------------------*/
+.container_49 .pull_1 {left: -20px;}
+.container_49 .pull_2 {left: -40px;}
+.container_49 .pull_3 {left: -60px;}
+.container_49 .pull_4 {left: -80px;}
+.container_49 .pull_5 {left: -100px;}
+.container_49 .pull_6 {left: -120px;}
+.container_49 .pull_7 {left: -140px;}
+.container_49 .pull_8 {left: -160px;}
+.container_49 .pull_9 {left: -180px;}
+.container_49 .pull_10 {left: -200px;}
+.container_49 .pull_11 {left: -220px;}
+.container_49 .pull_12 {left: -240px;}
+.container_49 .pull_13 {left: -260px;}
+.container_49 .pull_14 {left: -280px;}
+.container_49 .pull_15 {left: -300px;}
+.container_49 .pull_16 {left: -320px;}
+.container_49 .pull_17 {left: -340px;}
+.container_49 .pull_18 {left: -360px;}
+.container_49 .pull_19 {left: -380px;}
+.container_49 .pull_20 {left: -400px;}
+.container_49 .pull_21 {left: -420px;}
+.container_49 .pull_22 {left: -440px;}
+.container_49 .pull_23 {left: -460px;}
+.container_49 .pull_24 {left: -480px;}
+.container_49 .pull_25 {left: -500px;}
+.container_49 .pull_26 {left: -520px;}
+.container_49 .pull_27 {left: -540px;}
+.container_49 .pull_28 {left: -560px;}
+.container_49 .pull_29 {left: -580px;}
+.container_49 .pull_30 {left: -600px;}
+.container_49 .pull_31 {left: -620px;}
+.container_49 .pull_32 {left: -640px;}
+.container_49 .pull_33 {left: -660px;}
+.container_49 .pull_34 {left: -680px;}
+.container_49 .pull_35 {left: -700px;}
+.container_49 .pull_36 {left: -720px;}
+.container_49 .pull_37 {left: -740px;}
+.container_49 .pull_38 {left: -760px;}
+.container_49 .pull_39 {left: -780px;}
+.container_49 .pull_40 {left: -800px;}
+.container_49 .pull_41 {left: -820px;}
+.container_49 .pull_42 {left: -840px;}
+.container_49 .pull_43 {left: -860px;}
+.container_49 .pull_44 {left: -880px;}
+.container_49 .pull_45 {left: -900px;}
+.container_49 .pull_46 {left: -920px;}
+.container_49 .pull_47 {left: -940px;}
+.container_49 .pull_48 {left: -960px;}
+
+/* `Clear Floated Elements
+----------------------------------------------------------------------------------------------------*/
+/* http://sonspring.com/journal/clearing-floats */
+.clear {
+	clear: both;
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+
+/* http://www.yuiblog.com/blog/2010/09/27/clearfix-reloaded-overflowhidden-demystified */
+.clearfix:before,
+.clearfix:after {
+	content: "\0020";
+	display: block;
+	overflow: hidden;
+	visibility: hidden;
+	width: 0;
+	height: 0;
+}
+.clearfix:after {
+	clear: both;
+}
+/*
+The following zoom:1 rule is specifically for IE6 + IE7.
+Move to separate stylesheet if invalid CSS is a problem.
+*/
+.clearfix {
+	zoom: 1;
+}
