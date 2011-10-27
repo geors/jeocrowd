@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-Jeocrowd4::Application.load_tasks
+Jeocrowd4s::Application.load_tasks
