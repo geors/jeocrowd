@@ -57,16 +57,8 @@ class SearchesController < ApplicationController
   # PUT /searches/1.json
   def update
     @search = Search.find(params[:id])
-
-    respond_to do |format|
-      if @search.update_attributes(params[:search])
-        format.html { redirect_to @search, notice: 'Search was successfully updated.' }
-        format.json { head :ok }
-      else
-        format.html { render action: "edit" }
-        format.json { render json: @search.errors, status: :unprocessable_entity }
-      end
-    end
+    @search.updateExploratory(params[:xpTiles], params[:page].to_i) if (params[:xpTiles] && params[:page])
+    @search.save
   end
 
   # DELETE /searches/1

@@ -8,6 +8,7 @@ class window.Grid
     
   constructor: (@level) ->
     @tiles = new window.TileCollection()
+    @dirty = true
     
   step: ->
     @_step ||= Math.pow(LEVEL_MULTIPLIER, @level) * BASE_GRID_STEP
@@ -19,9 +20,11 @@ class window.Grid
   digitizeCoordinates: (lat, lon) ->
     return @digitizeCoordinate(lat).toFixed(4) + COORDINATE_SEPARATOR + @digitizeCoordinate(lon).toFixed(4)
 
-  addTile: (id) ->
+  addTile: (id, degree, points) ->
     tile = new Tile(@level, id)
     tile.grid = this
+    tile.degree = degree if degree
+    tile.points = points if points
     @tiles.add(tile)
     
   removeTile: (id) ->
@@ -33,8 +36,7 @@ class window.Grid
     tile
     
   addPoints: (data) ->
-    results = @addPoint point for point in data
-    results.length
+    @addPoint point for point in data
       
   draw: ->
     oldGrid = Jeocrowd.grids Jeocrowd.visibleLevel()

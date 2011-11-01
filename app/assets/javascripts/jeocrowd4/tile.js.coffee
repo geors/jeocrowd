@@ -16,8 +16,14 @@ class window.Tile
       @id = id[0] + '^' + id[1]
       @gridLat = parseFloat id[0]
       @gridLon = parseFloat id[1]
-    @points = []
     @degree = 0
+    @points = []
+    
+  toJSON: (withoutID) ->
+    json = {'id': @id, 'degree': @degree}
+    json.points = @points if @points.length > 0
+    delete(json.id) if (withoutID)
+    json
       
   addPoint: (point) ->
     if @points.indexOf point.url == -1

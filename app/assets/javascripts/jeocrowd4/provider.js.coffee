@@ -2,29 +2,54 @@
 
 class window.Provider
   
-  constructor: (@name) ->
+  constructor: (@name, url, search) ->
     @apiURL = window.Providers[@name].apiURL
     @params = jQuery.extend {}, window.Providers[@name].params
+    @serverURL = if (q = url.indexOf '?') == -1
+      url + ".js"
+    else
+      url.substring(0, q) + ".js" + url.substring(q)
+    @pages = search.pages
+    @results = []
     
   callbacks: {}
-  
-  pages: {}
-  
-  fetchNextPage: (keywords, page, callback) ->
+    
+  # Jeocrowd -> provider -> fetchNextPage -> 
+  #             <exploratory, refinement>Callback -> save<Exploratory, Refinement>Results ->
+  #             
+
+  computeNextPage: ->
+    window.Util.firstMissingFromRange(@pages, @maxPage)
+
+  fetchNextPage: (keywords, callback) ->
+    return null if (page = @computeNextPage()) == null
+    @params.page = page + 1
+    @params.text = keywords
+    @params.jsoncallback = "Jeocrowd._provider.callbacks.exploratory_page_" + page
     @callbacks['exploratory_page_' + page] = (data) -> # called from the global namespace
       Jeocrowd.provider().exploratoryCallback data, page, callback
-    @params.jsoncallback = "Jeocrowd._provider.callbacks.exploratory_page_" + page
-    @params.text = keywords
-    @params.page = page + 1
     try
       jQuery.getScript @apiURL + "?" + jQuery.param(@params)
     catch error
       console.log error
-      @fetchNextPage keywords, page
+      @fetchNextPage keywords, callback
     
   exploratoryCallback: (data, page, callback) ->
-    @pages[page] = @convertData(data)
-    callback.apply Jeocrowd, [@pages[page], page]
+    @results[page] = @convertData(data)
+    @pages[page] = page
+    callback.apply Jeocrowd, [@results[page], page]
+    
+  saveExploratoryResults: (results, page, callback) ->
+    data = {}
+    data['xpTiles'] = results
+    data['page'] = page
+    jQuery.ajax {
+      'url': @serverURL,
+      'type': 'PUT',
+      'data': data,
+      'success': (data, xmlhttp, textStatus) ->
+        callback.apply Jeocrowd
+    }
     
   convertData: (data) ->
     points = data.photos.photo.map (p) ->
@@ -34,6 +59,7 @@ class window.Provider
       point.title = p.title
       point.url = "http://farm" + p.farm + ".static.flickr.com/" + p.server + "/" + p.id + "_" + p.secret + ".jpg"
       point
+
     
 # different providers for later expansion
     

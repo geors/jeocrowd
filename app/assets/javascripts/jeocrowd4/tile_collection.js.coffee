@@ -25,3 +25,9 @@ class window.TileCollection
       tile[func](params) for tile in @values
     else if typeof func == 'function'
       func(tile, params) for tile in @values
+
+  toJSON: ->
+    json = {}
+    json[tile.id] = tile.toJSON(true) for tile in @values # toJSON true, to remove the id
+    json
+    
