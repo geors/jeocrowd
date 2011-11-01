@@ -12,13 +12,13 @@ div.search_controls {
 div#map_wrapper {
   float: left;
   width: 730px;
-  height: 400px;
+  height: 415px;
   border: 1px solid #ccc;
 }
 
 div#map {
   width: 730px;
-  height: 400px;
+  height: 415px;
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
@@ -37,7 +37,7 @@ div.option {
     @include gradient-background-horizontal($left-option-color, #fff);
     padding: 0 4px;
   }
-  div.control {
+  div.value {
     display: table-cell;
     height: 25px;
     vertical-align: middle;

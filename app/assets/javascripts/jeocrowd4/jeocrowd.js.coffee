@@ -7,10 +7,10 @@ window.Jeocrowd =
   grids: (level) ->
     @_grids ||= [0..6].map (i) ->
       new window.Grid(i)
-    if level != null
-      @_grids[level]
-    else
+    if level == undefined
       @_grids
+    else
+      @_grids[level]
   
   _provider : null
   provider: ->
@@ -19,16 +19,23 @@ window.Jeocrowd =
   _visibleLayer: 'degree'
   visibleLayer: (layer) ->
     if layer
+      $('#layer').val(layer)
       @_visibleLayer = layer
-    else
-      @_visibleLayer
+      @visibleGrid().draw()
+    @_visibleLayer
 
   _visibleLevel: 0
   visibleLevel: (level) ->
     if level
+      level = parseInt(level) if typeof level == 'string'
+      $('#level').val(level)
+      @grids(@_visibleLevel).undraw()
       @_visibleLevel = level
-    else
-      @_visibleLevel
+      @grids(@_visibleLevel).draw()
+    @_visibleLevel
+      
+  visibleGrid: ->
+    @grids(@visibleLevel())
 
   buildMap: (div) ->
     initialOptions = { zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP }
@@ -42,6 +49,8 @@ window.Jeocrowd =
     configurationElement = document.getElementById 'jeocrowd_config'
     @config.search = JSON.parse configurationElement.innerHTML if configurationElement
     if @config.search.phase == 'exploratory'
+      @visibleLevel(0)
+      @visibleLayer('neighbors')
       @grids(0).addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
       @grids(0).draw()
     else if @config.search.phase == 'refinement'

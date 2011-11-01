@@ -7,89 +7,39 @@ COORDINATE_SEPARATOR = '^';
 class window.Tile
     
   constructor: (@level, id...) ->
-    if (id.length == 1)
+    @grid = Jeocrowd.grids(@level)
+    if id.length == 1
       @id = id[0]
       [@gridLat, @gridLon] = id[0].split COORDINATE_SEPARATOR
-      @gridLat = parseFloat @gridLat
-      @gridLon = parseFloat @gridLon
+      @gridLat = @grid.digitizeCoordinate(parseFloat @gridLat)
+      @gridLon = @grid.digitizeCoordinate(parseFloat @gridLon)
     else if id.length == 2
       @id = id[0] + '^' + id[1]
-      @gridLat = parseFloat id[0]
-      @gridLon = parseFloat id[1]
+      @gridLat = @grid.digitizeCoordinate(if typeof id[0] == 'string' then parseFloat id[0] else id[0])
+      @gridLon = @grid.digitizeCoordinate(if typeof id[1] == 'string' then parseFloat id[1] else id[1])
     @degree = 0
     @points = []
+    @className = 'Tile'
+  
     
   toJSON: (withoutID) ->
     json = {'id': @id, 'degree': @degree}
     json.points = @points if @points.length > 0
     delete(json.id) if (withoutID)
     json
+  
       
   addPoint: (point) ->
-    if @points.indexOf point.url == -1
+    $('#current_input_tile_value').text(@id)
+    result = if @points.indexOf point.url == -1
       @points.push point.url
       @degree++
       true
     else
       false
-      
-  #
-  # ---- ---- NEIGHBORS ---- ----
-  #
-
-  # GridCell.prototype.getNeighborIds =
-  #   function GridCell_getNeighborIds() {
-  #     if (this.neighborIds == null) {
-  #       var addMe = this.grid.step + this.grid.step / 2;
-  #       var subMe = this.grid.step / 2;
-  #       var topLeft      = this.grid.digitizeCoordinates(this.gridLat + addMe, this.gridLon - subMe);
-  #       var top          = this.grid.digitizeCoordinates(this.gridLat + addMe, this.gridLon);
-  #       var topRight     = this.grid.digitizeCoordinates(this.gridLat + addMe, this.gridLon + addMe);
-  #       var right        = this.grid.digitizeCoordinates(this.gridLat, this.gridLon + addMe);
-  #       var bottomRight  = this.grid.digitizeCoordinates(this.gridLat - subMe, this.gridLon + addMe);
-  #       var bottom       = this.grid.digitizeCoordinates(this.gridLat - subMe, this.gridLon);
-  #       var bottomLeft   = this.grid.digitizeCoordinates(this.gridLat - subMe, this.gridLon - subMe);
-  #       var left         = this.grid.digitizeCoordinates(this.gridLat, this.gridLon - subMe);
-  #       this.neighborIds = [topLeft, top, topRight, right, bottomRight, bottom, bottomLeft, left];
-  #     }
-  # 
-  #     return this.neighborIds;
-  #   }
-  # 
-  # 
-  # GridCell.prototype.getSquareNeighborIds =
-  #   function GridCell_getSquareNeighborIds() {
-  #     if (this.squareNeighborIds == null) {
-  #       var n = this.getNeighborIds();
-  #       this.squareNeighborIds = [n[1], n[3], n[5], n[7]];
-  #     }
-  # 
-  #     return this.squareNeighborIds;
-  #   }
-  # 
-  # 
-  # GridCell.prototype.getNeighbors = 
-  #   function GridCell_getNeighbors(includeNotInGrid) {
-  #     this.neighbors = new CellCollection();
-  #     this.neighbors.addMultiple(this.getNeighborIds(), this.grid.cells, includeNotInGrid, this.grid);
-  # 
-  #     return this.neighbors;
-  #   }
-  # 
-  # 
-  # GridCell.prototype.getSquareNeighbors = 
-  #   function GridCell_getSquareNeighbors(includeNotInGrid) {
-  #     this.neighbors = new CellCollection();
-  #     this.neighbors.addMultiple(this.getSquareNeighborIds(), this.grid.cells, includeNotInGrid, this.grid);
-  # 
-  #     return this.neighbors;
-  #   }
-
-
-  getNeighborCount: ->
-    #@getNeighbors().size()
-    0
-      
+    $('#current_input_tile_value').text('')
+    result
+        
   #
   # ---- ---- VISUAL DESIGN ---- ----
   #
@@ -174,7 +124,6 @@ class window.Tile
     #     this.visualCross2.setMap(display == false ? null : this.grid.application.map);
     #   }
 
-
   undraw: ->
     @visual.setMap(null) if @visual
 
@@ -208,3 +157,121 @@ class window.Tile
 
   shouldDisplay: ->
     true
+  
+  #
+  # ---- ---- NEIGHBORS ---- ----
+  #
+
+  getNeighborIds: ->
+    if @neighborIds == undefined
+      addMe = @grid.step() + (@grid.step() / 2)
+      subMe = @grid.step() / 2
+      topLeft      = @grid.digitizeCoordinates @gridLat + addMe,  @gridLon - subMe
+      top          = @grid.digitizeCoordinates @gridLat + addMe,  @gridLon     
+      topRight     = @grid.digitizeCoordinates @gridLat + addMe,  @gridLon + addMe
+      right        = @grid.digitizeCoordinates @gridLat,          @gridLon + addMe
+      bottomRight  = @grid.digitizeCoordinates @gridLat - subMe,  @gridLon + addMe
+      bottom       = @grid.digitizeCoordinates @gridLat - subMe,  @gridLon
+      bottomLeft   = @grid.digitizeCoordinates @gridLat - subMe,  @gridLon - subMe
+      left         = @grid.digitizeCoordinates @gridLat,          @gridLon - subMe
+      @neighborIds = [topLeft, top, topRight, right, bottomRight, bottom, bottomLeft, left]
+    @neighborIds
+
+
+  getSquareNeighborIds: ->
+    if @squareNeighborIds == undefined
+      n = @getNeighborIds()
+      @squareNeighborIds = [n[1], n[3], n[5], n[7]]
+    @squareNeighborIds
+
+
+  getNeighbors: (force) ->
+    @neighbors = new TileCollection()
+    @neighbors.copyFrom @getNeighborIds(), @grid.tiles, if force then @grid.level else null
+    @neighbors
+
+
+  getSquareNeighbors: (force) ->
+    @squareNeighbors = new TileCollection()
+    @squareNeighbors.copyFrom @getSquareNeighborIds(), @grid.tiles, if force then @grid.level else null
+    @squareNeighbors
+
+
+  getNeighborCount: ->
+    @getNeighbors().size()
+
+
+
+  # 
+  # ---- ---- PARENTS, CHILDREN and SIBLINGS ---- ----
+  # 
+  
+  atLeastOne: ->
+    @getSiblings().size() >= 1
+
+  atLeastTwo: ->
+    @getSiblings().size() >= 2
+
+  toParent: (algorithm) ->
+    aboveGrid = Jeocrowd.grids @grid.level + 1
+    if algorithm.apply this # algorithm used to decide growing up or not, eg atLeastOne, atLeastTwo... etc...
+      degree = 0
+      points = []
+      @getSiblings().each (child) ->
+        degree += child.degree;
+        points.push point for point in child.points
+      aboveGrid = Jeocrowd.grids(@grid.level + 1)
+      aboveGrid.addTile aboveGrid.digitizeCoordinates(@gridLat, @gridLon), degree, points
+    else
+      null
+      
+  getParent: (force) ->
+    aboveGrid = Jeocrowd.grids @grid.level + 1
+    parentId = aboveGrid.digitizeCoordinates(@gridLat, @gridLon)
+    parent = aboveGrid.getTile parentId
+    if force && parent == null
+      parent = new Tile aboveGrid.level, parentId
+    parent
+    
+  getChildrenIds: (force) ->
+    return null if @grid.level == 0
+    belowGrid = Jeocrowd.grids @grid.level - 1
+    if @allChildrenIds == undefined
+      @allChildrenIds = []
+      vChild = new Tile belowGrid.level, @gridLat, @gridLon
+      (
+        [lat, lon] = vChildId.split COORDINATE_SEPARATOR
+        hChild = new Tile belowGrid.level, lat, lon
+        @allChildrenIds.push hChildId for hChildId in hChild.getHorizontalNeighborIds LEVEL_MULTIPLIER - 1
+      ) for vChildId in vChild.getVerticalNeighborIds LEVEL_MULTIPLIER - 1
+    @childrenIds = @allChildrenIds.map (id, index, ids) ->
+      if belowGrid.getTile(id) || force then id else null
+    
+  getChildren: (force) ->
+    @children = new TileCollection()
+    @children.copyFrom @getChildrenIds(force), @grid.tiles, if force then @grid.level else null
+    @children
+    
+  getSiblingsIds: (force) ->
+    @getParent(true).getChildrenIds(force)
+    
+  getSiblings: (force) ->
+    @siblings = new TileCollection()
+    @siblings.copyFrom @getSiblingsIds(force), @grid.tiles, if force then @grid.level else null
+    @siblings
+    
+  getVerticalNeighborIds: (afar) ->
+    @grid.digitizeCoordinates(@gridLat + @grid.step() * i + @grid.step() / 2, @gridLon) for i in [0..afar]
+  
+  getHorizontalNeighborIds: (afar) ->
+    @grid.digitizeCoordinates(@gridLat, @grid.step() * i + @grid.step() / 2 + @gridLon) for i in [0..afar]
+
+  
+
+
+
+
+
+
+
+

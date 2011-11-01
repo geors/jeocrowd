@@ -6,7 +6,7 @@
         <div id="keywords_label" class="label">
           <%= f.label :keywords %>
         </div>
-        <div id="keywords_control" class="control text_box">
+        <div id="keywords_control" class="value">
           <div>
             <%= f.text_field :keywords, :class => "text_box" %>
             <%= f.submit "Search" %>
@@ -15,32 +15,32 @@
       <% end %>
     </div>
     
-    <%= search_option "Search phase" do %>
+    <%= search_option "search_phase" do %>
       <%= @search.phase %>
     <% end %>
 
-    <%= search_option "Layer" do %>
+    <%= search_option "layer" do %>
       <%= select_tag :layer, options_for_select([["neighbor hitmap", "neighbor"], ["degree hitmap", "degree"]]) %>
     <% end %>
 
-    <%= search_option "Level" do %>
+    <%= search_option "level" do %>
       <%= select_tag :level, options_for_select((0..6).entries.map { |i|
           ["Level #{i} (#{number_to_human 50*5**i, :units => {:unit => "m", :thousand => "km"}})", i]}) %>
     <% end %>
     
-    <%= search_option "Available points" do %>
+    <%= search_option "available_points" do %>
       <%= @search.statistics["available_points"] %>
     <% end %>
 
-    <%= search_option "Visible points" do %>
+    <%= search_option "visible_points" do %>
       <%= @search.statistics["visible_points"] %>
     <% end %>
 
-    <%= search_option "Visible cells" do %>
-      <%= @search.statistics["visible_cells"] %>
+    <%= search_option "visible_tiles" do %>
+      <%= @search.statistics["visible_tiles"] %>
     <% end %>
 
-    <%= search_option "Hottest cells" do %>
+    <%= search_option "hottest_tiles" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     
@@ -50,27 +50,71 @@
       </div>
     </div>
     
-    <%= search_option "Degree range" do %>
+    <%= search_option "degree_range" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     
-    <%= search_option "Neighbor range" do %>
+    <%= search_option "neighbor_range" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     
-    <%= search_option "Selected cell" do %>
+    <%= search_option "selected_tile" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     
-    <%= search_option "Selected cell degree" do %>
+    <%= search_option "selected_tile_degree" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     
-    <%= search_option "Selected cell neighbors" do %>
+    <%= search_option "selected_tile_neighbors" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     
-    <%= search_option "Current input cell" do %>
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "current_input_tile" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>  
+    
+    <%= search_option "exploratory_pages" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     

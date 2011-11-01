@@ -11,11 +11,13 @@ class window.Provider
       url.substring(0, q) + ".js" + url.substring(q)
     @pages = search.pages
     @results = []
+    @className = 'Provider'
+    
     
   callbacks: {}
     
-  # Jeocrowd -> provider -> fetchNextPage -> 
-  #             <exploratory, refinement>Callback -> save<Exploratory, Refinement>Results ->
+  # Jeocrowd -> provider -> fetchNextPage -> <exploratory, refinement>Callback ->
+  # Jeocrowd -> save<Exploratory, Refinement>Results -> 
   #             
 
   computeNextPage: ->
@@ -37,6 +39,7 @@ class window.Provider
   exploratoryCallback: (data, page, callback) ->
     @results[page] = @convertData(data)
     @pages[page] = page
+    $('#exploratory_pages_value').text(JSON.stringify @pages)
     callback.apply Jeocrowd, [@results[page], page]
     
   saveExploratoryResults: (results, page, callback) ->
