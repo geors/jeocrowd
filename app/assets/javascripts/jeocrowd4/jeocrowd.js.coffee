@@ -57,24 +57,25 @@ window.Jeocrowd =
       $('#exploratory_pages_value').text(JSON.stringify @provider().pages)
     else if @config.search.phase == 'refinement'
       @levels = @config.search.levels
-      level = Util.lastMissingFromRange(@levels)
-      if @config.search.rfTiles[level] == null
-        @grids(level + 1).addTile(id, info) for own id, degree of @config.search.rfTiles[level + 1]
-        @grids(level).growDown(Tile.prototype.always)
+      @refinementLevel = Util.lastMissingFromRange(@levels)
+      if @config.search.rfTiles[@refinementLevel] == null
+        @grids(@refinementLevel + 1).addTile(id, info) for own id, degree of @config.search.rfTiles[@refinementLevel + 1]
+        @grids(@refinementLevel).growDown(Tile.prototype.always)
       else
-        @grids(level).addTile(id, info) for own id, degree of @config.search.rfTiles[level]
+        @grids(@refinementLevel).addTile(id, info) for own id, degree of @config.search.rfTiles[@refinementLevel]
       @visibleLayer('neighbors')
-      @visibleLevel(level)
+      @visibleLevel(@refinementLevel)
   
   autoStart: ->
     @config.autoStart || true
     
   resumeSearch: ->
     if @config.search.phase == 'exploratory'
-      next = @provider().fetchNextPage @config.search.keywords, @receiveResults
+      next = @provider().exploratorySearch @config.search.keywords, @receiveResults
       @switchToRefinementPhase() if next == null
     else if @config.search.phase == 'refinement'
-      true
+      next = @provider().refinementSearch @config.search.keywords, @refinementLevel, @receiveResults
+      @gotoPreviousLevel() if next == null
     
   receiveResults: (data, page) ->
     console.log 'hi!'
@@ -83,6 +84,7 @@ window.Jeocrowd =
       @visibleGrid().draw()
       @provider().saveExploratoryResults @grids(0).tiles.toJSON({withoutID: true}), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
+      console.log "here?"
       true
       
   switchToRefinementPhase: ->

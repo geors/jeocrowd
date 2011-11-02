@@ -19,13 +19,16 @@ class window.Provider
   #             
 
   computeNextPage: ->
-    window.Util.firstMissingFromRange(@pages, @maxPage)
+    Util.firstMissingFromRange @pages, @maxPage
+    
+  computeNextBox: (level) ->
+    Util.firstWithZeroDegree Jeocrowd.grids(level).tiles
 
-  fetchNextPage: (keywords, callback) ->
+  exploratorySearch: (keywords, callback) ->
     return null if (page = @computeNextPage()) == null
     @params.page = page + 1
     @params.text = keywords
-    @params.jsoncallback = "Jeocrowd._provider.callbacks.exploratory_page_" + page
+    @params.jsoncallback = 'Jeocrowd._provider.callbacks.exploratory_page_' + page
     @callbacks['exploratory_page_' + page] = (data) -> # called from the global namespace
       Jeocrowd.provider().exploratoryCallback data, page, callback
     try
@@ -33,14 +36,36 @@ class window.Provider
       true
     catch error
       console.log error
-      @fetchNextPage keywords, callback
+      @exploratorySearch keywords, callback
     
+  refinementSearch: (keywords, level, callback) ->
+    return null if (box = @computeNextBox(level)) == null
+    @params.bbox = box.getBoundingBoxString()
+    @params.text = keywords
+    @params.per_page = 1
+    @params.jsoncallback = 'Jeocrowd._provider.callbacks.refinement_level_' + level + '_box_' + box.sanitizedId()
+    @callbacks['refinement_level_' + level + '_box_' + box.sanitizedId()] = (data) -> # called from the global namespace
+      Jeocrowd.provider().refinementCallback data, level, box, callback
+    try
+      jQuery.getScript @apiURL + "?" + jQuery.param(@params)
+      true
+    catch error
+      console.log error
+      @exploratorySearch keywords, callback
+
   exploratoryCallback: (data, page, callback) ->
     data = @convertData(data)
     @pages[page] = page
     $('#exploratory_pages_value').text(JSON.stringify @pages)
     callback.apply Jeocrowd, [data, page]
-    
+
+  refinementCallback: (data, level, box, callback) ->
+    total = data.photos.total
+    total = parseInt total if typeof total == 'string'
+    box.setDegree(total)
+    $('#refinement_boxes_value').text($('#refinement_boxes_value').text() + '.')
+    callback.apply Jeocrowd, [data, level, box]
+
   saveExploratoryResults: (results, page, callback) ->
     data = {}
     data['xpTiles'] = results
@@ -57,7 +82,7 @@ class window.Provider
     data = {}
     data['rfTiles'] = results
     data['level'] = level
-    data['phase'] = 'refinement'
+    data['phase'] = 'refinement' if level == Jeocrowd.maxLevel
     data['maxLevel'] = Jeocrowd.maxLevel if level == Jeocrowd.maxLevel
     jQuery.ajax {
       'url': @serverURL,

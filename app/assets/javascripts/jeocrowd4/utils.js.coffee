@@ -15,3 +15,8 @@ window.Util =
     i-- while(i >= 0 && range[i] != null)
     i
     
+    
+  firstWithZeroDegree: (tileCollection) ->
+    i = 0
+    i++ while tileCollection.values[i] != null && tileCollection.values[i].degree != 0
+    tileCollection.values[i]

@@ -21,6 +21,8 @@ class window.Tile
     @points = []
     @className = 'Tile'
   
+  sanitizedId: ->
+    @id.replace(/[^0-9A-Za-z]/g, "_")
     
   toJSON: (withoutID, withoutPoints) ->
     json = {'id': @id, 'degree': @degree}
@@ -41,6 +43,10 @@ class window.Tile
     $('#current_input_tile_value').text('')
     result
         
+  setDegree: (degree) ->
+    @grid.hottestTile = this if @grid.hottestTile == null || @grid.hottestTile.degree < degree
+    @degree = degree
+    
   #
   # ---- ---- VISUAL DESIGN ---- ----
   #
@@ -55,6 +61,10 @@ class window.Tile
       }
     @boundingBox;
 
+  getBoundingBoxString: ->
+    box = @getBoundingBox();
+    [box.left, box.bottom, box.right, box.top].join()
+  
   draw: ->
     if @visual
       @visual.setOptions {
@@ -231,7 +241,7 @@ class window.Tile
   toChildren: (algorithm) ->
     if algorithm.apply this # algorithm used to decide growing down or not, eg always...
       belowGrid = Jeocrowd.grids @grid.level - 1
-      belowGrid.addTile(childId, null) for childId in @getChildrenIds(true)
+      belowGrid.addTile childId for childId in @getChildrenIds(true)
     else
       null
   
