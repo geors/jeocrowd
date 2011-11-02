@@ -22,10 +22,11 @@ class window.Tile
     @className = 'Tile'
   
     
-  toJSON: (withoutID) ->
+  toJSON: (withoutID, withoutPoints) ->
     json = {'id': @id, 'degree': @degree}
     json.points = @points if @points.length > 0
     delete(json.id) if (withoutID)
+    delete(json.points) if (withoutPoints)
     json
   
       
@@ -151,7 +152,7 @@ class window.Tile
       if @degree > 1000
         1
       else
-        @degree / 1000
+        @degree / 1000.0
     else
       0.75
 
@@ -206,6 +207,9 @@ class window.Tile
   # ---- ---- PARENTS, CHILDREN and SIBLINGS ---- ----
   # 
   
+  always: ->
+    true
+  
   atLeastOne: ->
     @getSiblings().size() >= 1
 
@@ -213,7 +217,6 @@ class window.Tile
     @getSiblings().size() >= 2
 
   toParent: (algorithm) ->
-    aboveGrid = Jeocrowd.grids @grid.level + 1
     if algorithm.apply this # algorithm used to decide growing up or not, eg atLeastOne, atLeastTwo... etc...
       degree = 0
       points = []
@@ -224,7 +227,14 @@ class window.Tile
       aboveGrid.addTile aboveGrid.digitizeCoordinates(@gridLat, @gridLon), degree, points
     else
       null
-      
+  
+  toChildren: (algorithm) ->
+    if algorithm.apply this # algorithm used to decide growing down or not, eg always...
+      belowGrid = Jeocrowd.grids @grid.level - 1
+      belowGrid.addTile(childId, null) for childId in @getChildrenIds(true)
+    else
+      null
+  
   getParent: (force) ->
     aboveGrid = Jeocrowd.grids @grid.level + 1
     parentId = aboveGrid.digitizeCoordinates(@gridLat, @gridLon)

@@ -58,7 +58,8 @@ class SearchesController < ApplicationController
   def update
     @search = Search.find(params[:id])
     @search.updateExploratory(params[:xpTiles], params[:page].to_i) if (params[:xpTiles] && params[:page])
-    @search.save
+    @search.updateRefinement(params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i)) if (params[:rfTiles] && params[:level])    
+    @search.save!
   end
 
   # DELETE /searches/1

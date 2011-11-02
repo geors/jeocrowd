@@ -9,3 +9,9 @@ window.Util =
     else
       null
     
+  lastMissingFromRange: (range) ->
+    return null if range.length == 0
+    i = range.length - 1
+    i-- while(i >= 0 && range[i] != null)
+    i
+    

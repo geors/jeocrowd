@@ -4,15 +4,14 @@ class Search < CouchRest::Model::Base
   property :phase,      String,   :default => "exploratory"
   property :pages,      [Fixnum], :default => []
   property :xpTiles,    Hash,     :default => {}
+  property :levels,     [Fixnum], :default => []  
+  property :rfTiles,    [Hash],   :default => []
   property :statistics, Hash,     :default => {}
-  
   
   def updateExploratory(results, page)
     ActiveRecord::Base.logger.debug "updating from exploratory search... with page #{page}"
-    ActiveRecord::Base.logger.debug pages.inspect
-    self.pages = pages.insert(page, page)
-    ActiveRecord::Base.logger.debug pages.inspect
-    self.xpTiles = xpTiles.merge Hash[results] do |key, new_val, old_val|
+    self.pages[page] = page
+    self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
       if !old_val.nil?
         val = {}
         val["points"] = (new_val["points"] + old_val["points"]).uniq
@@ -20,6 +19,20 @@ class Search < CouchRest::Model::Base
         val
       end
     end
+  end
+  
+  def updateRefinement(results, level, max_level = nil)
+    ActiveRecord::Base.logger.debug "updating from refinement search... with level #{level}"
+    if max_level
+      self.levels = []
+      self.levels[max_level] = max_level
+    end
+    self.phase = "refinement"
+    results.each_pair do |id, degree|
+      results[id] = degree.to_i
+    end
+    self.rfTiles[level] ||= {}
+    self.rfTiles[level] = rfTiles[level].merge Hash[results]
   end
   
 end

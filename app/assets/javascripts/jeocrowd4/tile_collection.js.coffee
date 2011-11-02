@@ -10,7 +10,6 @@ class window.TileCollection
     @collection = {}
     @keys = []
     @values = []
-    @push = @add    # alias for the add function
     @className = 'TileCollection'
   
   size: ->
@@ -29,6 +28,8 @@ class window.TileCollection
       true
     else
       false
+      
+  push: TileCollection.prototype.add
             
   # level for non existing is used when we want dummy tiles for all the ids supplied
   # some of them may not be found
@@ -71,8 +72,12 @@ class window.TileCollection
       ) for tile in @values
     container
   
-  toJSON: ->
+  toJSON: (options) ->
     json = {}
-    json[tile.id] = tile.toJSON(true) for tile in @values # toJSON true, to remove the id
+    json[tile.id] = tile.toJSON(options.withoutID, options.withoutPoints) for tile in @values # toJSON true, to remove the id
     json
-    
+  
+  toSimpleJSON: (key) ->
+    json = {}
+    json[tile.id] = tile[key] for tile in @values # toJSON true, to remove the id
+    json

@@ -1,11 +1,13 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
+MAX_LEVEL = 6
+
 window.Jeocrowd = 
   config: {search: {}, ui: {}}
   
   _grids: null
   grids: (level) ->
-    @_grids ||= [0..6].map (i) ->
+    @_grids ||= [0..MAX_LEVEL].map (i) ->
       new window.Grid(i)
     if level == undefined
       @_grids
@@ -49,20 +51,28 @@ window.Jeocrowd =
     configurationElement = document.getElementById 'jeocrowd_config'
     @config.search = JSON.parse configurationElement.innerHTML if configurationElement
     if @config.search.phase == 'exploratory'
-      @visibleLevel(0)
-      @visibleLayer('neighbors')
       @grids(0).addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
-      @grids(0).draw()
+      @visibleLayer('neighbors')
+      @visibleLevel(0)
+      $('#exploratory_pages_value').text(JSON.stringify @provider().pages)
     else if @config.search.phase == 'refinement'
-      true
-    
+      @levels = @config.search.levels
+      level = Util.lastMissingFromRange(@levels)
+      if @config.search.rfTiles[level] == null
+        @grids(level + 1).addTile(id, info) for own id, degree of @config.search.rfTiles[level + 1]
+        @grids(level).growDown(Tile.prototype.always)
+      else
+        @grids(level).addTile(id, info) for own id, degree of @config.search.rfTiles[level]
+      @visibleLayer('neighbors')
+      @visibleLevel(level)
+  
   autoStart: ->
     @config.autoStart || true
     
   resumeSearch: ->
     if @config.search.phase == 'exploratory'
-      @grids(0).draw
-      @provider().fetchNextPage @config.search.keywords, @receiveResults
+      next = @provider().fetchNextPage @config.search.keywords, @receiveResults
+      @switchToRefinementPhase() if next == null
     else if @config.search.phase == 'refinement'
       true
     
@@ -70,11 +80,35 @@ window.Jeocrowd =
     console.log 'hi!'
     if @config.search.phase == 'exploratory'
       @grids(0).addPoints(data)
-      @grids(0).draw()
-      @provider().saveExploratoryResults(@grids(0).tiles.toJSON(), page, Jeocrowd.resumeSearch)
+      @visibleGrid().draw()
+      @provider().saveExploratoryResults @grids(0).tiles.toJSON({withoutID: true}), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
       true
+      
+  switchToRefinementPhase: ->
+    @config.search.phase = 'refinement'
+    $('#search_phase_value').text('refinement')
+    @maxLevel = @calculateMaxLevel()
+    @grids(@maxLevel).growUp Tile.prototype.atLeastOne
+    @grids(@maxLevel).clearBeforeRefinement()
+    @visibleLevel(@maxLevel)
+    @levels = []
+    @levels[i] = null for i in [0..@maxLevel]
+    @levels[@maxLevel] = @maxLevel
+    @provider().saveRefinementResults @visibleGrid().tiles.toSimpleJSON('degree'), 
+                                      @visibleGrid().level, Jeocrowd.syncWithServer
+  
+  syncWithServer: (newData) ->
+    @resumeSearch()
     
+  calculateMaxLevel: ->
+    @visibleGrid().undraw()
+    grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()
+    @grids(MAX_LEVEL).growUp Tile.prototype.atLeastTwo
+    i = MAX_LEVEL
+    i-- while @grids(i).tiles.size() == 0
+    grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()
+    @maxLevel = i
 
 
 

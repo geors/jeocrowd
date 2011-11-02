@@ -10,9 +10,7 @@ class window.Provider
     else
       url.substring(0, q) + ".js" + url.substring(q)
     @pages = search.pages
-    @results = []
     @className = 'Provider'
-    
     
   callbacks: {}
     
@@ -32,15 +30,16 @@ class window.Provider
       Jeocrowd.provider().exploratoryCallback data, page, callback
     try
       jQuery.getScript @apiURL + "?" + jQuery.param(@params)
+      true
     catch error
       console.log error
       @fetchNextPage keywords, callback
     
   exploratoryCallback: (data, page, callback) ->
-    @results[page] = @convertData(data)
+    data = @convertData(data)
     @pages[page] = page
     $('#exploratory_pages_value').text(JSON.stringify @pages)
-    callback.apply Jeocrowd, [@results[page], page]
+    callback.apply Jeocrowd, [data, page]
     
   saveExploratoryResults: (results, page, callback) ->
     data = {}
@@ -51,7 +50,21 @@ class window.Provider
       'type': 'PUT',
       'data': data,
       'success': (data, xmlhttp, textStatus) ->
-        callback.apply Jeocrowd
+        callback.apply Jeocrowd, [data]
+    }
+    
+  saveRefinementResults: (results, level, callback) ->
+    data = {}
+    data['rfTiles'] = results
+    data['level'] = level
+    data['phase'] = 'refinement'
+    data['maxLevel'] = Jeocrowd.maxLevel if level == Jeocrowd.maxLevel
+    jQuery.ajax {
+      'url': @serverURL,
+      'type': 'PUT',
+      'data': data,
+      'success': (data, xmlhttp, textStatus) ->
+        callback.apply Jeocrowd, [data]
     }
     
   convertData: (data) ->
@@ -62,7 +75,6 @@ class window.Provider
       point.title = p.title
       point.url = "http://farm" + p.farm + ".static.flickr.com/" + p.server + "/" + p.id + "_" + p.secret + ".jpg"
       point
-
     
 # different providers for later expansion
     

@@ -29,7 +29,7 @@ class window.Grid
   addTile: (id, degree, points) ->
     tile = @tiles.get(id) || new Tile(@level, id)
     tile.grid = this
-    tile.degree = degree if degree
+    tile.degree = (if typeof degree == 'string' then parseInt(degree) else degree) if degree
     tile.points = points if points
     @hottestTile = tile if @hottestTile == null || @hottestTile.degree < degree
     if @tiles.add tile
@@ -37,7 +37,8 @@ class window.Grid
       @visibleTilesCounter += 1 if tile.shouldDisplay()
       @pointsCounter += tile.points.length
       @visiblePointsCounter += tile.points.length if tile.shouldDisplay()
-      tile.isNew = true
+    else
+      tile.existing = true
     tile
   
   removeTile: (id) ->
@@ -52,14 +53,14 @@ class window.Grid
   
   addPoints: (data) ->
     @addTile(@digitizeCoordinates(point.latitude, point.longitude)).addPoint(point) for point in data
-    grid.dirty = true for grid in Jeocrowd.grids()
+    grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()
   
   draw: ->
     if @dirty
       if Jeocrowd.config.search.phase == 'exploratory'
         @growUp Tile.prototype.atLeastTwo
-      else if Jeocrowd.config.search.phase == 'refinement'
-        true
+      # else if Jeocrowd.config.search.phase == 'refinement'
+      #   @growUp Tile.prototype.atLeastOne
     @tiles.each 'draw'
     $('#visible_points_value').text(@visiblePointsCounter)
     $('#visible_tiles_value').text(@visibleTilesCounter)
@@ -69,6 +70,18 @@ class window.Grid
   
   growUp: (algorithm) ->
     belowGrid = Jeocrowd.grids(@level - 1)
-    belowGrid.growUp(algorithm) if belowGrid.dirty
-    @tiles = belowGrid.tiles.mapCollection 'toParent', algorithm
+    belowGrid.growUp(algorithm) if (belowGrid.dirty || belowGrid.algorithm != algorithm) && belowGrid.level > 0
+    belowGrid.tiles.each 'toParent', algorithm
+    @dirty = false
+    @algorithm = algorithm
+
+  growDown: (algorithm) ->
+    aboveGrid = Jeocrowd.grids(@level + 1)
+    aboveGrid.growDown(algorithm) if (aboveGrid.dirty || aboveGrid.algorithm != algorithm) && aboveGrid.level > Jeocrowd.maxLevel
+    aboveGrid.tiles.each 'toChildren', algorithm
+    @dirty = false
+    @algorithm = algorithm
+
+  clearBeforeRefinement: ->
+    true
   
