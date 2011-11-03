@@ -16,7 +16,9 @@
     </div>
     
     <%= search_option "search_phase" do %>
-      <%= @search.phase %>
+      <span id='phase'>
+        <%= @search.phase %>
+      </span>
       <%= check_box_tag :running, 1, true %>
     <% end %>
 

@@ -52,9 +52,9 @@ window.Jeocrowd =
     @config.search = JSON.parse configurationElement.innerHTML if configurationElement
     $('#available_points_value').text(@config.search.statistics.total_available_points)
     $('#exploratory_pages_value').text(JSON.stringify @config.search.pages)
+    @visibleLayer('neighbors')
     if @config.search.phase == 'exploratory'
       @grids(0).addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
-      @visibleLayer('neighbors')
       @visibleLevel(0)
     else if @config.search.phase == 'refinement'
       @levels = @config.search.levels
@@ -63,8 +63,7 @@ window.Jeocrowd =
         @gotoBelowLevel()
       else
         @grids(@refinementLevel).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel]
-      @visibleLayer('neighbors')
-      @visibleLevel(@refinementLevel)
+        @visibleLevel(@refinementLevel)
       $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
   
   autoStart: ->
@@ -97,7 +96,7 @@ window.Jeocrowd =
       
   switchToRefinementPhase: ->
     @config.search.phase = 'refinement'
-    $('#search_phase_value').text('refinement')
+    $('#phase').text('refinement')
     @maxLevel = @calculateMaxLevel()
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     @grids(@maxLevel).clearBeforeRefinement()
@@ -105,12 +104,14 @@ window.Jeocrowd =
     @levels = []
     @levels[i] = null for i in [0..@maxLevel]
     @levels[@maxLevel] = @maxLevel
+    @refinementLevel = @maxLevel - 1
     @provider().saveRefinementResults @visibleGrid().tiles.toSimpleJSON('degree'), 
-                                      @visibleGrid().level, Jeocrowd.syncWithServer
+                                      @visibleGrid().level, Jeocrowd.gotoBelowLevel
   
   gotoBelowLevel: ->
     @grids(@refinementLevel + 1).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel + 1]
     @grids(@refinementLevel).growDown(Tile.prototype.always)
+    @visibleLevel(@refinementLevel)
     @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'), 
                                       @refinementLevel, Jeocrowd.syncWithServer
   
