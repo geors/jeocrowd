@@ -57,6 +57,7 @@ class SearchesController < ApplicationController
   # PUT /searches/1.json
   def update
     @search = Search.find(params[:id])
+    @search.statistics[:total_available_points] = params[:total_available_points] if params[:total_available_points]
     @search.updateExploratory(params[:xpTiles], params[:page].to_i) if (params[:xpTiles] && params[:page])
     @search.updateRefinement(params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i)) if (params[:rfTiles] && params[:level])    
     @search.save!

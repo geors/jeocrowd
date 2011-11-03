@@ -42,6 +42,8 @@ div.option {
     display: table-cell;
     height: 25px;
     vertical-align: middle;
+    padding-right: 2px;
+    text-align: right;
     input[type=text] {
       width: 100px;
     }
@@ -49,5 +51,11 @@ div.option {
 }
 
 div.double_width {
-  width: 489px;
+  width: 488px;
+}
+
+div.smaller_value {
+  div.value {
+    font-size: 10px;
+  }
 }

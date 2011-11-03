@@ -50,42 +50,50 @@ window.Jeocrowd =
   loadConfiguration: ->
     configurationElement = document.getElementById 'jeocrowd_config'
     @config.search = JSON.parse configurationElement.innerHTML if configurationElement
+    $('#available_points_value').text(@config.search.statistics.total_available_points)
+    $('#exploratory_pages_value').text(JSON.stringify @config.search.pages)
     if @config.search.phase == 'exploratory'
       @grids(0).addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
       @visibleLayer('neighbors')
       @visibleLevel(0)
-      $('#exploratory_pages_value').text(JSON.stringify @provider().pages)
     else if @config.search.phase == 'refinement'
       @levels = @config.search.levels
       @refinementLevel = Util.lastMissingFromRange(@levels)
       if @config.search.rfTiles[@refinementLevel] == null
-        @grids(@refinementLevel + 1).addTile(id, info) for own id, degree of @config.search.rfTiles[@refinementLevel + 1]
-        @grids(@refinementLevel).growDown(Tile.prototype.always)
+        @gotoBelowLevel()
       else
-        @grids(@refinementLevel).addTile(id, info) for own id, degree of @config.search.rfTiles[@refinementLevel]
+        @grids(@refinementLevel).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel]
       @visibleLayer('neighbors')
       @visibleLevel(@refinementLevel)
+      $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
   
   autoStart: ->
     @config.autoStart || true
     
   resumeSearch: ->
+    return if $('#running:checked').length == 0
     if @config.search.phase == 'exploratory'
       next = @provider().exploratorySearch @config.search.keywords, @receiveResults
       @switchToRefinementPhase() if next == null
     else if @config.search.phase == 'refinement'
       next = @provider().refinementSearch @config.search.keywords, @refinementLevel, @receiveResults
-      @gotoPreviousLevel() if next == null
+      @gotoBelowLevel() if next == null
     
-  receiveResults: (data, page) ->
-    console.log 'hi!'
+  receiveResults: (data, pageOrLevel, box) ->
     if @config.search.phase == 'exploratory'
+      page = pageOrLevel
       @grids(0).addPoints(data)
       @visibleGrid().draw()
+      @map.panTo @visibleGrid().hottestTile.getCenter() if $('#pan_map:checked[value=hottest]').length > 0      
       @provider().saveExploratoryResults @grids(0).tiles.toJSON({withoutID: true}), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
-      console.log "here?"
-      true
+      level = pageOrLevel
+      if box.degree > 0
+        box.draw() if level == @visibleLevel()
+      else
+        box.undraw() if level == @visibleLevel()
+        @grids(level).removeTile box.id
+      @provider().saveRefinementResults box.toSimpleJSON('degree'), level, Jeocrowd.syncWithServer
       
   switchToRefinementPhase: ->
     @config.search.phase = 'refinement'
@@ -100,9 +108,15 @@ window.Jeocrowd =
     @provider().saveRefinementResults @visibleGrid().tiles.toSimpleJSON('degree'), 
                                       @visibleGrid().level, Jeocrowd.syncWithServer
   
+  gotoBelowLevel: ->
+    @grids(@refinementLevel + 1).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel + 1]
+    @grids(@refinementLevel).growDown(Tile.prototype.always)
+    @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'), 
+                                      @refinementLevel, Jeocrowd.syncWithServer
+  
   syncWithServer: (newData) ->
     @resumeSearch()
-    
+  
   calculateMaxLevel: ->
     @visibleGrid().undraw()
     grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()

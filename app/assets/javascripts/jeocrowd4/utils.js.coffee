@@ -15,8 +15,14 @@ window.Util =
     i-- while(i >= 0 && range[i] != null)
     i
     
-    
-  firstWithZeroDegree: (tileCollection) ->
+  firstWithNegativeDegree: (tileCollection) ->
     i = 0
-    i++ while tileCollection.values[i] != null && tileCollection.values[i].degree != 0
-    tileCollection.values[i]
+    i++ while i < tileCollection.values.length && tileCollection.values[i].degree != -1
+    if i < tileCollection.values.length
+      tileCollection.values[i]
+    else
+      null
+      
+  createDelegate: (object, method, params...) ->
+    shim = ->
+      method.apply object, params

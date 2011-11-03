@@ -30,8 +30,11 @@ class window.Grid
     tile = @tiles.get(id) || new Tile(@level, id)
     tile.grid = this
     tile.degree = (if typeof degree == 'string' then parseInt(degree) else degree) if degree
+    tile.status = 'unknown' if degree == -1
     tile.points = points if points
-    @hottestTile = tile if @hottestTile == null || @hottestTile.degree < degree
+    if @hottestTile == null || @hottestTile.degree < degree
+      @hottestTile = tile
+      $('#hottest_tiles_value').text(@hottestTile.id)
     if @tiles.add tile
       @tilesCounter += 1
       @visibleTilesCounter += 1 if tile.shouldDisplay()
@@ -59,8 +62,8 @@ class window.Grid
     if @dirty
       if Jeocrowd.config.search.phase == 'exploratory'
         @growUp Tile.prototype.atLeastTwo
-      # else if Jeocrowd.config.search.phase == 'refinement'
-      #   @growUp Tile.prototype.atLeastOne
+      else if Jeocrowd.config.search.phase == 'refinement'
+        @addTile(id, degree) for own id, degree of Jeocrowd.config.search.rfTiles[@level]
     @tiles.each 'draw'
     $('#visible_points_value').text(@visiblePointsCounter)
     $('#visible_tiles_value').text(@visibleTilesCounter)
@@ -68,6 +71,7 @@ class window.Grid
   undraw: ->
     @tiles.each 'undraw'
   
+  # fills current grid with the parent tiles of the grid below
   growUp: (algorithm) ->
     belowGrid = Jeocrowd.grids(@level - 1)
     belowGrid.growUp(algorithm) if (belowGrid.dirty || belowGrid.algorithm != algorithm) && belowGrid.level > 0
@@ -75,6 +79,7 @@ class window.Grid
     @dirty = false
     @algorithm = algorithm
 
+  # fills current grid with the children tiles of the grid above
   growDown: (algorithm) ->
     aboveGrid = Jeocrowd.grids(@level + 1)
     aboveGrid.growDown(algorithm) if (aboveGrid.dirty || aboveGrid.algorithm != algorithm) && aboveGrid.level > Jeocrowd.maxLevel
@@ -83,5 +88,18 @@ class window.Grid
     @algorithm = algorithm
 
   clearBeforeRefinement: ->
-    true
-  
+    ids = @tiles.filter('isLoner').map('getId')
+    @removeTile id for id in ids
+    
+  refinementPercent: ->
+    s = @tiles.size()
+    done = @tiles.filter('refined').size()
+    done / s if s > 0
+
+
+
+
+
+
+
+

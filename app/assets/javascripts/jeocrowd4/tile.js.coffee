@@ -21,32 +21,40 @@ class window.Tile
     @points = []
     @className = 'Tile'
   
+  getId: ->
+    @id
+  
   sanitizedId: ->
     @id.replace(/[^0-9A-Za-z]/g, "_")
     
   toJSON: (withoutID, withoutPoints) ->
     json = {'id': @id, 'degree': @degree}
-    json.points = @points if @points.length > 0
+    json.points = @points if @points && @points.length > 0
     delete(json.id) if (withoutID)
     delete(json.points) if (withoutPoints)
     json
-  
+    
+  toSimpleJSON: (key) ->
+    json = {}
+    json[@id] = this[key]
+    json
       
   addPoint: (point) ->
-    $('#current_input_tile_value').text(@id)
-    result = if @points.indexOf point.url == -1
+    if @points.indexOf point.url == -1
       @points.push point.url
       @degree++
       true
     else
       false
-    $('#current_input_tile_value').text('')
-    result
         
   setDegree: (degree) ->
     @grid.hottestTile = this if @grid.hottestTile == null || @grid.hottestTile.degree < degree
+    delete(@status) if degree != 0
     @degree = degree
     
+  refined: ->
+    @degree > 0
+  
   #
   # ---- ---- VISUAL DESIGN ---- ----
   #
@@ -64,6 +72,10 @@ class window.Tile
   getBoundingBoxString: ->
     box = @getBoundingBox();
     [box.left, box.bottom, box.right, box.top].join()
+  
+  getCenter: ->
+    box = @getBoundingBox();
+    new google.maps.LatLng(box.bottom + this.grid.step() / 2, box.left + this.grid.step() / 2)
   
   draw: ->
     if @visual
@@ -88,11 +100,17 @@ class window.Tile
         fillOpacity: @getOpacity(),
         zIndex: 10
       }
-      #google.maps.event.addListener(@visual, "click", createDelegate(this, this.onVisualCellClick));
+      google.maps.event.addListener(@visual, 'click', Util.createDelegate(this, Tile.prototype.visualClicked));
     if @shouldDisplay()
       @visual.setMap Jeocrowd.map
     else
       @visual.setMap null
+      
+  visualClicked: ->
+    @grid.selectedCell = this
+    $('#selected_tile_value').text(@id)
+    $('#selected_tile_degree_value').text(@degree)
+    $('#selected_tile_neighbors_value').text(@getNeighbors().size())
 
     # 
     # GridCell.prototype.highlight =
@@ -141,6 +159,8 @@ class window.Tile
   getColor: ->
     if @status == 'ignored'
       '#AAAAAA'
+    else if @status == 'unknown'
+      '#DDDDDD'
     else if Jeocrowd.visibleLayer() == 'degree'
       '#FF0000'
     else
@@ -199,19 +219,20 @@ class window.Tile
   getNeighbors: (force) ->
     @neighbors = new TileCollection()
     @neighbors.copyFrom @getNeighborIds(), @grid.tiles, if force then @grid.level else null
-    @neighbors
+    @neighbors.filter 'refined'
 
 
   getSquareNeighbors: (force) ->
     @squareNeighbors = new TileCollection()
     @squareNeighbors.copyFrom @getSquareNeighborIds(), @grid.tiles, if force then @grid.level else null
-    @squareNeighbors
+    @squareNeighbors.filter 'refined'
 
 
   getNeighborCount: ->
     @getNeighbors().size()
 
-
+  isLoner: ->
+    @getNeighbors().size() == 0
 
   # 
   # ---- ---- PARENTS, CHILDREN and SIBLINGS ---- ----
@@ -241,7 +262,7 @@ class window.Tile
   toChildren: (algorithm) ->
     if algorithm.apply this # algorithm used to decide growing down or not, eg always...
       belowGrid = Jeocrowd.grids @grid.level - 1
-      belowGrid.addTile childId for childId in @getChildrenIds(true)
+      belowGrid.addTile childId, -1 for childId in @getChildrenIds(true) # children given -1 as initial degree
     else
       null
   

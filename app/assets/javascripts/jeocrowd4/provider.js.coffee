@@ -22,7 +22,7 @@ class window.Provider
     Util.firstMissingFromRange @pages, @maxPage
     
   computeNextBox: (level) ->
-    Util.firstWithZeroDegree Jeocrowd.grids(level).tiles
+    Util.firstWithNegativeDegree Jeocrowd.grids(level).tiles
 
   exploratorySearch: (keywords, callback) ->
     return null if (page = @computeNextPage()) == null
@@ -40,6 +40,8 @@ class window.Provider
     
   refinementSearch: (keywords, level, callback) ->
     return null if (box = @computeNextBox(level)) == null
+    $('#current_input_tile_value').text(box.id)
+    Jeocrowd.map.panTo box.getCenter() if $('#pan_map:checked[value=input]').length > 0
     @params.bbox = box.getBoundingBoxString()
     @params.text = keywords
     @params.per_page = 1
@@ -54,16 +56,18 @@ class window.Provider
       @exploratorySearch keywords, callback
 
   exploratoryCallback: (data, page, callback) ->
-    data = @convertData(data)
+    newData = @convertData(data)
     @pages[page] = page
+    $('#available_points_value').text(data.photos.total)
+    @saveTotalAvailablePoints(data.photos.total)
     $('#exploratory_pages_value').text(JSON.stringify @pages)
-    callback.apply Jeocrowd, [data, page]
+    callback.apply Jeocrowd, [newData, page]
 
   refinementCallback: (data, level, box, callback) ->
     total = data.photos.total
     total = parseInt total if typeof total == 'string'
-    box.setDegree(total)
-    $('#refinement_boxes_value').text($('#refinement_boxes_value').text() + '.')
+    box.setDegree total
+    $('#refinement_boxes_value').text((Jeocrowd.grids(level).refinementPercent() * 100).toFixed(2) + '%')
     callback.apply Jeocrowd, [data, level, box]
 
   saveExploratoryResults: (results, page, callback) ->
@@ -82,8 +86,9 @@ class window.Provider
     data = {}
     data['rfTiles'] = results
     data['level'] = level
-    data['phase'] = 'refinement' if level == Jeocrowd.maxLevel
-    data['maxLevel'] = Jeocrowd.maxLevel if level == Jeocrowd.maxLevel
+    if level == Jeocrowd.maxLevel
+      data['phase'] = 'refinement' 
+      data['maxLevel'] = Jeocrowd.maxLevel
     jQuery.ajax {
       'url': @serverURL,
       'type': 'PUT',
@@ -91,7 +96,14 @@ class window.Provider
       'success': (data, xmlhttp, textStatus) ->
         callback.apply Jeocrowd, [data]
     }
-    
+
+  saveTotalAvailablePoints: (total) ->
+    jQuery.ajax {
+      'url': @serverURL,
+      'type': 'PUT',
+      'data': {'total_available_points': total}
+    }
+  
   convertData: (data) ->
     points = data.photos.photo.map (p) ->
       point = {}

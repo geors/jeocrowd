@@ -33,6 +33,7 @@ class Search < CouchRest::Model::Base
     end
     self.rfTiles[level] ||= {}
     self.rfTiles[level] = rfTiles[level].merge Hash[results]
+    self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
   end
   
 end

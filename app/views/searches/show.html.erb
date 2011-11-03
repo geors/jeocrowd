@@ -17,6 +17,7 @@
     
     <%= search_option "search_phase" do %>
       <%= @search.phase %>
+      <%= check_box_tag :running, 1, true %>
     <% end %>
 
     <%= search_option "layer" do %>
@@ -70,51 +71,55 @@
       <%= @search.statistics["degrees"] %>
     <% end %>
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option "current_input_tile", "smaller_value" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option "pan_map_to_input_cell" do %>
+      <%= check_box_tag :pan_map, 'input', false %>
+    <% end %>  
+    
+    <%= search_option "pan_map_to_hottest_cell" do %>
+      <%= check_box_tag :pan_map, 'hottest', false %>
+    <% end %>  
+    
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
-    <%= search_option "current_input_tile" do %>
-      <%= @search.statistics["degrees"] %>
-    <% end %>  
-    
-    <%= search_option "current_input_tile" do %>
-      <%= @search.statistics["degrees"] %>
-    <% end %>  
-    
-    <%= search_option "current_input_tile" do %>
+    <%= search_option " " do %>
       <%= @search.statistics["degrees"] %>
     <% end %>  
     
     <%= search_option "exploratory_pages", "double_width" do %>
+      <%= @search.statistics["degrees"] %>
+    <% end %>
+    
+    <%= search_option "refinement_boxes", "double_width" do %>
       <%= @search.statistics["degrees"] %>
     <% end %>
     

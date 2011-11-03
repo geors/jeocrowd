@@ -30,7 +30,17 @@ class window.TileCollection
       false
       
   push: TileCollection.prototype.add
-            
+  
+  remove: (id) ->
+    if @collection[id] != null 
+      index = @keys.indexOf(id)
+      @keys.splice index, 1
+      @values.splice index, 1
+      delete @collection[id]
+      return true;
+    else
+      return false;
+  
   # level for non existing is used when we want dummy tiles for all the ids supplied
   # some of them may not be found
   copyFrom: (ids, collection, levelForNonExisting) ->
@@ -71,13 +81,27 @@ class window.TileCollection
         container.push r if r
       ) for tile in @values
     container
+    
+  filter: (func, params...) ->
+    container = new TileCollection()
+    if typeof func == 'string'
+      (
+        r = Tile.prototype[func].apply(tile, params)
+        container.push tile if r
+      ) for tile in @values
+    else if typeof func == 'function'
+      (
+        r = func.apply(testTile, params)
+        container.push tile if r
+      ) for tile in @values
+    container
   
   toJSON: (options) ->
     json = {}
-    json[tile.id] = tile.toJSON(options.withoutID, options.withoutPoints) for tile in @values # toJSON true, to remove the id
+    json[tile.id] = tile.toJSON(options.withoutID, options.withoutPoints) for tile in @values
     json
   
   toSimpleJSON: (key) ->
     json = {}
-    json[tile.id] = tile[key] for tile in @values # toJSON true, to remove the id
+    json[tile.id] = tile[key] for tile in @values
     json
