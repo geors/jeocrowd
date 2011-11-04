@@ -45,6 +45,7 @@ class window.Grid
     tile
   
   removeTile: (id) ->
+    @tiles.get(id).undraw() if @tiles.get(id) 
     @tiles.remove(id)
     
   getTile: (id...) ->
@@ -88,7 +89,7 @@ class window.Grid
     @algorithm = algorithm
 
   clearBeforeRefinement: ->
-    ids = @tiles.filter('isLoner').map('getId')
+    ids = @tiles.filter('willBeRemoved').map('getId')
     @removeTile id for id in ids
     
   refinementPercent: ->

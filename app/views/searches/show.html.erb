@@ -19,7 +19,7 @@
       <span id='phase'>
         <%= @search.phase %>
       </span>
-      <%= check_box_tag :running, 1, true %>
+      <%= check_box_tag :running, 1, params[:display].nil? %>
     <% end %>
 
     <%= search_option "layer" do %>
@@ -78,11 +78,11 @@
     <% end %>  
     
     <%= search_option "pan_map_to_input_cell" do %>
-      <%= check_box_tag :pan_map, 'input', false %>
+      <%= check_box_tag :pan_map, 'input', true %>
     <% end %>  
     
     <%= search_option "pan_map_to_hottest_cell" do %>
-      <%= check_box_tag :pan_map, 'hottest', false %>
+      <%= check_box_tag :pan_map, 'hottest', true %>
     <% end %>  
     
     <%= search_option " " do %>

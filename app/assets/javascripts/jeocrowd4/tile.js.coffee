@@ -106,8 +106,12 @@ class window.Tile
     else
       @visual.setMap null
       
+  drawNeighborhood: ->
+    @draw()
+    @getNeighbors().each 'draw'
+    
   visualClicked: ->
-    @grid.selectedCell = this
+    @grid.selectedTile = this
     $('#selected_tile_value').text(@id)
     $('#selected_tile_degree_value').text(@degree)
     $('#selected_tile_neighbors_value').text(@getNeighbors().size())
@@ -219,13 +223,13 @@ class window.Tile
   getNeighbors: (force) ->
     @neighbors = new TileCollection()
     @neighbors.copyFrom @getNeighborIds(), @grid.tiles, if force then @grid.level else null
-    @neighbors.filter 'refined'
+    @neighbors.filter 'refined'           # do not include neighbors with zero degree
 
 
   getSquareNeighbors: (force) ->
     @squareNeighbors = new TileCollection()
     @squareNeighbors.copyFrom @getSquareNeighborIds(), @grid.tiles, if force then @grid.level else null
-    @squareNeighbors.filter 'refined'
+    @squareNeighbors.filter 'refined'     # do not include neighbors with zero degree
 
 
   getNeighborCount: ->
@@ -233,7 +237,11 @@ class window.Tile
 
   isLoner: ->
     @getNeighbors().size() == 0
-
+    
+  willBeRemoved: ->
+    @isLoner() || @degree < 0.05 * @grid.hottestTile.degree
+    
+  
   # 
   # ---- ---- PARENTS, CHILDREN and SIBLINGS ---- ----
   # 

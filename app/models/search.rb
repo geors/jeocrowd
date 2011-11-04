@@ -8,6 +8,10 @@ class Search < CouchRest::Model::Base
   property :rfTiles,    [Hash],   :default => []
   property :statistics, Hash,     :default => {}
   
+  design do
+    view :by_keywords
+  end
+  
   def updateExploratory(results, page)
     ActiveRecord::Base.logger.debug "updating from exploratory search... with page #{page}"
     self.pages[page] = page
@@ -26,6 +30,8 @@ class Search < CouchRest::Model::Base
     if max_level
       self.levels = []
       self.levels[max_level] = max_level
+    else
+      self.levels[level + 1] = level + 1 if level < levels.length
     end
     self.phase = "refinement"
     results.each_pair do |id, degree|

@@ -1,7 +1,8 @@
 <div class="search_item">
-  <%= link_to search.keywords, search %>
+  <%= search.attributes.reject { |a| a =~ /tiles/i }.inspect %><br/>
+  <%= link_to "[continue]", search %>
   <%= link_to "[just show]", search_path(search, :display => 1) %>
-  <%= link_to "[restart]", search_path(search, :restart => 1) %>
-  <%= link_to "[x]", search, :method => :delete, :alert => "Are you sure?" %><br/>
-  <%= search.attributes.inspect %>
+  <%= link_to "[restart exploratory]", search_path(search, :restart_exploratory => 1) %>
+  <%= link_to "[restart refinement]", search_path(search, :restart_refinement => 1) %>
+  <%= link_to "[x]", search, :method => :delete, :alert => "Are you sure?" %>
 </div>

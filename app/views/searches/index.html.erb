@@ -1,6 +1,9 @@
 <div class="searches_header">
   <h1>Listing searches</h1>
 </div>
+<div class="nav">
+  <%= link_to 'New search', new_search_path %>
+</div>
 <div class="searches_list">
   <% @searches.each do |search| %>
     <%= render search %>
