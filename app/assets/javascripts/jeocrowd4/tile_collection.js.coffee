@@ -65,7 +65,7 @@ class window.TileCollection
     if typeof func == 'string'
       container.push Tile.prototype[func].apply(tile, params) for tile in @values
     else if typeof func == 'function'
-      container.push func.apply(testTile, params) for tile in @values
+      container.push func.apply(tile, params) for tile in @values
     container
 
   mapCollection: (func, params...) ->

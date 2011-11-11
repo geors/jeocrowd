@@ -44,7 +44,7 @@ window.Jeocrowd =
     @grids(@visibleLevel())
 
   buildMap: (div) ->
-    initialOptions = { zoom: 12, mapTypeId: google.maps.MapTypeId.ROADMAP }
+    initialOptions = { zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP }
     initialLocation = new google.maps.LatLng 37.97918, 23.716647
     if placeholder = document.getElementById div 
       @map = new google.maps.Map placeholder, initialOptions 
@@ -107,8 +107,12 @@ window.Jeocrowd =
     $('#phase').text('refinement')
     @maxLevel = @calculateMaxLevel()
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
-    @grids(@maxLevel).clearBeforeRefinement()
     @visibleLevel(@maxLevel)
+    @map.panTo @visibleGrid().hottestTile.getCenter()
+    @grids(@maxLevel).clearBeforeRefinement true, ->  # true: display cells to be removed
+      Jeocrowd.continueSwitchToRefinementPhase()
+    
+  continueSwitchToRefinementPhase: ->
     @levels = []
     @levels[i] = null for i in [0..@maxLevel]
     @levels[@maxLevel] = @maxLevel
@@ -123,7 +127,13 @@ window.Jeocrowd =
       return
     @levels[@refinementLevel + 1] = @refinementLevel + 1  # mark above level as complete
     @grids(@refinementLevel + 1).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel + 1]
-    @grids(@refinementLevel + 1).clearBeforeRefinement() if (@refinementLevel + 1 != @maxLevel)
+    if (@refinementLevel + 1 != @maxLevel)
+      @grids(@refinementLevel + 1).clearBeforeRefinement true, ->
+        Jeocrowd.continueGotoBelowLevel()
+    else
+      @continueGotoBelowLevel()
+    
+  continueGotoBelowLevel: ->
     @grids(@refinementLevel).growDown(Tile.prototype.always)
     @visibleLevel(@refinementLevel)
     @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'), 

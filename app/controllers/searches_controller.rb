@@ -16,7 +16,7 @@ class SearchesController < ApplicationController
       @search.statistics
       @search.save
     elsif params[:restart_refinement] && @search.phase != "exploratory"
-      @search.phase = "refinement"
+      @search.phase = "exploratory"
       @search.levels = []
       @search.rfTiles = []
       @search.statistics

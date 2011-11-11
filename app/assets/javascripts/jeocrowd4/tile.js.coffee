@@ -42,13 +42,16 @@ class window.Tile
   addPoint: (point) ->
     if @points.indexOf point.url == -1
       @points.push point.url
-      @degree++
+      @setDegree @degree + 1
       true
     else
       false
         
   setDegree: (degree) ->
-    @grid.hottestTile = this if @grid.hottestTile == null || @grid.hottestTile.degree < degree
+    if @grid.hottestTile == null || @grid.hottestTile.degree < degree
+      @grid.hottestTile = this 
+      $('#hottest_tiles_value').text(@id)
+      $('#hottest_tiles_degree_value').text(degree)
     delete(@status) if degree != 0
     @degree = degree
     
@@ -116,49 +119,47 @@ class window.Tile
     $('#selected_tile_degree_value').text(@degree)
     $('#selected_tile_neighbors_value').text(@getNeighbors().size())
 
-    # 
-    # GridCell.prototype.highlight =
-    #   function Grid_highlight(display) {
-    #     this.visualBounds = this.visualBounds || new google.maps.Rectangle({
-    #       bounds: new google.maps.LatLngBounds(
-    #         new google.maps.LatLng(this.getBoundingBox().bottom, this.getBoundingBox().left),
-    #         new google.maps.LatLng(this.getBoundingBox().top, this.getBoundingBox().right)
-    #         ),
-    #       fillOpacity: 0,
-    #       zIndex: 20
-    #     });
-    #     this.visualBounds.setMap(display == false ? null : this.grid.application.map);
-    #   }
-    # 
-    # 
-    # GridCell.prototype.highlight2 =
-    #   function Grid_highlight(display) {
-    #     this.visualCross1 = this.visualCross1 || new google.maps.Polygon({
-    #       paths: [
-    #       new google.maps.LatLng(this.getBoundingBox().top, this.getBoundingBox().left),
-    #       new google.maps.LatLng(this.getBoundingBox().bottom, this.getBoundingBox().right)
-    #       ],
-    #       strokeOpacity: 0.8,
-    #       strokeWeight: 1,
-    #       fillOpacity: 0,
-    #       zIndex: 20
-    #     });
-    #     this.visualCross2 = this.visualCross2 || new google.maps.Polygon({
-    #       paths: [
-    #       new google.maps.LatLng(this.getBoundingBox().top, this.getBoundingBox().right),
-    #       new google.maps.LatLng(this.getBoundingBox().bottom, this.getBoundingBox().left)
-    #       ],
-    #       strokeOpacity: 0.8,
-    #       strokeWeight: 1,
-    #       fillOpacity: 0,
-    #       zIndex: 20
-    #     });
-    #     this.visualCross1.setMap(display == false ? null : this.grid.application.map);
-    #     this.visualCross2.setMap(display == false ? null : this.grid.application.map);
-    #   }
+    
+  highlight: (display) ->
+    @visualBounds = @visualBounds || new google.maps.Rectangle({
+      bounds: new google.maps.LatLngBounds(
+        new google.maps.LatLng(@getBoundingBox().bottom, @getBoundingBox().left),
+        new google.maps.LatLng(@getBoundingBox().top, @getBoundingBox().right)
+      ),
+      fillOpacity: 0,
+      zIndex: 20
+    })
+    @visualBounds.setMap(if display then Jeocrowd.map else null)
+
+    
+  highlight2: (display) ->
+    @visualCross1 = @visualCross1 || new google.maps.Polygon({
+      paths: [
+        new google.maps.LatLng(@getBoundingBox().top, @getBoundingBox().left),
+        new google.maps.LatLng(@getBoundingBox().bottom, @getBoundingBox().right)
+      ],
+      strokeOpacity: 0.8,
+      strokeWeight: 1,
+      fillOpacity: 0,
+      zIndex: 20
+    })
+    @visualCross2 = @visualCross2 || new google.maps.Polygon({
+      paths: [
+        new google.maps.LatLng(this.getBoundingBox().top, this.getBoundingBox().right),
+        new google.maps.LatLng(this.getBoundingBox().bottom, this.getBoundingBox().left)
+      ],
+      strokeOpacity: 0.8,
+      strokeWeight: 1,
+      fillOpacity: 0,
+      zIndex: 20
+    })
+    @visualCross1.setMap(if display then Jeocrowd.map else null)
+    @visualCross2.setMap(if display then Jeocrowd.map else null)
+
 
   undraw: ->
     @visual.setMap(null) if @visual
+
 
   getColor: ->
     if @status == 'ignored'

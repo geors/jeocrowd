@@ -29,12 +29,9 @@ class window.Grid
   addTile: (id, degree, points) ->
     tile = @tiles.get(id) || new Tile(@level, id)
     tile.grid = this
-    tile.degree = (if typeof degree == 'string' then parseInt(degree) else degree) if degree
-    tile.status = 'unknown' if degree == -1
+    tile.setDegree(if typeof degree == 'string' then parseInt(degree) else degree) if degree
+    tile.status = 'unknown' if tile.degree == -1
     tile.points = points if points
-    if @hottestTile == null || @hottestTile.degree < degree
-      @hottestTile = tile
-      $('#hottest_tiles_value').text(@hottestTile.id)
     if @tiles.add tile
       @tilesCounter += 1
       @visibleTilesCounter += 1 if tile.shouldDisplay()
@@ -88,9 +85,17 @@ class window.Grid
     @dirty = false
     @algorithm = algorithm
 
-  clearBeforeRefinement: ->
-    ids = @tiles.filter('willBeRemoved').map('getId')
-    @removeTile id for id in ids
+  clearBeforeRefinement: (showProgress = false, callback = null) ->
+    if showProgress
+      ids = @tiles.filter('willBeRemoved').each('highlight2', true)
+      thisGrid = this
+      continueFunc = -> thisGrid.clearBeforeRefinement(false, callback)
+      setTimeout continueFunc, 2000
+    else
+      @tiles.filter('willBeRemoved').each('highlight2', false)
+      ids = @tiles.filter('willBeRemoved').map('getId')
+      @removeTile id for id in ids
+      callback() unless callback == null
     
   refinementPercent: ->
     s = @tiles.size()

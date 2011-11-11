@@ -44,7 +44,7 @@
     <% end %>
 
     <%= search_option "hottest_tiles" do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>
     
     <div id="map_wrapper">
@@ -53,28 +53,32 @@
       </div>
     </div>
     
+    <%= search_option "hottest_tiles_degree" do %>
+      <%= "" %>
+    <% end %>
+
     <%= search_option "degree_range" do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>
     
     <%= search_option "neighbor_range" do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>
     
     <%= search_option "selected_tile" do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>
     
     <%= search_option "selected_tile_degree" do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>
     
     <%= search_option "selected_tile_neighbors" do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>
     
     <%= search_option "current_input_tile", "smaller_value" do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>  
     
     <%= search_option "pan_map_to_input_cell" do %>
@@ -83,38 +87,38 @@
     
     <%= search_option "pan_map_to_hottest_cell" do %>
       <%= check_box_tag :pan_map, 'hottest', true %>
+    <% end %>    
+    
+    <%= search_option " " do %>
+      <%= "" %>
     <% end %>  
     
     <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>  
     
     <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>  
     
     <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>  
     
     <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>  
     
     <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
+      <%= "" %>
     <% end %>  
     
-    <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
-    <% end %>  
-    
-    <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
-    <% end %>  
-    
-    <%= search_option " " do %>
-      <%= @search.statistics["degrees"] %>
+    <%= search_option "navigation" do %>
+      <%= link_to image_tag("reload.png", :size => "16x16", :style => "position:absolute; top:2px;"), @search,
+                  :style => "position:relative; display:inline-block; width:16px; height:16px;" %>
+      <%= link_to "[&raquo;XP]".html_safe, search_path(@search, :restart_exploratory => 1) %>
+      <%= link_to "[&raquo;RF]".html_safe, search_path(@search, :restart_refinement => 1) %>
+      <%= link_to "[Back]", searches_path %>
     <% end %>  
     
     <%= search_option "exploratory_pages", "double_width" do %>
