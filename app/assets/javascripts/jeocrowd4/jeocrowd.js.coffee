@@ -2,7 +2,7 @@
 # to do:
 # add parallelization
 # check how we can draw hybrid grids (with tiles from bigger levels!!)
-# check resuming from server in rf mode, golden gate park
+# add highcharts for cell degree distribution
 
 MAX_LEVEL = 6
 

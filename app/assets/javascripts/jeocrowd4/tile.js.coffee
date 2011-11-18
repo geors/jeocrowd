@@ -25,7 +25,10 @@ class window.Tile
     @id
   
   sanitizedId: ->
-    @id.replace(/[^0-9A-Za-z]/g, "_")
+    @id.replace(/[^0-9A-Za-z]/g, '_')
+    
+  linkTo: ->
+    '<a href="#' + @id + '" class="pan_map_to_href">' + @id + '</a>'
     
   toJSON: (withoutID, withoutPoints) ->
     json = {'id': @id, 'degree': @degree}
@@ -50,7 +53,7 @@ class window.Tile
   setDegree: (degree) ->
     if @grid.hottestTile == null || @grid.hottestTile.degree < degree
       @grid.hottestTile = this 
-      $('#hottest_tiles_value').text(@id)
+      $('#hottest_tiles_value').html(@linkTo())
       $('#hottest_tiles_degree_value').text(degree)
     delete(@status) if degree != 0
     @degree = degree
@@ -115,7 +118,7 @@ class window.Tile
     
   visualClicked: ->
     @grid.selectedTile = this
-    $('#selected_tile_value').text(@id)
+    $('#selected_tile_value').html(@linkTo())
     $('#selected_tile_degree_value').text(@degree)
     $('#selected_tile_neighbors_value').text(@getNeighbors().size())
 
@@ -153,9 +156,13 @@ class window.Tile
       fillOpacity: 0,
       zIndex: 20
     })
-    @visualCross1.setMap(if display then Jeocrowd.map else null)
-    @visualCross2.setMap(if display then Jeocrowd.map else null)
-
+    if display
+      @visualCross1.setMap Jeocrowd.map
+      @visualCross2.setMap Jeocrowd.map
+    else
+      @visualCross1.setMap null
+      @visualCross2.setMap null
+    
 
   undraw: ->
     @visual.setMap(null) if @visual

@@ -40,7 +40,7 @@ class window.Provider
     
   refinementSearch: (keywords, level, callback) ->
     return null if (box = @computeNextBox(level)) == null
-    $('#current_input_tile_value').text(box.id)
+    $('#current_input_tile_value').html(box.linkTo())
     Jeocrowd.map.panTo box.getCenter() if $('#pan_map:checked[value=input]').length > 0
     @params.bbox = box.getBoundingBoxString()
     @params.text = keywords
