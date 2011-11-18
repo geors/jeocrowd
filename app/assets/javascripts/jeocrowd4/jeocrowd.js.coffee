@@ -3,6 +3,7 @@
 # add parallelization
 # check how we can draw hybrid grids (with tiles from bigger levels!!)
 # add highcharts for cell degree distribution
+#
 
 MAX_LEVEL = 6
 
