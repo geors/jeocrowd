@@ -15,14 +15,11 @@ giveLifeToPage = ->
       Jeocrowd.resumeSearch()
   $('.pan_map_to_href').live('click', ->
     href = $(this).attr('href')
-    [lat, lon] = href.replace('#', '').split(COORDINATE_SEPARATOR)
+    [lat, lon] = href.replace('#', '').split(Jeocrowd.COORDINATE_SEPARATOR)
     [lat, lon] = [parseFloat(lat), parseFloat(lon)]
     point = new google.maps.LatLng lat, lon
     Jeocrowd.map.panTo point
     false
   )
   
-BASE_GRID_STEP = 0.0005;
-LEVEL_MULTIPLIER = 5;
-COORDINATE_SEPARATOR = '^';
 

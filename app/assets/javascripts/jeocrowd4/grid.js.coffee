@@ -1,9 +1,5 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
-BASE_GRID_STEP = 0.0005
-LEVEL_MULTIPLIER = 5
-COORDINATE_SEPARATOR = '^'
-
 class window.Grid
     
   constructor: (@level) ->
@@ -17,14 +13,17 @@ class window.Grid
     @className = 'Grid'
   
   step: ->
-    @_step ||= Math.pow(LEVEL_MULTIPLIER, @level) * BASE_GRID_STEP
+    @_step ||= Math.pow(Jeocrowd.LEVEL_MULTIPLIER, @level) * Jeocrowd.BASE_GRID_STEP
   
   digitizeCoordinate: (c) ->
     c = parseFloat(c) if typeof c == 'string'
     return Math.floor((c + @step() / 1000) / @step()) / (1 / @step())
 
   digitizeCoordinates: (lat, lon) ->
-    return @digitizeCoordinate(lat).toFixed(4) + COORDINATE_SEPARATOR + @digitizeCoordinate(lon).toFixed(4)
+    return @digitizeCoordinate(lat).toFixed(4) + Jeocrowd.COORDINATE_SEPARATOR + @digitizeCoordinate(lon).toFixed(4)
+  
+  size: ->
+    @tiles.size()
   
   addTile: (id, degree, points) ->
     tile = @tiles.get(id) || new Tile(@level, id)
@@ -47,7 +46,7 @@ class window.Grid
     
   getTile: (id...) ->
     if id.length == 1
-      [gridLat, gridLon] = id[0].split COORDINATE_SEPARATOR
+      [gridLat, gridLon] = id[0].split Jeocrowd.COORDINATE_SEPARATOR
       @tiles.get @digitizeCoordinates(parseFloat(gridLat), parseFloat(gridLon))
     else if id.length == 2
       @tiles.get @digitizeCoordinates(id[0], id[1])

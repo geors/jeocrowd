@@ -1,15 +1,23 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 # to do:
 # add parallelization
+#   first add sync with server
+#   then add taken pages for computation
+#   then expire taken pages after 30sec
+# zoom map to include all tile (some tiles with high degree)
 # check how we can draw hybrid grids (with tiles from bigger levels!!)
-# add highcharts for cell degree distribution
+# add highcharts for tile degree distribution
 #
 
 MAX_LEVEL = 6
 
 window.Jeocrowd = 
-  config: {}
+  BASE_GRID_STEP: 0.0005
+  LEVEL_MULTIPLIER: 5
+  COORDINATE_SEPARATOR: '^'
   
+  config: {}
+    
   _grids: null
   grids: (level) ->
     @_grids ||= [0..MAX_LEVEL].map (i) ->

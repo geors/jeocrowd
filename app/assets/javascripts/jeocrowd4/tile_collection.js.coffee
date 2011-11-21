@@ -1,8 +1,5 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
-BASE_GRID_STEP = 0.0005;
-LEVEL_MULTIPLIER = 5;
-COORDINATE_SEPARATOR = '^';
 
 class window.TileCollection
     

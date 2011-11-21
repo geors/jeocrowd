@@ -1,16 +1,12 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
-BASE_GRID_STEP = 0.0005;
-LEVEL_MULTIPLIER = 5;
-COORDINATE_SEPARATOR = '^';
-
 class window.Tile
     
   constructor: (@level, id...) ->
     @grid = Jeocrowd.grids(@level)
     if id.length == 1
       @id = id[0]
-      [@gridLat, @gridLon] = id[0].split COORDINATE_SEPARATOR
+      [@gridLat, @gridLon] = id[0].split Jeocrowd.COORDINATE_SEPARATOR
       @gridLat = @grid.digitizeCoordinate(parseFloat @gridLat)
       @gridLon = @grid.digitizeCoordinate(parseFloat @gridLon)
     else if id.length == 2
@@ -297,10 +293,10 @@ class window.Tile
       @allChildrenIds = []
       vChild = new Tile belowGrid.level, @gridLat, @gridLon
       (
-        [lat, lon] = vChildId.split COORDINATE_SEPARATOR
+        [lat, lon] = vChildId.split Jeocrowd.COORDINATE_SEPARATOR
         hChild = new Tile belowGrid.level, lat, lon
-        @allChildrenIds.push hChildId for hChildId in hChild.getHorizontalNeighborIds LEVEL_MULTIPLIER - 1
-      ) for vChildId in vChild.getVerticalNeighborIds LEVEL_MULTIPLIER - 1
+        @allChildrenIds.push hChildId for hChildId in hChild.getHorizontalNeighborIds Jeocrowd.LEVEL_MULTIPLIER - 1
+      ) for vChildId in vChild.getVerticalNeighborIds Jeocrowd.LEVEL_MULTIPLIER - 1
     @childrenIds = @allChildrenIds.map (id, index, ids) ->
       if belowGrid.getTile(id) || force then id else null
     
