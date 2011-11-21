@@ -29,7 +29,7 @@ window.Jeocrowd =
   
   _provider : null
   provider: ->
-    @_provider ||= new window.Provider 'Flickr', window.location.href, @config.search
+    @_provider ||= new window.Provider 'Flickr', window.location.href, @config.search, @config.timestamp
   
   _visibleLayer: 'degree'
   visibleLayer: (layer) ->
@@ -61,8 +61,10 @@ window.Jeocrowd =
       return @map
       
   loadConfiguration: ->
-    configurationElement = document.getElementById 'jeocrowd_config'
-    @config.search = JSON.parse configurationElement.innerHTML if configurationElement
+    c = $('#jeocrowd_config')
+    if c
+      @config.timestamp = c.data('timestamp')
+      @config.search = JSON.parse c.html()
     if @config.search
       $('#available_points_value').text(@config.search.statistics.total_available_points)
       $('#exploratory_pages_value').text(JSON.stringify @config.search.pages)
@@ -112,6 +114,9 @@ window.Jeocrowd =
       @provider().saveRefinementResults box.toSimpleJSON('degree'), level, Jeocrowd.syncWithServer
       
   switchToRefinementPhase: ->
+    if @grids(0).size() == 0
+      console.log "empty search"
+      return
     @config.search.phase = 'refinement'
     $('#phase').text('refinement')
     @maxLevel = @calculateMaxLevel()

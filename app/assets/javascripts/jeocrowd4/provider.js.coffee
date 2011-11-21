@@ -2,13 +2,13 @@
 
 class window.Provider
   
-  constructor: (@name, url, search) ->
+  constructor: (@name, url, search, @timestamp) ->
     @apiURL = window.Providers[@name].apiURL
     @params = jQuery.extend {}, window.Providers[@name].params
     @serverURL = if (q = url.indexOf '?') == -1
-      url + ".js"
+      url + '.js'
     else
-      url.substring(0, q) + ".js" + url.substring(q)
+      url.substring(0, q) + '.js' + url.substring(q)
     @pages = search.pages
     @className = 'Provider'
     
@@ -16,10 +16,9 @@ class window.Provider
     
   # Jeocrowd -> provider -> fetchNextPage -> <exploratory, refinement>Callback ->
   # Jeocrowd -> save<Exploratory, Refinement>Results -> 
-  #             
 
   computeNextPage: ->
-    Util.firstMissingFromRange @pages, @maxPage
+    Util.firstWithTimestamp @pages, @timestamp
     
   computeNextBox: (level) ->
     Util.firstWithNegativeDegree Jeocrowd.grids(level).tiles
@@ -74,6 +73,7 @@ class window.Provider
     data = {}
     data['xpTiles'] = results
     data['page'] = page
+    data['timestamp'] = @timestamp
     jQuery.ajax {
       'url': @serverURL,
       'type': 'PUT',

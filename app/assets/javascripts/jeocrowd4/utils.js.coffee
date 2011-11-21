@@ -8,6 +8,13 @@ window.Util =
       i
     else
       null
+      
+  firstWithTimestamp: (range, timestamp) ->
+    for element, index in range
+      if element == timestamp
+        return index
+    null
+    
     
   lastMissingFromRange: (range) ->
     return null if range.length == 0
