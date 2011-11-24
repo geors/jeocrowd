@@ -15,6 +15,7 @@ window.Jeocrowd =
   BASE_GRID_STEP: 0.0005
   LEVEL_MULTIPLIER: 5
   COORDINATE_SEPARATOR: '^'
+  MAX_XP_PAGES: 16
   
   config: {}
     
@@ -102,7 +103,7 @@ window.Jeocrowd =
       page = pageOrLevel
       @grids(0).addPoints(data)
       @visibleGrid().draw()
-      @map.panTo @visibleGrid().hottestTile.getCenter() if $('#pan_map:checked[value=hottest]').length > 0      
+      @map.panTo @visibleGrid().hottestTile.getCenter() if $('#pan_map:checked[value=hottest]').length > 0
       @provider().saveExploratoryResults @grids(0).tiles.toJSON({withoutID: true}), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
       level = pageOrLevel
@@ -154,7 +155,24 @@ window.Jeocrowd =
                                       @refinementLevel, Jeocrowd.syncWithServer
   
   syncWithServer: (newData) ->
+    if @config.search.phase == 'exploratory'
+      @provider().updatePages(newData.pages) if newData.pages
+      # if provider has 16 pages AND all calculated get all the xpTiles data from the server and resume to switch to refinement
+      @grids(0).addTile(id, info.degree, info.points) for own id, info of newData.xpTiles if newData.xpTiles
+      # if provider has 16 pages but not all calculated wait a few minutes the reload the page (without ?x=y....)
+      console.log 'will wait?'
+      console.log @provider().pages.length == Jeocrowd.MAX_XP_PAGES && !@provider().allPagesCompleted()
+      @waitAndReload() if @provider().pages.length == Jeocrowd.MAX_XP_PAGES && !@provider().allPagesCompleted()
     @resumeSearch()
+  
+  waitAndReload: ->
+    alert 'waiting'
+    $('#phase').text('waiting')
+    setTimeout(Jeocrowd.reloadWithoutParams, 10000)
+    
+  reloadWithoutParams: ->
+    alert 'hello'
+    # window.location = window.location.pathname
   
   markAsCompleted: ->
     $('#phase').text('completed')

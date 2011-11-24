@@ -8,7 +8,6 @@ class SearchesController < ApplicationController
     @timestamp = Time.now.to_i
     @search = Search.find(params[:id])
     return if @search.nil?
-    @search.current_client = @timestamp
     if params[:restart_exploratory]
       @search.phase = "exploratory"
       @search.pages = []
@@ -22,6 +21,7 @@ class SearchesController < ApplicationController
       @search.rfTiles = []
       @search.statistics
     end
+    @search.current_client = @timestamp
     @search.save
   end
 
@@ -43,7 +43,7 @@ class SearchesController < ApplicationController
     @search.statistics[:total_available_points] = params[:total_available_points].to_i if params[:total_available_points]
     @search.updateExploratory(params[:xpTiles], params[:page].to_i, params[:timestamp].to_i) if (params[:xpTiles] && params[:page])
     @search.updateRefinement(params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i)) if params[:rfTiles] && params[:level]   
-    @search.current_client = params[:timestamp].to_i
+    # @search.current_client = params[:timestamp].to_i if params[:timestamp]
     @search.save
   end
 

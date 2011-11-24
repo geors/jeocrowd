@@ -17,6 +17,16 @@ class window.Provider
   # Jeocrowd -> provider -> fetchNextPage -> <exploratory, refinement>Callback ->
   # Jeocrowd -> save<Exploratory, Refinement>Results -> 
 
+  updatePages: (page) ->
+    if typeof page == 'number'
+      @pages[page] = page
+    else if typeof page == 'object'
+      @pages = page
+    $('#exploratory_pages_value').text(JSON.stringify @pages)
+    
+  allPagesCompleted: ->
+    @pages.length == Jeocrowd.MAX_XP_PAGES && @pages.every((page) -> page < Jeocrowd.MAX_XP_PAGES)
+
   computeNextPage: ->
     Util.firstWithTimestamp @pages, @timestamp
     
@@ -56,10 +66,9 @@ class window.Provider
 
   exploratoryCallback: (data, page, callback) ->
     newData = @convertData(data)
-    @pages[page] = page
+    @updatePages(page)
     $('#available_points_value').text(data.photos.total)
-    @saveTotalAvailablePoints(data.photos.total)
-    $('#exploratory_pages_value').text(JSON.stringify @pages)
+    @saveTotalAvailablePoints(data.photos.total) if page == 0   # change this to save if not already saved
     callback.apply Jeocrowd, [newData, page]
 
   refinementCallback: (data, level, box, callback) ->
@@ -78,23 +87,29 @@ class window.Provider
       'url': @serverURL,
       'type': 'PUT',
       'data': data,
+      'dataType': 'json',
       'success': (data, xmlhttp, textStatus) ->
         callback.apply Jeocrowd, [data]
+      'complete': (jqXHR, textStatus) ->
+        console.log textStatus if textStatus != 'success'
     }
     
   saveRefinementResults: (results, level, callback) ->
     data = {}
     data['rfTiles'] = results
     data['level'] = level
-    if level == Jeocrowd.maxLevel
+    if level == Jeocrowd.maxLevelt
       data['phase'] = 'refinement' 
       data['maxLevel'] = Jeocrowd.maxLevel
     jQuery.ajax {
       'url': @serverURL,
       'type': 'PUT',
       'data': data,
+      'dataType': 'json',
       'success': (data, xmlhttp, textStatus) ->
         callback.apply Jeocrowd, [data]
+      'complete': (jqXHR, textStatus) ->
+        console.log textStatus if textStatus != 'success'
     }
 
   saveTotalAvailablePoints: (total) ->

@@ -1,0 +1,11 @@
+{
+  "status": "ok"
+  <% if @search.phase == "exploratory" %>
+  ,
+  "pages": <%= @search.pages.to_json %>
+  <% end %>
+  <% if @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
+  ,
+  "xpTiles": <%= @search.xpTiles.to_json.html_safe %>
+  <% end %>
+}

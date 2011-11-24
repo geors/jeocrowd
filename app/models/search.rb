@@ -1,7 +1,7 @@
 class Search < CouchRest::Model::Base
 
   MAX_XP_PAGES = 16
-  XP_TIMEOUT = 3000
+  XP_TIMEOUT = 10.seconds
   
   property :keywords,   String
   property :phase,      String,   :default => "exploratory"
@@ -22,25 +22,29 @@ class Search < CouchRest::Model::Base
   def current_client=(timestamp)
     if phase == "exploratory"
       current_page = next_available_xp_page
-      pages[current_page] = timestamp
+      logger.debug current_page
+      self.pages[current_page] = timestamp if current_page
     elsif phase == "refinement"
       
     end
   end
   
   def next_available_xp_page
+    return nil if pages.length == MAX_XP_PAGES
     pages.each_with_index do |page, index|
-      return index if (Time.now.to_i - page > XP_TIMEOUT)
+      return index if (Time.now.to_i - page > XP_TIMEOUT) && (page > MAX_XP_PAGES - 1)
     end
     [pages.length, MAX_XP_PAGES - 1].min
   end
   
   def updateExploratory(results, page, original_timestamp)
     ActiveRecord::Base.logger.debug "updating from exploratory search... with page #{page}"
+    logger.debug "Current pages: #{pages.inspect}"
     self.pages[page] = page
-    logger.debug next_available_xp_page.inspect
-    logger.debug original_timestamp.inspect
-    self.pages[next_available_xp_page] = original_timestamp
+    logger.debug "Calculated pages: #{pages.inspect}"
+    self.current_client = original_timestamp
+    logger.debug "Sending pages: #{pages.inspect}"
+    
     self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
       if !old_val.nil?
         val = {}
