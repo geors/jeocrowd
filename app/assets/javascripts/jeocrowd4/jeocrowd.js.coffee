@@ -161,16 +161,15 @@ window.Jeocrowd =
       @grids(0).addTile(id, info.degree, info.points) for own id, info of newData.xpTiles if newData.xpTiles
       # if provider has 16 pages but not all calculated wait a few minutes the reload the page (without ?x=y....)
       @waitAndReload() if !@provider().allPagesCompleted() && @provider().noPagesForMe()
-    @resumeSearch()
+    @resumeSearch() unless @exitNow
   
   waitAndReload: ->
-    alert 'waiting'
     $('#phase').text('waiting')
+    @exitNow = true
     setTimeout(Jeocrowd.reloadWithoutParams, 10000)
     
   reloadWithoutParams: ->
-    alert 'hello'
-    # window.location = window.location.pathname
+    window.location = window.location.pathname
   
   markAsCompleted: ->
     $('#phase').text('completed')

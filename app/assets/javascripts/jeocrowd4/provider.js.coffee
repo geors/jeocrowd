@@ -112,7 +112,7 @@ class window.Provider
     data = {}
     data['rfTiles'] = results
     data['level'] = level
-    if level == Jeocrowd.maxLevelt
+    if level == Jeocrowd.maxLevel
       data['phase'] = 'refinement' 
       data['maxLevel'] = Jeocrowd.maxLevel
     jQuery.ajax {

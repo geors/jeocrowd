@@ -2,7 +2,7 @@ class Search
   include MongoMapper::Document
 
   MAX_XP_PAGES = 16
-  XP_TIMEOUT = 10.seconds
+  XP_TIMEOUT = 15.seconds
   
   key :keywords,   String
   key :phase,      String,  :default => "exploratory"
@@ -20,26 +20,30 @@ class Search
   
   def current_client=(timestamp)
     if phase == "exploratory"
-      current_page = next_available_xp_page
+      current_page = next_available_xp_page(timestamp)
       self.pages[current_page] = timestamp if current_page
-      set :pages => pages
+      if current_page == pages.length
+        push :pages => timestamp unless current_page == MAX_XP_PAGES
+      else
+        set :pages => pages
+      end
       reload
-      self.current_client = timestamp if pages.detect { |page| page == timestamp } .nil? unless exploratory_completed?
+      self.current_client = timestamp if pages.detect { |page| page == timestamp } .nil? unless pages.length == MAX_XP_PAGES
     elsif phase == "refinement"
       
     end
   end
   
-  def next_available_xp_page
+  def next_available_xp_page(timestamp)
     return nil if pages.length == MAX_XP_PAGES
     pages.each_with_index do |page, index|
-      return index if (Time.now.to_i - page > XP_TIMEOUT) && (page > MAX_XP_PAGES - 1)
+      return index if (timestamp - page > XP_TIMEOUT) && (page > MAX_XP_PAGES - 1)
     end
     [pages.length, MAX_XP_PAGES - 1].min
   end
   
   def updateExploratory(results, page, original_timestamp)
-    ActiveRecord::Base.logger.debug "updating from exploratory search... with page #{page}"
+    ActiveRecord::Base.logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
     logger.debug "Current pages: #{pages.inspect}"
     self.pages[page] = page
     logger.debug "Calculated pages: #{pages.inspect}"
