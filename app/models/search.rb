@@ -21,8 +21,10 @@ class Search
   def current_client=(timestamp)
     if phase == "exploratory"
       current_page = next_available_xp_page
-      logger.debug current_page
       self.pages[current_page] = timestamp if current_page
+      set :pages => pages
+      reload
+      self.current_client = timestamp if pages.detect { |page| page == timestamp } .nil? unless exploratory_completed?
     elsif phase == "refinement"
       
     end
@@ -52,6 +54,10 @@ class Search
         val
       end
     end
+  end
+  
+  def exploratory_completed?
+    pages.length == MAX_XP_PAGES && pages.all? { |page| page < MAX_XP_PAGES }
   end
   
   def updateRefinement(results, level, max_level = nil)
