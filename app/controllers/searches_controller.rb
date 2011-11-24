@@ -1,7 +1,7 @@
 class SearchesController < ApplicationController
 
   def index
-    @searches = Search.by_keywords.all
+    @searches = Search.all
   end
 
   def show

@@ -1,19 +1,18 @@
-class Search < CouchRest::Model::Base
+class Search
+  include MongoMapper::Document
 
   MAX_XP_PAGES = 16
   XP_TIMEOUT = 10.seconds
   
-  property :keywords,   String
-  property :phase,      String,   :default => "exploratory"
-  property :pages,      [Fixnum], :default => []
-  property :xpTiles,    Hash,     :default => {}
-  property :levels,     [Fixnum], :default => []  
-  property :rfTiles,    [Hash],   :default => []
-  property :statistics, Hash,     :default => {}
+  key :keywords,   String
+  key :phase,      String,  :default => "exploratory"
+  key :pages,      Array,   :default => []   # Array of Fixnum
+  key :xpTiles,    Hash,    :default => {}
+  key :levels,     Array,   :default => []   # Array of Fixnum
+  key :rfTiles,    Array,   :default => []   # Array of Hashes
+  key :statistics, Hash,    :default => {}
   
-  design do
-    view :by_keywords
-  end
+  ensure_index :keywords, :unique => true
   
   def logger
     ActiveRecord::Base.logger

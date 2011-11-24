@@ -2,10 +2,8 @@ source 'http://rubygems.org'
 
 gem 'rails', '3.1.1'
 
-# Bundle edge Rails instead:
-# gem 'rails',     :git => 'git://github.com/rails/rails.git'
-
-gem 'couchrest_model'
+# gem 'couchrest_model'
+gem 'mongo_mapper'
 gem 'mysql2', :group => [:development, :test]
 gem 'pg', :group => [:production]
 

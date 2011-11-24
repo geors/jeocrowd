@@ -160,9 +160,7 @@ window.Jeocrowd =
       # if provider has 16 pages AND all calculated get all the xpTiles data from the server and resume to switch to refinement
       @grids(0).addTile(id, info.degree, info.points) for own id, info of newData.xpTiles if newData.xpTiles
       # if provider has 16 pages but not all calculated wait a few minutes the reload the page (without ?x=y....)
-      console.log 'will wait?'
-      console.log @provider().pages.length == Jeocrowd.MAX_XP_PAGES && !@provider().allPagesCompleted()
-      @waitAndReload() if @provider().pages.length == Jeocrowd.MAX_XP_PAGES && !@provider().allPagesCompleted()
+      @waitAndReload() if !@provider().allPagesCompleted() && @provider().noPagesForMe()
     @resumeSearch()
   
   waitAndReload: ->
