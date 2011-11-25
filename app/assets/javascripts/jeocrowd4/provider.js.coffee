@@ -29,17 +29,8 @@ class window.Provider
 
   noPagesForMe: ->
     t = @timestamp
-    console.log 'these are my pages: ' + @pages.toString() + ' and this is my timestamp ' + t
-    console.log 'checked : ' + @pages.filter((page) -> page > Jeocrowd.MAX_XP_PAGES).toString()
-    console.log 'checked : ' + @pages.filter((page) -> page > Jeocrowd.MAX_XP_PAGES).every (page) -> 
-      console.log 'comparison page : ' + page + ' with timestamp ' + t
-      c = page != t
-      console.log 'result unequal? ' + c
-      c
-    b = @pages.length == Jeocrowd.MAX_XP_PAGES &&
+    @pages.length == Jeocrowd.MAX_XP_PAGES &&
       @pages.filter((page) -> page > Jeocrowd.MAX_XP_PAGES).every((page) -> page != t)
-    console.log 'result is ' + b
-    b
 
   computeNextPage: ->
     Util.firstWithTimestamp @pages, @timestamp

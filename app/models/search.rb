@@ -2,7 +2,7 @@ class Search
   include MongoMapper::Document
 
   MAX_XP_PAGES = 16
-  XP_TIMEOUT = 15.seconds
+  XP_TIMEOUT = 15.seconds * 1000
   
   key :keywords,   String
   key :phase,      String,  :default => "exploratory"
@@ -37,6 +37,9 @@ class Search
   def next_available_xp_page(timestamp)
     return nil if pages.length == MAX_XP_PAGES
     pages.each_with_index do |page, index|
+      # You cannot use Time.now.to_i here because you might steal the job of another client
+      # that you started together with, after XP_TIMEOUT time during the initiation of the search
+      # since in xp search timestamps are not auto-updated
       return index if (timestamp - page > XP_TIMEOUT) && (page > MAX_XP_PAGES - 1)
     end
     [pages.length, MAX_XP_PAGES - 1].min
@@ -47,7 +50,7 @@ class Search
     logger.debug "Current pages: #{pages.inspect}"
     self.pages[page] = page
     logger.debug "Calculated pages: #{pages.inspect}"
-    self.current_client = original_timestamp
+    self.current_client = new_timestamp = (Time.now.to_f * 1000).to_i
     logger.debug "Sending pages: #{pages.inspect}"
     
     self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
@@ -58,6 +61,7 @@ class Search
         val
       end
     end
+    new_timestamp
   end
   
   def exploratory_completed?
@@ -79,6 +83,7 @@ class Search
     self.rfTiles[level] ||= {}
     self.rfTiles[level] = rfTiles[level].merge Hash[results]
     self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
+    (Time.now.to_f * 1000).to_i
   end
   
 end

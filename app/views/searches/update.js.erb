@@ -1,5 +1,9 @@
 {
   "status": "ok"
+  <% if @new_timestamp %>
+  ,
+  "timestamp": <%= @new_timestamp %>
+  <% end %>
   <% if @search.phase == "exploratory" %>
   ,
   "pages": <%= @search.pages.to_json %>

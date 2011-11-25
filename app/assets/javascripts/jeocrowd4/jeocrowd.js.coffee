@@ -156,6 +156,7 @@ window.Jeocrowd =
   
   syncWithServer: (newData) ->
     if @config.search.phase == 'exploratory'
+      @config.timestamp = @provider().timestamp = newData.timestamp
       @provider().updatePages(newData.pages) if newData.pages
       # if provider has 16 pages AND all calculated get all the xpTiles data from the server and resume to switch to refinement
       @grids(0).addTile(id, info.degree, info.points) for own id, info of newData.xpTiles if newData.xpTiles
