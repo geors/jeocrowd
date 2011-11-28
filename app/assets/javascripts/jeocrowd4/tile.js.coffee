@@ -167,9 +167,7 @@ class window.Tile
 
 
   getColor: ->
-    if @status == 'ignored'
-      '#AAAAAA'
-    else if @status == 'unknown'
+    if @status == 'unknown'
       '#DDDDDD'
     else if Jeocrowd.visibleLayer() == 'degree'
       '#FF0000'
@@ -186,13 +184,13 @@ class window.Tile
         when 8 then return '#CC0000'
     
   getOpacity: ->
-    if @status == 'ignored'
+    if @status == 'unknown'
       0.5
     else if Jeocrowd.visibleLayer() == 'degree'
-      if @degree > 1000
+      if @degree > 500
         1
       else
-        @degree / 1000.0
+        @degree / 500.0
     else
       0.75
 
