@@ -10,6 +10,29 @@ giveLifeToPage = ->
     Jeocrowd.visibleLayer($(this).val())    
   $('#level').change ->
     Jeocrowd.visibleLevel($(this).val())
+  $('#degree--').click ->
+    placeholder = $('#degree')
+    placeholder.val(parseInt(placeholder.val()) + 1)
+    Jeocrowd.setMinVisibleDegree(placeholder.val())
+    false
+  $('#degree-').click ->
+    placeholder = $('#degree')
+    newValue = parseInt(placeholder.val()) - 1
+    placeholder.val(if newValue < 0 then 0 else newValue)
+    Jeocrowd.setMinVisibleDegree(placeholder.val())
+    false
+  $('#neighbor--').click ->
+    placeholder = $('#neighbor')
+    newValue = parseInt(placeholder.val()) + 1
+    placeholder.val(if newValue > 8 then 8 else newValue)
+    Jeocrowd.setMinVisibleNeighborCount(placeholder.val())
+    false
+  $('#neighbor-').click ->
+    placeholder = $('#neighbor')
+    newValue = parseInt(placeholder.val()) - 1
+    placeholder.val(if newValue < 0 then 0 else newValue)
+    Jeocrowd.setMinVisibleNeighborCount(placeholder.val())
+    false
   $('#running').change ->
     if $(this).attr('checked')
       Jeocrowd.resumeSearch()

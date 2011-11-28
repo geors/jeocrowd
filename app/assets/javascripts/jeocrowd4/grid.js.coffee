@@ -10,6 +10,8 @@ class window.Grid
     @pointsCounter = 0
     @visiblePointsCounter = 0
     @hottestTile = null
+    @minVisibleDegree = 0
+    @minVisibleNeighborCount = 0
     @className = 'Grid'
   
   step: ->
@@ -24,6 +26,12 @@ class window.Grid
   
   size: ->
     @tiles.size()
+    
+  setMinVisibleDegree: (d) ->
+    @minVisibleDegree = d
+  
+  setMinVisibleNeighborCount: (n) ->
+    @minVisibleNeighborCount = n
   
   addTile: (id, degree, points) ->
     tile = @tiles.get(id) || new Tile(@level, id)

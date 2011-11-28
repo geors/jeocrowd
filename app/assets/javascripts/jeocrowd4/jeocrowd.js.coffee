@@ -53,8 +53,16 @@ window.Jeocrowd =
   visibleGrid: ->
     @grids(@visibleLevel())
 
+  setMinVisibleDegree: (d) ->
+    grid.setMinVisibleDegree(d) for grid in @grids()
+    @visibleGrid().draw()
+  
+  setMinVisibleNeighborCount: (n) ->
+    grid.setMinVisibleNeighborCount(n) for grid in @grids()
+    @visibleGrid().draw()
+  
   buildMap: (div) ->
-    initialOptions = { zoom: 8, mapTypeId: google.maps.MapTypeId.ROADMAP }
+    initialOptions = { zoom: 10, mapTypeId: google.maps.MapTypeId.ROADMAP }
     initialLocation = new google.maps.LatLng 37.97918, 23.716647
     if placeholder = document.getElementById div 
       @map = new google.maps.Map placeholder, initialOptions 
@@ -116,7 +124,7 @@ window.Jeocrowd =
       
   switchToRefinementPhase: ->
     if @grids(0).size() == 0
-      console.log "empty search"
+      console.log 'empty search'
       return
     @config.search.phase = 'refinement'
     $('#phase').text('refinement')

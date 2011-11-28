@@ -195,7 +195,7 @@ class window.Tile
       0.75
 
   shouldDisplay: ->
-    true
+    @status == 'unknown' || @grid.minVisibleDegree <= @degree && @grid.minVisibleNeighborCount <= @getNeighborCount()
   
   #
   # ---- ---- NEIGHBORS ---- ----

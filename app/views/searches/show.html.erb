@@ -89,12 +89,16 @@
       <%= check_box_tag :pan_map, 'hottest', true %>
     <% end %>    
     
-    <%= search_option " " do %>
-      <%= "" %>
+    <%= search_option "Min visible degree" do %>
+      <%= link_to("&mdash;".html_safe, "#", :id => "degree-") + " " +
+          text_field_tag("degree", 0, {:style => "width: 30px; text-align: right; border: 1px solid silver"}) + " " + 
+          link_to("+", "#", :id => "degree--") %>
     <% end %>  
     
-    <%= search_option " " do %>
-      <%= "" %>
+    <%= search_option "Min neighbor degree" do %>
+      <%= link_to("&mdash;".html_safe, "#", :id => "neighbor-") + " " +
+          text_field_tag("neighbor", 0, {:style => "width: 30px; text-align: right; border: 1px solid silver"}) + " " + 
+          link_to("+", "#", :id => "neighbor--") %>
     <% end %>  
     
     <%= search_option " " do %>
