@@ -93,9 +93,9 @@ class window.TileCollection
       ) for tile in @values
     container
   
-  toJSON: (options) ->
+  toJSON: (keys) ->
     json = {}
-    json[tile.id] = tile.toJSON(options.withoutID, options.withoutPoints) for tile in @values
+    json[tile.id] = tile.toJSON(keys) for tile in @values
     json
   
   toSimpleJSON: (key) ->

@@ -26,16 +26,18 @@ class window.Tile
   linkTo: ->
     '<a href="#' + @id + '" class="pan_map_to_href">' + @id + '</a>'
     
-  toJSON: (withoutID, withoutPoints) ->
-    json = {'id': @id, 'degree': @degree}
-    json.points = @points if @points && @points.length > 0
-    delete(json.id) if (withoutID)
-    delete(json.points) if (withoutPoints)
+  toJSON: (keys) ->
+    json = {}
+    for own key in keys
+      json[key] = this[key]
     json
     
-  toSimpleJSON: (key) ->
+  toSimpleJSON: (keys) ->
     json = {}
-    json[@id] = this[key]
+    if keys.length == 1
+      json[@id] = this[keys[0]]
+    else
+      json[@id] = @toJSON(keys)
     json
       
   addPoint: (point) ->

@@ -112,7 +112,7 @@ window.Jeocrowd =
       @grids(0).addPoints(data)
       @visibleGrid().draw()
       @map.panTo @visibleGrid().hottestTile.getCenter() if $('#pan_map:checked[value=hottest]').length > 0
-      @provider().saveExploratoryResults @grids(0).tiles.toJSON({withoutID: true}), page, Jeocrowd.syncWithServer
+      @provider().saveExploratoryResults @grids(0).tiles.toJSON(['degree', 'points']), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
       level = pageOrLevel
       if box.degree > 0
@@ -120,7 +120,7 @@ window.Jeocrowd =
       else
         box.undraw() if level == @visibleLevel()
         @grids(level).removeTile box.id
-      @provider().saveRefinementResults box.toSimpleJSON('degree'), level, Jeocrowd.syncWithServer
+      @provider().saveRefinementResults box.toSimpleJSON(['degree']), level, Jeocrowd.syncWithServer
       
   switchToRefinementPhase: ->
     if @grids(0).size() == 0
