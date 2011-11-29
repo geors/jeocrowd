@@ -111,6 +111,9 @@ class window.Grid
     done = @tiles.filter('refined').size()
     done / s if s > 0
 
+  isSparse: ->
+    lonelyTilesCount = @tiles.filter('isLoner').size()
+    if @size() > 0 then lonelyTilesCount / @size() > 0.75 else false
 
 
 

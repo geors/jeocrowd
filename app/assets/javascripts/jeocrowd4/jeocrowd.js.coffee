@@ -141,6 +141,9 @@ window.Jeocrowd =
     $('#phase').text('refinement')
     @maxLevel = @calculateMaxLevel()
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
+    if @grids(@maxLevel).isSparse()
+      @maxLevel += 1
+      @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     @visibleLevel(@maxLevel)
     @map.panTo @visibleGrid().hottestTile.getCenter()
     @grids(@maxLevel).clearBeforeRefinement true, ->  # true: display cells to be removed
