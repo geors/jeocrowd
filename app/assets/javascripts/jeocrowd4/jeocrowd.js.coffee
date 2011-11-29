@@ -1,13 +1,10 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 # to do:
-# add parallelization
-#   first add sync with server
-#   then add taken pages for computation
-#   then expire taken pages after 30sec
+# add parallelization to refinement like in exploratory but with batches of boxes
 # zoom map to include all tile (some tiles with high degree)
 # check how we can draw hybrid grids (with tiles from bigger levels!!)
 # add highcharts for tile degree distribution
-#
+# check statue of liberty, grid level 3 has all zeros
 
 MAX_LEVEL = 6
 
@@ -16,8 +13,8 @@ window.Jeocrowd =
   LEVEL_MULTIPLIER: 5
   COORDINATE_SEPARATOR: '^'
   MAX_XP_PAGES: 16
-  MAX_NEIGHBORS: 8
-  FULL_SEARCH_TIMES: 2
+  MAX_NEIGHBORS: 7
+  FULL_SEARCH_TIMES: 1
   
   config: {}
     
@@ -165,7 +162,6 @@ window.Jeocrowd =
     @levels[@refinementLevel + 1] = @refinementLevel + 1  # mark above level as complete
     @reloadTiles(@refinementLevel + 1) if @grids(@refinementLevel + 1).size() == 0
     if (@refinementLevel + 1 != @maxLevel)
-      @grids(@refinementLevel).growDown(Tile.prototype.always)
       @grids(@refinementLevel + 1).clearBeforeRefinement true, ->
         Jeocrowd.continueGotoBelowLevel()
     else
@@ -173,6 +169,7 @@ window.Jeocrowd =
       @continueGotoBelowLevel()
     
   continueGotoBelowLevel: ->
+    @grids(@refinementLevel).growDown(Tile.prototype.always)
     @visibleLevel(@refinementLevel)
     @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'), 
                                       @refinementLevel, Jeocrowd.syncWithServer

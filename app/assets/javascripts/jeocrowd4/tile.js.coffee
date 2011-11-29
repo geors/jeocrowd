@@ -249,7 +249,9 @@ class window.Tile
     @getNeighbors().size() == 0
     
   willBeRemoved: ->
-    @degree > 0 && (@isLoner() || @degree < 0.05 * @grid.hottestTile.degree)
+    # we cannot eliminate a tile just because it is alone, this might discard some small areas or point features
+    # that even at a high level only one tile was left, or even multi clusters, ie. a few loner tiles were left
+    @degree > 0 && ((@isLoner() && @degree < 0.5 * @grid.hottestTile.degree) || @degree < 0.02 * @grid.hottestTile.degree)
     
   fullParent: ->
     @degree < 0 && -@degree >= Jeocrowd.MAX_NEIGHBORS && -@degree <= 8

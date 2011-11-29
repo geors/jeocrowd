@@ -48,9 +48,15 @@ class window.Grid
     tile
   
   removeTile: (id) ->
-    @tiles.get(id).undraw() if @tiles.get(id) 
-    @tiles.remove(id)
+    tile = @tiles.get(id) 
+    if @tiles.remove(id)
+      @tilesCounter -= 1
+      @visibleTilesCounter -= 1 if tile && tile.shouldDisplay()
+    if tile
+      tile.undraw()
+      $('#visible_points_value').text(@visiblePointsCounter)
     
+  
   getTile: (id...) ->
     if id.length == 1
       [gridLat, gridLon] = id[0].split Jeocrowd.COORDINATE_SEPARATOR
