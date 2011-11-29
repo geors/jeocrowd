@@ -37,7 +37,6 @@ class window.Grid
     tile = @tiles.get(id) || new Tile(@level, id)
     tile.grid = this
     tile.setDegree(if typeof degree == 'string' then parseInt(degree) else degree) if degree
-    tile.status = 'unknown' if tile.degree == -1
     tile.points = points if points
     if @tiles.add tile
       @tilesCounter += 1
@@ -85,10 +84,13 @@ class window.Grid
     @algorithm = algorithm
 
   # fills current grid with the children tiles of the grid above
-  growDown: (algorithm) ->
+  growDown: (algorithm, rejectWillBeRemoved = true) ->
     aboveGrid = Jeocrowd.grids(@level + 1)
     aboveGrid.growDown(algorithm) if (aboveGrid.dirty || aboveGrid.algorithm != algorithm) && aboveGrid.level > Jeocrowd.maxLevel
-    aboveGrid.tiles.each 'toChildren', algorithm
+    if rejectWillBeRemoved
+      aboveGrid.tiles.reject('willBeRemoved').each('toChildren', algorithm)
+    else
+      aboveGrid.tiles.each('toChildren', algorithm)
     @dirty = false
     @algorithm = algorithm
 

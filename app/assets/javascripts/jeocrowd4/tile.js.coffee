@@ -53,11 +53,10 @@ class window.Tile
       @grid.hottestTile = this 
       $('#hottest_tiles_value').html(@linkTo())
       $('#hottest_tiles_degree_value').text(degree)
-    delete(@status) if degree != 0
     @degree = degree
     
   refined: ->
-    @degree > 0
+    @degree > 0 || @fullParent()
   
   #
   # ---- ---- VISUAL DESIGN ---- ----
@@ -85,6 +84,7 @@ class window.Tile
     if @visual
       @visual.setOptions {
         strokeColor: @getColor(),
+        strokeWeight: if @fullParent() then 0 else 1,
         fillColor: @getColor(),
         fillOpacity: @getOpacity()
       }
@@ -99,7 +99,7 @@ class window.Tile
         paths: pathPoints,
         strokeColor: @getColor(),
         strokeOpacity: 0.8,
-        strokeWeight: 1,
+        strokeWeight: if @fullParent() then 0 else 1,
         fillColor: @getColor(),
         fillOpacity: @getOpacity(),
         zIndex: 10
@@ -122,6 +122,7 @@ class window.Tile
 
     
   highlight: (display) ->
+    return if @isHighlighted1 == display
     @visualBounds = @visualBounds || new google.maps.Rectangle({
       bounds: new google.maps.LatLngBounds(
         new google.maps.LatLng(@getBoundingBox().bottom, @getBoundingBox().left),
@@ -131,9 +132,11 @@ class window.Tile
       zIndex: 20
     })
     @visualBounds.setMap(if display then Jeocrowd.map else null)
+    @isHighlighted1 = display
 
     
   highlight2: (display) ->
+    return if @isHighlighted2 == display
     @visualCross1 = @visualCross1 || new google.maps.Polygon({
       paths: [
         new google.maps.LatLng(@getBoundingBox().top, @getBoundingBox().left),
@@ -160,6 +163,7 @@ class window.Tile
     else
       @visualCross1.setMap null
       @visualCross2.setMap null
+    @isHighlighted2 = display
     
 
   undraw: ->
@@ -167,7 +171,9 @@ class window.Tile
 
 
   getColor: ->
-    if @status == 'unknown'
+    if @fullParent()
+      '#1E719F'
+    else if @degree < 0
       '#DDDDDD'
     else if Jeocrowd.visibleLayer() == 'degree'
       '#FF0000'
@@ -184,7 +190,7 @@ class window.Tile
         when 8 then return '#CC0000'
     
   getOpacity: ->
-    if @status == 'unknown'
+    if @degree < 0
       0.5
     else if Jeocrowd.visibleLayer() == 'degree'
       if @degree > 500
@@ -195,7 +201,7 @@ class window.Tile
       0.75
 
   shouldDisplay: ->
-    @status == 'unknown' || @grid.minVisibleDegree <= @degree && @grid.minVisibleNeighborCount <= @getNeighborCount()
+    @degree < 0 || (@grid.minVisibleDegree <= @degree && @grid.minVisibleNeighborCount <= @getNeighborCount())
   
   #
   # ---- ---- NEIGHBORS ---- ----
@@ -243,8 +249,10 @@ class window.Tile
     @getNeighbors().size() == 0
     
   willBeRemoved: ->
-    @isLoner() || @degree < 0.05 * @grid.hottestTile.degree
+    @degree > 0 && (@isLoner() || @degree < 0.05 * @grid.hottestTile.degree)
     
+  fullParent: ->
+    @degree < 0 && -@degree >= Jeocrowd.MAX_NEIGHBORS && -@degree <= 8
   
   # 
   # ---- ---- PARENTS, CHILDREN and SIBLINGS ---- ----
@@ -272,9 +280,11 @@ class window.Tile
       null
   
   toChildren: (algorithm) ->
+    childDegree = if Jeocrowd.keepFullCells(@grid.level, 'computing') then -10 else (if @degree < 0 then @degree else -@getNeighborCount())
     if algorithm.apply this # algorithm used to decide growing down or not, eg always...
       belowGrid = Jeocrowd.grids @grid.level - 1
-      belowGrid.addTile childId, -1 for childId in @getChildrenIds(true) # children given -1 as initial degree
+      # children given -parentNeighborCount as initial degree
+      belowGrid.addTile child.id, childDegree for child in @getChildren(true).values
     else
       null
   
@@ -302,7 +312,7 @@ class window.Tile
     
   getChildren: (force) ->
     @children = new TileCollection()
-    @children.copyFrom @getChildrenIds(force), @grid.tiles, if force then @grid.level else null
+    @children.copyFrom @getChildrenIds(force), @grid.tiles, if force then (@grid.level - 1) else null
     @children
     
   getSiblingsIds: (force) ->

@@ -20,6 +20,7 @@ class SearchesController < ApplicationController
       @search.levels = []
       @search.rfTiles = []
       @search.statistics
+      @search.save
     end
     @search.current_client = @timestamp = (Time.now.to_f * 1000).to_i
     @search.save

@@ -41,12 +41,10 @@ class window.TileCollection
   # level for non existing is used when we want dummy tiles for all the ids supplied
   # some of them may not be found
   copyFrom: (ids, collection, levelForNonExisting) ->
-    (
-      if levelForNonExisting
-        @add(collection.collection[id] || new Tile(levelForNonExisting, id))
-      else
-        @add(collection.collection[id])
-    ) for id in ids
+    for id in ids
+      t = collection.collection[id]
+      t = t || new Tile(levelForNonExisting, id) if levelForNonExisting != null
+      @add(t)
     
   each: (func, params...) ->
     if typeof func == 'string'
@@ -92,7 +90,21 @@ class window.TileCollection
         container.push tile if r
       ) for tile in @values
     container
-  
+
+  reject: (func, params...) ->
+    container = new TileCollection()
+    if typeof func == 'string'
+      (
+        r = Tile.prototype[func].apply(tile, params)
+        container.push tile if !r
+      ) for tile in @values
+    else if typeof func == 'function'
+      (
+        r = func.apply(testTile, params)
+        container.push tile if !r
+      ) for tile in @values
+    container
+
   toJSON: (keys) ->
     json = {}
     json[tile.id] = tile.toJSON(keys) for tile in @values

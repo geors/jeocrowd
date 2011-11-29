@@ -1,35 +1,31 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 window.Util = 
-  firstMissingFromRange: (range, bound = 16) ->
-    i = 0
-    i++ while(i < range.length && range[i] != null)
-    if i < bound
-      i
-    else
-      null
       
   firstWithTimestamp: (range, timestamp) ->
     for element, index in range
       if element == timestamp
         return index
     null
-    
+  
+  firstWithNegativeDegree: (tileCollection) ->
+    for element in tileCollection.values
+      if element.degree < 0
+        return element
+    null
+      
+  firstWithNegativeDegreeAndLessThanNeighbors: (tileCollection, n) ->
+    for element in tileCollection.values
+      if element.degree < 0 && -element.degree < n
+        return element
+    null
     
   lastMissingFromRange: (range) ->
     return null if range.length == 0
-    i = range.length - 1
-    i-- while(i >= 0 && range[i] != null)
-    i
-    
-  firstWithNegativeDegree: (tileCollection) ->
-    i = 0
-    i++ while i < tileCollection.values.length && tileCollection.values[i].degree != -1
-    if i < tileCollection.values.length
-      tileCollection.values[i]
-    else
-      null
-      
+    for i in [(range.length - 1)..0]
+      return i if range[i] == null
+    null
+
   createDelegate: (object, method, params...) ->
     shim = ->
       method.apply object, params

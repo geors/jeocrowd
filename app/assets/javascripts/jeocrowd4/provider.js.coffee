@@ -36,7 +36,10 @@ class window.Provider
     Util.firstWithTimestamp @pages, @timestamp
     
   computeNextBox: (level) ->
-    Util.firstWithNegativeDegree Jeocrowd.grids(level).tiles
+    if Jeocrowd.keepFullCells(level, 'searching')
+      Util.firstWithNegativeDegree Jeocrowd.grids(level).tiles
+    else
+      Util.firstWithNegativeDegreeAndLessThanNeighbors Jeocrowd.grids(level).tiles, Jeocrowd.MAX_NEIGHBORS
 
   exploratorySearch: (keywords, callback) ->
     return null if (page = @computeNextPage()) == null

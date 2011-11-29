@@ -16,6 +16,8 @@ window.Jeocrowd =
   LEVEL_MULTIPLIER: 5
   COORDINATE_SEPARATOR: '^'
   MAX_XP_PAGES: 16
+  MAX_NEIGHBORS: 8
+  FULL_SEARCH_TIMES: 2
   
   config: {}
     
@@ -61,6 +63,13 @@ window.Jeocrowd =
     grid.setMinVisibleNeighborCount(n) for grid in @grids()
     @visibleGrid().draw()
   
+  # calculating when we have to search everything or when to keep full areas based on FULL_SEARCH_TIMES
+  keepFullCells: (level, searchingOrComputing) ->
+    if searchingOrComputing == 'computing'
+      @maxLevel - level < Jeocrowd.FULL_SEARCH_TIMES
+    else if searchingOrComputing == 'searching'
+      @maxLevel - level < Jeocrowd.FULL_SEARCH_TIMES + 1
+  
   buildMap: (div) ->
     initialOptions = { zoom: 10, mapTypeId: google.maps.MapTypeId.ROADMAP }
     initialLocation = new google.maps.LatLng 37.97918, 23.716647
@@ -85,14 +94,16 @@ window.Jeocrowd =
         @levels = @config.search.levels
         @maxLevel = @levels.length - 1
         @refinementLevel = Util.lastMissingFromRange(@levels)
+        if @refinementLevel == null
+          @markAsCompleted()
+          return
         if @config.search.rfTiles[@refinementLevel] == null
           @gotoBelowLevel()
         else
           @grids(@refinementLevel).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel]
           @visibleLevel(@refinementLevel)
         $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
-        $('#level_label label').text(@maxLevel)
-  
+        $('#level_label label').text('max: ' + @maxLevel)
   
   autoStart: ->
     @config.autoStart || true
@@ -149,18 +160,22 @@ window.Jeocrowd =
       @markAsCompleted()
       return
     @levels[@refinementLevel + 1] = @refinementLevel + 1  # mark above level as complete
-    @grids(@refinementLevel + 1).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel + 1]
+    @reloadTiles(@refinementLevel + 1) if @grids(@refinementLevel + 1).size() == 0
     if (@refinementLevel + 1 != @maxLevel)
+      @grids(@refinementLevel).growDown(Tile.prototype.always)
       @grids(@refinementLevel + 1).clearBeforeRefinement true, ->
         Jeocrowd.continueGotoBelowLevel()
     else
+      @grids(@refinementLevel).growDown(Tile.prototype.always, false)
       @continueGotoBelowLevel()
     
   continueGotoBelowLevel: ->
-    @grids(@refinementLevel).growDown(Tile.prototype.always)
     @visibleLevel(@refinementLevel)
     @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'), 
                                       @refinementLevel, Jeocrowd.syncWithServer
+  
+  reloadTiles: (level) ->
+    @grids(level).addTile(id, degree) for own id, degree of @config.search.rfTiles[level]
   
   syncWithServer: (newData) ->
     if @config.search.phase == 'exploratory'
