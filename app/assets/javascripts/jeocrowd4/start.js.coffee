@@ -44,5 +44,27 @@ giveLifeToPage = ->
     Jeocrowd.map.panTo point
     false
   )
+  $('#hottest_tiles_label').click ->
+    new Highcharts.Chart({
+      chart: {
+        renderTo: 'highchart_graph'
+      },
+      title: {
+        text: 'Tile degree distribution of level ' + Jeocrowd.visibleLevel()
+      },
+      xAxis: {
+        title: {
+          text: 'tiles'
+        }
+      },
+      yAxis: {
+        title: {
+          text: 'degree of tiles'
+        }
+      },
+      series: [{
+        data: Jeocrowd.visibleGrid().tiles.map('getDegree').filter((x) -> x > 0).sort((a, b) -> return b - a)
+      }]
+    })
   
 

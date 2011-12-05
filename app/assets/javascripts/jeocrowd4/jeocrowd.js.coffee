@@ -3,8 +3,6 @@
 # add parallelization to refinement like in exploratory but with batches of boxes
 # zoom map to include all tile (some tiles with high degree)
 # check how we can draw hybrid grids (with tiles from bigger levels!!)
-# add highcharts for tile degree distribution
-# check statue of liberty, grid level 3 has all zeros
 
 MAX_LEVEL = 6
 
@@ -157,6 +155,7 @@ window.Jeocrowd =
   
   gotoBelowLevel: ->
     if @refinementLevel == -1
+      @grids(@refinementLevel).clearBeforeRefinement true
       @markAsCompleted()
       return
     @levels[@refinementLevel + 1] = @refinementLevel + 1  # mark above level as complete

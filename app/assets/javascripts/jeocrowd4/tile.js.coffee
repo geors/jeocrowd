@@ -47,6 +47,9 @@ class window.Tile
       true
     else
       false
+      
+  getDegree: ->
+    @degree
         
   setDegree: (degree) ->
     if @grid.hottestTile == null || @grid.hottestTile.degree < degree
@@ -283,6 +286,7 @@ class window.Tile
   
   toChildren: (algorithm) ->
     childDegree = if Jeocrowd.keepFullCells(@grid.level, 'computing') then -10 else (if @degree < 0 then @degree else -@getNeighborCount())
+    childDegree = -1 if childDegree == 0 # use this fake degree in case of a huge lonely cell that will have no neighbors
     if algorithm.apply this # algorithm used to decide growing down or not, eg always...
       belowGrid = Jeocrowd.grids @grid.level - 1
       # children given -parentNeighborCount as initial degree
