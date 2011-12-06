@@ -56,14 +56,6 @@
     <%= search_option "hottest_tiles_degree" do %>
       <%= "" %>
     <% end %>
-
-    <%= search_option "degree_range" do %>
-      <%= "" %>
-    <% end %>
-    
-    <%= search_option "neighbor_range" do %>
-      <%= "" %>
-    <% end %>
     
     <%= search_option "selected_tile" do %>
       <%= "" %>
@@ -107,7 +99,11 @@
     
     <%= search_option " " do %>
       <%= "" %>
-    <% end %>  
+    <% end %> 
+    
+    <%= search_option " " do %>
+      <%= "" %>
+    <% end %>
     
     <%= search_option " " do %>
       <%= "" %>
@@ -115,6 +111,10 @@
     
     <%= search_option " " do %>
       <%= "" %>
+    <% end %>  
+    
+    <%= search_option "reload_tree" do %>
+      <%= "&raquo;".html_safe %>
     <% end %>  
     
     <%= search_option "navigation" do %>
@@ -135,7 +135,8 @@
     
   </div>
 </div>
-<div id="highchart_graph" style="width: 100%; height: 300px;"></div>
-<div id="jeocrowd_config" data-timestamp="<%= @timestamp %>">
+<div id="highchart_graph" style="float: left; width: 100%; height: 300px;">&nbsp;</div>
+<div id="jeocrowd_tree" style="float: left; width: 100%; min-height: 200px;">...</div>
+<div id="jeocrowd_config" data-timestamp="<%= @timestamp %>" style="float: left; display:none">
   <%= @search.attributes.to_json %>
 </div>

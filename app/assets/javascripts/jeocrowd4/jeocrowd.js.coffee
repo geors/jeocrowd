@@ -99,6 +99,7 @@ window.Jeocrowd =
           @visibleLevel(@refinementLevel)
         $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
         $('#level_label label').text('max: ' + @maxLevel)
+    @config
   
   autoStart: ->
     @config.autoStart || true
@@ -197,9 +198,23 @@ window.Jeocrowd =
     grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()
     @maxLevel = i
 
-
-
-
+  convertConfigurationToTree: ->
+    @config.search ||= JSON.parse $('#jeocrowd_config').html()
+    g = new Grid(0)
+    g.addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
+    xp = g.tiles.map('getIdAndDegree')
+    rf = []
+    for i in (@levels || [])
+      if parseInt(i) >= 0
+        g = new Grid(0)
+        g.addTile(id, degree) for own id, degree of @config.search.rfTiles[i]
+        rf[i] = {data: i + '', children: g.tiles.map('getIdAndDegree')}
+    data = [
+      {data: 'xpTiles', children: xp},
+      {data: 'levels', children: (@levels || []).map( (x)-> x + '')},
+      {data: 'rfTiles', children: rf}
+    ]
+    
 
 
 

@@ -7,5 +7,6 @@
 //= require jquery
 //= require jquery-ui
 //= require jquery_ujs
+//= require jquery.jstree
 //= require highcharts
 //= require_tree .

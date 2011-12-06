@@ -69,5 +69,12 @@ giveLifeToPage = ->
         data: Jeocrowd.visibleGrid().tiles.map('getDegree').filter((x) -> x > 0).sort((a, b) -> return b - a)
       }]
     })
+  $('#jeocrowd_tree').jstree({
+    core : {  },
+    plugins : [ "json_data", "themes", "ui" ],
+    json_data: {
+      data: Jeocrowd.convertConfigurationToTree()
+    }
+  })
   
 

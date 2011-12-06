@@ -19,6 +19,9 @@ class window.Tile
   
   getId: ->
     @id
+    
+  getIdAndDegree: ->
+    @id + ': ' + @degree
   
   sanitizedId: ->
     @id.replace(/[^0-9A-Za-z]/g, '_')
