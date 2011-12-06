@@ -62,6 +62,9 @@ giveLifeToPage = ->
           text: 'degree of tiles'
         }
       },
+      tooltip: {
+        formatter: -> @y
+      }
       series: [{
         data: Jeocrowd.visibleGrid().tiles.map('getDegree').filter((x) -> x > 0).sort((a, b) -> return b - a)
       }]
