@@ -141,17 +141,12 @@ window.Jeocrowd =
       @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     @visibleLevel(@maxLevel)
     @map.panTo @visibleGrid().hottestTile.getCenter()
-    @grids(@maxLevel).clearBeforeRefinement true, ->  # true: display cells to be removed
-      Jeocrowd.continueSwitchToRefinementPhase()
-    
-  continueSwitchToRefinementPhase: ->
     @levels = []
     @levels[i] = null for i in [0..@maxLevel]
     @levels[@maxLevel] = @maxLevel
-    @refinementLevel = @maxLevel - 1
     (delete(@_grids[grid.level]) if grid.level != @maxLevel) for grid in @_grids
-    @provider().saveRefinementResults @visibleGrid().tiles.toSimpleJSON('degree'), 
-                                      @visibleGrid().level, Jeocrowd.gotoBelowLevel
+    @refinementLevel = @maxLevel - 1
+    @gotoBelowLevel()
   
   gotoBelowLevel: ->
     if @refinementLevel == -1
@@ -160,12 +155,8 @@ window.Jeocrowd =
       return
     @levels[@refinementLevel + 1] = @refinementLevel + 1  # mark above level as complete
     @reloadTiles(@refinementLevel + 1) if @grids(@refinementLevel + 1).size() == 0
-    if (@refinementLevel + 1 != @maxLevel)
-      @grids(@refinementLevel + 1).clearBeforeRefinement true, ->
-        Jeocrowd.continueGotoBelowLevel()
-    else
-      @grids(@refinementLevel).growDown(Tile.prototype.always, false)
-      @continueGotoBelowLevel()
+    @grids(@refinementLevel + 1).clearBeforeRefinement true, ->
+      Jeocrowd.continueGotoBelowLevel()
     
   continueGotoBelowLevel: ->
     @grids(@refinementLevel).growDown(Tile.prototype.always)
