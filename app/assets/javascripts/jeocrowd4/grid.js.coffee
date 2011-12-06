@@ -55,6 +55,7 @@ class window.Grid
     if tile
       tile.undraw()
       $('#visible_points_value').text(@visiblePointsCounter)
+      $('#visible_tiles_value').text(@visibleTilesCounter)
     
   
   getTile: (id...) ->
