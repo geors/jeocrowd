@@ -69,12 +69,15 @@ giveLifeToPage = ->
         data: Jeocrowd.visibleGrid().tiles.map('getDegree').filter((x) -> x > 0).sort((a, b) -> return b - a)
       }]
     })
-  $('#jeocrowd_tree').jstree({
-    core : {  },
-    plugins : [ "json_data", "themes", "ui" ],
-    json_data: {
-      data: Jeocrowd.convertConfigurationToTree()
-    }
-  })
+  $('#reload_tree_value').click ->
+    Jeocrowd.loadConfigIntoTree()
+  $('#refined').click ->
+    ch = $('#refined:checked').length > 0
+    if Jeocrowd.config.search.phase == 'refinement' && Jeocrowd.visibleGrid().isComplete()
+      if ch
+        Jeocrowd.visibleGrid().clearBeforeRefinement(false)
+      else
+        Jeocrowd.reloadTiles(Jeocrowd.visibleLevel())
+        Jeocrowd.visibleGrid().draw()
   
 

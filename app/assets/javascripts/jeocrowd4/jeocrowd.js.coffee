@@ -3,6 +3,7 @@
 # add parallelization to refinement like in exploratory but with batches of boxes
 # zoom map to include all tile (some tiles with high degree)
 # check how we can draw hybrid grids (with tiles from bigger levels!!)
+# -- > check if possible again to not use negative degrees for the tiles
 
 MAX_LEVEL = 6
 
@@ -12,22 +13,22 @@ window.Jeocrowd =
   COORDINATE_SEPARATOR: '^'
   MAX_XP_PAGES: 16
   MAX_NEIGHBORS: 7
-  FULL_SEARCH_TIMES: 1
+  FULL_SEARCH_TIMES: 1  # DO NOT SET THIS TO ZERO
   
   config: {}
     
   _grids: null
   grids: (level) ->
-    @_grids ||= [0..MAX_LEVEL].map (i) ->
+    @_grids ?= [0..MAX_LEVEL].map (i) ->
       new Grid(i)
     if level == undefined
       @_grids
     else
-      @_grids[level] || (@_grids[level] = new Grid(level))
+      @_grids[level] ? (@_grids[level] = new Grid(level))
   
   _provider : null
   provider: ->
-    @_provider ||= new window.Provider 'Flickr', window.location.href, @config.search, @config.timestamp
+    @_provider ?= new window.Provider 'Flickr', window.location.href, @config.search, @config.timestamp
   
   _visibleLayer: 'degree'
   visibleLayer: (layer) ->
@@ -92,14 +93,37 @@ window.Jeocrowd =
         if @refinementLevel == null
           @markAsCompleted()
           return
+        @reloadTiles(level) for level in [(@maxLevel - 1)..@refinementLevel]
         if @config.search.rfTiles[@refinementLevel] == null
           @gotoBelowLevel()
         else
-          @grids(@refinementLevel).addTile(id, degree) for own id, degree of @config.search.rfTiles[@refinementLevel]
           @visibleLevel(@refinementLevel)
         $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
         $('#level_label label').text('max: ' + @maxLevel)
     @config
+    
+  loadConfigIntoTree: ->
+    g = new Grid(0)
+    g.addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
+    xp = g.tiles.map('getIdAndDegree')
+    rf = []
+    for i in (@levels ? [])
+      if parseInt(i) >= 0
+        g = new Grid(0)
+        g.addTile(id, degree) for own id, degree of @config.search.rfTiles[i]
+        rf[i] = {'data': i + '', 'children': g.tiles.map('getIdAndDegree')}
+    data = [
+      {'data': 'xpTiles', 'children': xp},
+      {'data': 'levels', 'children': (@levels ? []).map( (x) -> x + '')},
+      {'data': 'rfTiles', 'children': rf}
+    ]
+    $('#jeocrowd_tree').jstree({
+      'core' : {  },
+      'plugins' : [ "json_data", "themes", "ui" ],
+      'json_data': {
+        'data': data
+      }
+    })
   
   autoStart: ->
     @config.autoStart || true
@@ -140,6 +164,7 @@ window.Jeocrowd =
     if @grids(@maxLevel).isSparse()
       @maxLevel += 1
       @grids(@maxLevel).growUp Tile.prototype.atLeastOne
+    $('#level_label label').text('max: ' + @maxLevel)
     @visibleLevel(@maxLevel)
     @map.panTo @visibleGrid().hottestTile.getCenter()
     @levels = []
@@ -149,13 +174,17 @@ window.Jeocrowd =
     @refinementLevel = @maxLevel - 1
     @gotoBelowLevel()
   
+  # maximum level is not stored on the server
+  # it can be computed by calling 'switchToRefinementPhase' from the exploratory search final results
+  # each lower level is stored once hollow-calculated and then individually for each tile
+  # this means that eventually when a grid is complete it will be stored before it got refined.
+  # this is good because it allows us to view the before-after refinement-clearing of each level.
   gotoBelowLevel: ->
     if @refinementLevel == -1
       @grids(@refinementLevel).clearBeforeRefinement true
       @markAsCompleted()
       return
     @levels[@refinementLevel + 1] = @refinementLevel + 1  # mark above level as complete
-    @reloadTiles(@refinementLevel + 1) if @grids(@refinementLevel + 1).size() == 0
     @grids(@refinementLevel + 1).clearBeforeRefinement true, ->
       Jeocrowd.continueGotoBelowLevel()
     
@@ -198,22 +227,6 @@ window.Jeocrowd =
     grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()
     @maxLevel = i
 
-  convertConfigurationToTree: ->
-    @config.search ||= JSON.parse $('#jeocrowd_config').html()
-    g = new Grid(0)
-    g.addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
-    xp = g.tiles.map('getIdAndDegree')
-    rf = []
-    for i in (@levels || [])
-      if parseInt(i) >= 0
-        g = new Grid(0)
-        g.addTile(id, degree) for own id, degree of @config.search.rfTiles[i]
-        rf[i] = {data: i + '', children: g.tiles.map('getIdAndDegree')}
-    data = [
-      {data: 'xpTiles', children: xp},
-      {data: 'levels', children: (@levels || []).map( (x)-> x + '')},
-      {data: 'rfTiles', children: rf}
-    ]
     
 
 

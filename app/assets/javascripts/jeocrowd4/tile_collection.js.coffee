@@ -43,7 +43,7 @@ class window.TileCollection
   copyFrom: (ids, collection, levelForNonExisting) ->
     for id in ids
       t = collection.collection[id]
-      t = t || new Tile(levelForNonExisting, id) if levelForNonExisting != null
+      t = t ? new Tile(levelForNonExisting, id) if levelForNonExisting != null
       @add(t)
     
   each: (func, params...) ->

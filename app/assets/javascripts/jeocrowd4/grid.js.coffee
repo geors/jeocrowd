@@ -15,7 +15,7 @@ class window.Grid
     @className = 'Grid'
   
   step: ->
-    @_step ||= Math.pow(Jeocrowd.LEVEL_MULTIPLIER, @level) * Jeocrowd.BASE_GRID_STEP
+    @_step ?= Math.pow(Jeocrowd.LEVEL_MULTIPLIER, @level) * Jeocrowd.BASE_GRID_STEP
   
   digitizeCoordinate: (c) ->
     c = parseFloat(c) if typeof c == 'string'
@@ -34,7 +34,7 @@ class window.Grid
     @minVisibleNeighborCount = n
   
   addTile: (id, degree, points) ->
-    tile = @tiles.get(id) || new Tile(@level, id)
+    tile = @tiles.get(id) ? new Tile(@level, id)
     tile.grid = this
     tile.setDegree(if typeof degree == 'string' then parseInt(degree) else degree) if degree
     tile.points = points if points
@@ -56,7 +56,6 @@ class window.Grid
       tile.undraw()
       $('#visible_points_value').text(@visiblePointsCounter)
       $('#visible_tiles_value').text(@visibleTilesCounter)
-    
   
   getTile: (id...) ->
     if id.length == 1
@@ -122,6 +121,8 @@ class window.Grid
     lonelyTilesCount = @tiles.filter('isLoner').size()
     if @size() > 0 then lonelyTilesCount / @size() > 0.75 else false
 
+  isComplete: ->
+    @tiles.map('getDegree').every( (t) -> t > 0 || Jeocrowd.MAX_NEIGHBORS <= -t <= 8)
 
 
 

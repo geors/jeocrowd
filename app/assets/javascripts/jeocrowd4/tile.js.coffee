@@ -129,7 +129,7 @@ class window.Tile
     
   highlight: (display) ->
     return if @isHighlighted1 == display
-    @visualBounds = @visualBounds || new google.maps.Rectangle({
+    @visualBounds = @visualBounds ? new google.maps.Rectangle({
       bounds: new google.maps.LatLngBounds(
         new google.maps.LatLng(@getBoundingBox().bottom, @getBoundingBox().left),
         new google.maps.LatLng(@getBoundingBox().top, @getBoundingBox().right)
@@ -143,7 +143,7 @@ class window.Tile
     
   highlight2: (display) ->
     return if @isHighlighted2 == display
-    @visualCross1 = @visualCross1 || new google.maps.Polygon({
+    @visualCross1 = @visualCross1 ? new google.maps.Polygon({
       paths: [
         new google.maps.LatLng(@getBoundingBox().top, @getBoundingBox().left),
         new google.maps.LatLng(@getBoundingBox().bottom, @getBoundingBox().right)
@@ -153,7 +153,7 @@ class window.Tile
       fillOpacity: 0,
       zIndex: 20
     })
-    @visualCross2 = @visualCross2 || new google.maps.Polygon({
+    @visualCross2 = @visualCross2 ? new google.maps.Polygon({
       paths: [
         new google.maps.LatLng(this.getBoundingBox().top, this.getBoundingBox().right),
         new google.maps.LatLng(this.getBoundingBox().bottom, this.getBoundingBox().left)
