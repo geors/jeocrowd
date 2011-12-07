@@ -107,12 +107,9 @@ window.Jeocrowd =
     g.addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
     xp = g.tiles.map('getIdAndDegree')
     rf = []
-    for i in (@levels ? [])
-      if parseInt(i) >= 0
-        g = new Grid(0)
-        g.addTile(id, degree) for own id, degree of @config.search.rfTiles[i]
-        rf[i] = {'data': i + '', 'children': g.tiles.map('getIdAndDegree')}
-    data = [
+    for i in [0..(@maxLevel - 1)]
+      rf[i] = {'data': i + '', 'children': @grids(i).tiles.map('getIdAndDegree')}
+    @treedata = [
       {'data': 'xpTiles', 'children': xp},
       {'data': 'levels', 'children': (@levels ? []).map( (x) -> x + '')},
       {'data': 'rfTiles', 'children': rf}
@@ -121,7 +118,7 @@ window.Jeocrowd =
       'core' : {  },
       'plugins' : [ "json_data", "themes", "ui" ],
       'json_data': {
-        'data': data
+        'data': @treedata
       }
     })
   
