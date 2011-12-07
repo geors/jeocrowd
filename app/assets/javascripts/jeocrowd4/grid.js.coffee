@@ -92,7 +92,6 @@ class window.Grid
   # fills current grid with the children tiles of the grid above
   growDown: (algorithm, rejectWillBeRemoved = true) ->
     aboveGrid = Jeocrowd.grids(@level + 1)
-    aboveGrid.growDown(algorithm) if (aboveGrid.dirty || aboveGrid.algorithm != algorithm) && aboveGrid.level > Jeocrowd.maxLevel
     if rejectWillBeRemoved
       aboveGrid.tiles.reject('willBeRemoved').each('toChildren', algorithm)
     else
