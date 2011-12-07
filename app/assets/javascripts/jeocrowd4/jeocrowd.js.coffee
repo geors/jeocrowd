@@ -91,7 +91,7 @@ window.Jeocrowd =
           @markAsCompleted()
           return
         @reloadTiles(level) for level in [(@maxLevel - 1)..@refinementLevel]
-        @grids(level).clearBeforeRefinement(false) for level in [(@maxLevel - 1)..@refinementLevel]
+        @grids(level).clearBeforeRefinement(false) for level in [(@maxLevel - 1)..(@refinementLevel + 1)]
         if @config.search.rfTiles[@refinementLevel] == null
           @gotoBelowLevel()
         else

@@ -235,12 +235,10 @@ class window.Tile
       @squareNeighborIds = [n[1], n[3], n[5], n[7]]
     @squareNeighborIds
 
-
   getNeighbors: (force) ->
     @neighbors = new TileCollection()
     @neighbors.copyFrom @getNeighborIds(), @grid.tiles, if force then @grid.level else null
-    @neighbors.filter 'refined'           # do not include neighbors with zero degree
-
+    @neighbors = @neighbors.filter 'refined'           # do not include neighbors with zero degree
 
   getSquareNeighbors: (force) ->
     @squareNeighbors = new TileCollection()
@@ -249,7 +247,21 @@ class window.Tile
 
 
   getNeighborCount: ->
-    @getNeighbors().size()
+    s = @getNeighbors().size()
+    # since during refinement we do NOT copy fully occupied tiles to the level below
+    # but we keep them only in the above levels we have to account for that fact when
+    # we count the neighbors!
+    if Jeocrowd.config.search.phase == 'refinement'
+      existingNeighborIds = @getNeighbors().map('getId')
+      missingNeighborIds = @getNeighborIds().filter((x) -> existingNeighborIds.indexOf(x) == -1)
+      for ct in missingNeighborIds
+        # console.log ct
+        for i in [(@grid.level + 1)..(Jeocrowd.maxLevel - 1)]
+          if t = Jeocrowd.grids(i).getTile(ct)
+            s += 1 if t.willBeDrawnFromHigherLevel()
+            # console.log s
+            break
+    s
 
   isLoner: ->
     @getNeighbors().size() == 0
