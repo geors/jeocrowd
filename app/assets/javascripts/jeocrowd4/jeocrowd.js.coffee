@@ -60,11 +60,8 @@ window.Jeocrowd =
     @visibleGrid().draw()
   
   # calculating when we have to search everything or when to keep full areas based on FULL_SEARCH_TIMES
-  keepFullCells: (level, searchingOrComputing) ->
-    if searchingOrComputing == 'computing'
-      @maxLevel - level < Jeocrowd.FULL_SEARCH_TIMES
-    else if searchingOrComputing == 'searching'
-      @maxLevel - level < Jeocrowd.FULL_SEARCH_TIMES + 1
+  searchEverything: (level) ->
+    @maxLevel - level < Jeocrowd.FULL_SEARCH_TIMES
   
   buildMap: (div) ->
     initialOptions = { zoom: 10, mapTypeId: google.maps.MapTypeId.ROADMAP }
@@ -94,6 +91,7 @@ window.Jeocrowd =
           @markAsCompleted()
           return
         @reloadTiles(level) for level in [(@maxLevel - 1)..@refinementLevel]
+        @grids(level).clearBeforeRefinement(false) for level in [(@maxLevel - 1)..@refinementLevel]
         if @config.search.rfTiles[@refinementLevel] == null
           @gotoBelowLevel()
         else
@@ -132,7 +130,7 @@ window.Jeocrowd =
       @switchToRefinementPhase() if next == null
     else if @config.search.phase == 'refinement'
       next = @provider().refinementSearch @config.search.keywords, @refinementLevel, @receiveResults
-      @gotoBelowLevel(@refinementLevel = @refinementLevel - 1) if next == null
+      @gotoBelowLevel() if next == null
     
   receiveResults: (data, pageOrLevel, box) ->
     if @config.search.phase == 'exploratory'
@@ -164,11 +162,11 @@ window.Jeocrowd =
     $('#level_label label').text('max: ' + @maxLevel)
     @visibleLevel(@maxLevel)
     @map.panTo @visibleGrid().hottestTile.getCenter()
+    for grid in @_grids
+      delete(@_grids[grid.level]) if grid.level != @maxLevel
     @levels = []
     @levels[i] = null for i in [0..@maxLevel]
-    @levels[@maxLevel] = @maxLevel
-    (delete(@_grids[grid.level]) if grid.level != @maxLevel) for grid in @_grids
-    @refinementLevel = @maxLevel - 1
+    @refinementLevel = @maxLevel
     @gotoBelowLevel()
   
   # maximum level is not stored on the server
@@ -177,16 +175,16 @@ window.Jeocrowd =
   # this means that eventually when a grid is complete it will be stored before it got refined.
   # this is good because it allows us to view the before-after refinement-clearing of each level.
   gotoBelowLevel: ->
-    if @refinementLevel == -1
+    if @refinementLevel == 0
       @grids(@refinementLevel).clearBeforeRefinement true
       @markAsCompleted()
       return
-    @levels[@refinementLevel + 1] = @refinementLevel + 1  # mark above level as complete
-    @grids(@refinementLevel + 1).clearBeforeRefinement true, ->
-      Jeocrowd.continueGotoBelowLevel()
+    @levels[@refinementLevel] = @refinementLevel  # mark current level as complete before going down
+    @grids(@refinementLevel).clearBeforeRefinement(true, -> Jeocrowd.continueGotoBelowLevel())
     
   continueGotoBelowLevel: ->
-    @grids(@refinementLevel).growDown(Tile.prototype.always)
+    @refinementLevel -= 1
+    @grids(@refinementLevel).growDown(Tile.prototype.notFull)
     @visibleLevel(@refinementLevel)
     @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'), 
                                       @refinementLevel, Jeocrowd.syncWithServer
@@ -198,7 +196,8 @@ window.Jeocrowd =
     if @config.search.phase == 'exploratory'
       @config.timestamp = @provider().timestamp = newData.timestamp
       @provider().updatePages(newData.pages) if newData.pages
-      # if provider has 16 pages AND all calculated get all the xpTiles data from the server and resume to switch to refinement
+      # if provider has 16 pages AND all calculated get all the xpTiles data from the server
+      # and resume to switch to refinement
       @grids(0).addTile(id, info.degree, info.points) for own id, info of newData.xpTiles if newData.xpTiles
       # if provider has 16 pages but not all calculated wait a few minutes the reload the page (without ?x=y....)
       @waitAndReload() if !@provider().allPagesCompleted() && @provider().noPagesForMe()

@@ -69,11 +69,11 @@ class window.Grid
     grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()
   
   draw: ->
-    if @dirty
-      if Jeocrowd.config.search.phase == 'exploratory'
+    if @dirty && Jeocrowd.config.search.phase == 'exploratory'
         @growUp Tile.prototype.atLeastTwo
-      else if Jeocrowd.config.search.phase == 'refinement'
-        @addTile(id, degree) for own id, degree of Jeocrowd.config.search.rfTiles[@level]
+    if Jeocrowd.config.search.phase == 'refinement'
+      for i in [(@level + 1)..(Jeocrowd.maxLevel)]
+        Jeocrowd.grids(i).tiles.filter('willBeDrawnFromHigherLevel').each('draw')
     @tiles.each 'draw'
     $('#visible_points_value').text(@visiblePointsCounter)
     $('#visible_tiles_value').text(@visibleTilesCounter)
@@ -90,14 +90,14 @@ class window.Grid
     @algorithm = algorithm
 
   # fills current grid with the children tiles of the grid above
+  # rejectWillBeRemoved parameter is used if the above grid is not refined yet
+  # (usually not the case but just in case)
   growDown: (algorithm, rejectWillBeRemoved = true) ->
     aboveGrid = Jeocrowd.grids(@level + 1)
     if rejectWillBeRemoved
       aboveGrid.tiles.reject('willBeRemoved').each('toChildren', algorithm)
     else
       aboveGrid.tiles.each('toChildren', algorithm)
-    @dirty = false
-    @algorithm = algorithm
 
   clearBeforeRefinement: (showProgress = false, callback = null) ->
     if showProgress

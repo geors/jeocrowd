@@ -62,7 +62,7 @@ class window.Tile
     @degree = degree
     
   refined: ->
-    @degree > 0 || @fullParent()
+    @degree > 0
   
   #
   # ---- ---- VISUAL DESIGN ---- ----
@@ -90,7 +90,7 @@ class window.Tile
     if @visual
       @visual.setOptions {
         strokeColor: @getColor(),
-        strokeWeight: if @fullParent() then 0 else 1,
+        strokeWeight: if @willBeDrawnFromHigherLevel() then 0 else 1,
         fillColor: @getColor(),
         fillOpacity: @getOpacity()
       }
@@ -105,7 +105,7 @@ class window.Tile
         paths: pathPoints,
         strokeColor: @getColor(),
         strokeOpacity: 0.8,
-        strokeWeight: if @fullParent() then 0 else 1,
+        strokeWeight: if @willBeDrawnFromHigherLevel() then 0 else 1,
         fillColor: @getColor(),
         fillOpacity: @getOpacity(),
         zIndex: 10
@@ -177,7 +177,7 @@ class window.Tile
 
 
   getColor: ->
-    if @fullParent()
+    if @willBeDrawnFromHigherLevel()
       '#1E719F'
     else if @degree < 0
       '#DDDDDD'
@@ -259,15 +259,30 @@ class window.Tile
     # that even at a high level only one tile was left, or even multi clusters, ie. a few loner tiles were left
     @degree > 0 && ((@isLoner() && @degree < 0.5 * @grid.hottestTile.degree) || @degree < 0.02 * @grid.hottestTile.degree)
     
-  fullParent: ->
-    @degree < 0 && -@degree >= Jeocrowd.MAX_NEIGHBORS && -@degree <= 8
+  fullyOccupied: ->
+    @getNeighborCount() >= Jeocrowd.MAX_NEIGHBORS
+    
+  willBeDrawnFromHigherLevel: ->
+    !@willBeRemoved() && @fullyOccupied() && !Jeocrowd.searchEverything(@grid.level) && @level > Jeocrowd.visibleLevel()
   
   # 
   # ---- ---- PARENTS, CHILDREN and SIBLINGS ---- ----
   # 
   
+  # functions that allow transition either when grow up -> make parents
+  # or when growing down -> make children
+  # available functions:
+  # always:
+  # notFull: neighbors are beign counted after the parent grid has been refined
+  # atLeastOne:
+  # atLeastTwo:
+  
   always: ->
     true
+  
+  notFull: ->
+    Jeocrowd.searchEverything(@grid.level) ||
+        (!Jeocrowd.searchEverything(@grid.level) && !@fullyOccupied())
   
   atLeastOne: ->
     @getSiblings().size() >= 1
@@ -288,8 +303,7 @@ class window.Tile
       null
   
   toChildren: (algorithm) ->
-    childDegree = if Jeocrowd.keepFullCells(@grid.level, 'computing') then -10 else (if @degree < 0 then @degree else -@getNeighborCount())
-    childDegree = -1 if childDegree == 0 # use this fake degree in case of a huge lonely cell that will have no neighbors
+    childDegree = -1        # use this fake degree for tiles that
     if algorithm.apply this # algorithm used to decide growing down or not, eg always...
       belowGrid = Jeocrowd.grids @grid.level - 1
       # children given -parentNeighborCount as initial degree
@@ -311,17 +325,16 @@ class window.Tile
     if @allChildrenIds == undefined
       @allChildrenIds = []
       vChild = new Tile belowGrid.level, @gridLat, @gridLon
-      (
+      for vChildId in vChild.getVerticalNeighborIds Jeocrowd.LEVEL_MULTIPLIER - 1
         [lat, lon] = vChildId.split Jeocrowd.COORDINATE_SEPARATOR
         hChild = new Tile belowGrid.level, lat, lon
         @allChildrenIds.push hChildId for hChildId in hChild.getHorizontalNeighborIds Jeocrowd.LEVEL_MULTIPLIER - 1
-      ) for vChildId in vChild.getVerticalNeighborIds Jeocrowd.LEVEL_MULTIPLIER - 1
     @childrenIds = @allChildrenIds.map (id, index, ids) ->
       if belowGrid.getTile(id) || force then id else null
     
   getChildren: (force) ->
     @children = new TileCollection()
-    @children.copyFrom @getChildrenIds(force), @grid.tiles, if force then (@grid.level - 1) else null
+    @children.copyFrom @getChildrenIds(force), Jeocrowd.grids(@level - 1).tiles, if force then (@grid.level - 1) else null
     @children
     
   getSiblingsIds: (force) ->
