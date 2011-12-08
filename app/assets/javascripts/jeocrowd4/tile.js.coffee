@@ -124,7 +124,7 @@ class window.Tile
     @grid.selectedTile = this
     $('#selected_tile_value').html(@linkTo())
     $('#selected_tile_degree_value').text(@degree)
-    $('#selected_tile_neighbors_value').text(@getNeighbors().size())
+    $('#selected_tile_neighbors_value').text(@getNeighborCount())
 
     
   highlight: (display) ->
@@ -250,17 +250,18 @@ class window.Tile
     s = @getNeighbors().size()
     # since during refinement we do NOT copy fully occupied tiles to the level below
     # but we keep them only in the above levels we have to account for that fact when
-    # we count the neighbors!
+    # we count the neighbors!    # 
     if Jeocrowd.config.search.phase == 'refinement'
       existingNeighborIds = @getNeighbors().map('getId')
       missingNeighborIds = @getNeighborIds().filter((x) -> existingNeighborIds.indexOf(x) == -1)
       for ct in missingNeighborIds
         # console.log ct
-        for i in [(@grid.level + 1)..(Jeocrowd.maxLevel - 1)]
-          if t = Jeocrowd.grids(i).getTile(ct)
-            s += 1 if t.willBeDrawnFromHigherLevel()
-            # console.log s
-            break
+        if @grid.level + 1 <= Jeocrowd.maxLevel - 1 
+          for i in [(@grid.level + 1)..(Jeocrowd.maxLevel - 1)]
+            if t = Jeocrowd.grids(i).getTile(ct)
+              s += 1 if t.willBeDrawnFromHigherLevel()
+              # console.log s
+              break
     s
 
   isLoner: ->
