@@ -46,6 +46,11 @@ window.Jeocrowd =
       @grids(@_visibleLevel).undraw()
       @_visibleLevel = level
       @grids(@_visibleLevel).draw()
+      $('#visible_points_value').text(@grids(@_visibleLevel).visiblePointsCounter)
+      $('#visible_tiles_value').text(@grids(@_visibleLevel).visibleTilesCounter)
+      if @grids(@_visibleLevel).hottestTile
+        $('#hottest_tiles_value').html(@grids(@_visibleLevel).hottestTile.linkTo())
+        $('#hottest_tiles_degree_value').text(@grids(@_visibleLevel).hottestTile.degree)
     @_visibleLevel
       
   visibleGrid: ->
