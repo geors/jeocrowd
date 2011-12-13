@@ -147,12 +147,16 @@ window.Jeocrowd =
       @provider().saveExploratoryResults @grids(0).tiles.toJSON(['degree', 'points']), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
       level = pageOrLevel
-      if box.degree > 0
-        box.drawNeighborhood() if level == @visibleLevel()
+      if box
+        if box.degree > 0
+          box.drawNeighborhood() if level == @visibleLevel()
+        else
+          box.undraw() if level == @visibleLevel()
+          @grids(level).removeTile box.id
+      if @provider().continueRefinementBlock()
+        @resumeSearch()
       else
-        box.undraw() if level == @visibleLevel()
-        @grids(level).removeTile box.id
-      @provider().saveRefinementResults box.toSimpleJSON(['degree']), level, Jeocrowd.syncWithServer
+        @provider().saveRefinementResults @provider.assignedTilesCollection.toSimpleJSON(['degree']), level, Jeocrowd.syncWithServer
       
   switchToRefinementPhase: ->
     if @grids(0).size() == 0
@@ -192,21 +196,27 @@ window.Jeocrowd =
     @refinementLevel -= 1
     @grids(@refinementLevel).growDown(Tile.prototype.notFull)
     @visibleLevel(@refinementLevel)
-    @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'), 
+    @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'),
                                       @refinementLevel, Jeocrowd.syncWithServer
   
   reloadTiles: (level) ->
     @grids(level).addTile(id, degree) for own id, degree of @config.search.rfTiles[level]
   
   syncWithServer: (newData) ->
+    console.log 'syncing...'
+    @config.timestamp = @provider().timestamp = newData.timestamp
     if @config.search.phase == 'exploratory'
-      @config.timestamp = @provider().timestamp = newData.timestamp
+      console.log 'exploring...'
       @provider().updatePages(newData.pages) if newData.pages
       # if provider has 16 pages AND all calculated get all the xpTiles data from the server
       # and resume to switch to refinement
       @grids(0).addTile(id, info.degree, info.points) for own id, info of newData.xpTiles if newData.xpTiles
       # if provider has 16 pages but not all calculated wait a few minutes the reload the page (without ?x=y....)
       @waitAndReload() if !@provider().allPagesCompleted() && @provider().noPagesForMe()
+    else if @config.search.phase == 'refinement'
+      console.log 'refining...'
+      console.log newData
+      @provider().updateAssignedTiles(newData.boxes, newData.level) # boxes can be either an array of ids to search for or null/undefined
     @resumeSearch() unless @exitNow
   
   waitAndReload: ->

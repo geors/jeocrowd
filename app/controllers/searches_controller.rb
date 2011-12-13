@@ -45,9 +45,10 @@ class SearchesController < ApplicationController
     @new_timestamp = @search.updateExploratory(
                        params[:xpTiles], params[:page].to_i, params[:timestamp].to_i
                      ) if (params[:xpTiles] && params[:page])
-    @new_timestamp = @search.updateRefinement(
-                       params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i)
-                     ) if params[:rfTiles] && params[:level]   
+    @new_block, @new_timestamp = @search.updateRefinement(
+                                   params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i)
+                                 ) if params[:rfTiles] && params[:level]
+    @level = params[:level]
     @search.save
   end
 

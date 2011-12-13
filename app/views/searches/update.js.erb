@@ -8,8 +8,14 @@
   ,
   "pages": <%= @search.pages.to_json %>
   <% end %>
-  <% if @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
+  <% if @search.phase == "exploratory" && @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
   ,
   "xpTiles": <%= @search.xpTiles.to_json.html_safe %>
+  <% end %>
+  <% if @new_block %>
+  ,
+  "boxes": <%= @new_block.blank? ? null : @new_block.to_json.html_safe %>
+  ,
+  "level": <%= @level %>
   <% end %>
 }

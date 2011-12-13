@@ -34,13 +34,19 @@ class window.Provider
 
   computeNextPage: ->
     Util.firstWithTimestamp @pages, @timestamp
-    
+  
+  updateAssignedTiles: (tiles, level) ->
+    @assignedTiles = (if tiles? then tiles else null) # makes undefined -> null
+    @assignedTilesCollection = new TileCollection()
+    @assignedTilesCollection.copyFrom @assignedTiles, Jeocrowd.grids(level).tiles
+    @assingedTiles
+  
+  continueRefinementBlock: ->
+    @assignedTiles.length == 0
+  
   computeNextBox: (level) ->
-    Util.firstWithNegativeDegree Jeocrowd.grids(level).tiles
-    # if Jeocrowd.keepFullTiles(level, 'searching')
-    #   Util.firstWithNegativeDegree Jeocrowd.grids(level).tiles
-    # else
-    #   Util.firstWithNegativeDegreeAndLessThanNeighbors Jeocrowd.grids(level).tiles, Jeocrowd.MAX_NEIGHBORS
+    # returns the first element of the array and removes it from the assignedTiles list
+    if @assignedTiles? then @assignedTiles.splice(0, 1) else null
 
   exploratorySearch: (keywords, callback) ->
     return null if (page = @computeNextPage()) == null
@@ -58,6 +64,10 @@ class window.Provider
     
   refinementSearch: (keywords, level, callback) ->
     return null if (box = @computeNextBox(level)) == null
+    if box.length == 0
+      callback.apply Jeocrowd, [null, level, null]
+    else
+      box = Jeocrowd.grids(level).getTile box[0] # returned array from computeNextBox
     $('#current_input_tile_value').html(box.linkTo())
     Jeocrowd.map.panTo box.getCenter() if $('#pan_map:checked[value=input]').length > 0
     @params.bbox = box.getBoundingBoxString()

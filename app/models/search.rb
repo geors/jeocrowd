@@ -80,10 +80,28 @@ class Search
     results.each_pair do |id, degree|
       results[id] = degree.to_i
     end
+    results = Hash[results]
     self.rfTiles[level] ||= {}
-    self.rfTiles[level] = rfTiles[level].merge Hash[results]
+    self.rfTiles[level] = rfTiles[level].merge results
     self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
-    (Time.now.to_f * 1000).to_i
+    new_timestamp = (Time.now.to_f * 1000).to_i
+    [assign_new_refinement_block(level, 5, new_timestamp), new_timestamp]
+  end
+  
+  def assign_new_refinement_block(level, num, timestamp)
+    new_block = []
+    logger.debug rfTiles[level].inspect
+    if !rfTiles[level].nil?
+      rfTiles[level].keys.sort.each do |key|
+        if rfTiles[level][key] == -1
+          new_block << key
+          self.rfTiles[level][key] = -timestamp
+        end
+        break if new_block.length >= num
+      end
+    end
+    logger.debug rfTiles[level].inspect
+    new_block
   end
   
 end
