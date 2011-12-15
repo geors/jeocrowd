@@ -37,15 +37,17 @@ class window.Provider
   
   updateAssignedTiles: (tiles, level) ->
     @assignedTiles = (if tiles? then tiles else null) # makes undefined -> null
-    @assignedTilesCollection = new TileCollection()
-    @assignedTilesCollection.copyFrom @assignedTiles, Jeocrowd.grids(level).tiles
+    if tiles?
+      @assignedTilesCollection = new TileCollection()
+      @assignedTilesCollection.copyFrom @assignedTiles, Jeocrowd.grids(level).tiles
     @assingedTiles
   
   continueRefinementBlock: ->
-    @assignedTiles.length == 0
+    @assignedTiles.length > 0
   
   computeNextBox: (level) ->
     # returns the first element of the array and removes it from the assignedTiles list
+    console.log 'next box... '
     if @assignedTiles? then @assignedTiles.splice(0, 1) else null
 
   exploratorySearch: (keywords, callback) ->

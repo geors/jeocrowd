@@ -3,6 +3,8 @@ class Search
 
   MAX_XP_PAGES = 16
   XP_TIMEOUT = 15.seconds * 1000
+  RF_BLOCK_SIZE = 5
+  RF_TIMEOUT = (3 * RF_BLOCK_SIZE).seconds * 1000
   
   key :keywords,   String
   key :phase,      String,  :default => "exploratory"
@@ -30,7 +32,8 @@ class Search
       reload
       self.current_client = timestamp if pages.detect { |page| page == timestamp } .nil? unless pages.length == MAX_XP_PAGES
     elsif phase == "refinement"
-      
+      level = [levels.compact.min - 1, 0].max
+      assign_new_refinement_block(level, RF_BLOCK_SIZE, timestamp)
     end
   end
   
@@ -85,22 +88,20 @@ class Search
     self.rfTiles[level] = rfTiles[level].merge results
     self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
     new_timestamp = (Time.now.to_f * 1000).to_i
-    [assign_new_refinement_block(level, 5, new_timestamp), new_timestamp]
+    [assign_new_refinement_block(level, RF_BLOCK_SIZE, new_timestamp), new_timestamp]
   end
   
   def assign_new_refinement_block(level, num, timestamp)
     new_block = []
-    logger.debug rfTiles[level].inspect
     if !rfTiles[level].nil?
       rfTiles[level].keys.sort.each do |key|
-        if rfTiles[level][key] == -1
+        if rfTiles[level][key] == -1 || timestamp - rfTiles[level][key] < RF_TIMEOUT
           new_block << key
           self.rfTiles[level][key] = -timestamp
         end
         break if new_block.length >= num
       end
     end
-    logger.debug rfTiles[level].inspect
     new_block
   end
   

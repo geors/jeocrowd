@@ -156,7 +156,7 @@ window.Jeocrowd =
       if @provider().continueRefinementBlock()
         @resumeSearch()
       else
-        @provider().saveRefinementResults @provider.assignedTilesCollection.toSimpleJSON(['degree']), level, Jeocrowd.syncWithServer
+        @provider().saveRefinementResults @provider().assignedTilesCollection.toSimpleJSON(['degree']), level, Jeocrowd.syncWithServer
       
   switchToRefinementPhase: ->
     if @grids(0).size() == 0

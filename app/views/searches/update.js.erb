@@ -14,7 +14,7 @@
   <% end %>
   <% if @new_block %>
   ,
-  "boxes": <%= @new_block.blank? ? null : @new_block.to_json.html_safe %>
+  "boxes": <%= @new_block.blank? ? nil.to_json : @new_block.to_json.html_safe %>
   ,
   "level": <%= @level %>
   <% end %>
