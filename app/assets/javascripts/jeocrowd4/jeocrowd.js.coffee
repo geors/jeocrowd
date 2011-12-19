@@ -101,6 +101,7 @@ window.Jeocrowd =
         if @config.search.rfTiles[@refinementLevel] == null
           @gotoBelowLevel()
         else
+          @provider().updateAssignedTiles(Util.allWithTimestamp(@grids(@refinementLevel).tiles, -@config.timestamp), level);
           @visibleLevel(@refinementLevel)
         $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
         $('#level_label label').text('max: ' + @maxLevel)
@@ -156,7 +157,8 @@ window.Jeocrowd =
       if @provider().continueRefinementBlock()
         @resumeSearch()
       else
-        @provider().saveRefinementResults @provider().assignedTilesCollection.toSimpleJSON(['degree']), level, Jeocrowd.syncWithServer
+        @provider().saveRefinementResults @provider().assignedTilesCollection.toSimpleJSON(['degree']), 
+                                          level, Jeocrowd.syncWithServer
       
   switchToRefinementPhase: ->
     if @grids(0).size() == 0

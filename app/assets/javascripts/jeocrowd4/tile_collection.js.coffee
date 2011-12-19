@@ -43,7 +43,7 @@ class window.TileCollection
   copyFrom: (ids, collection, levelForNonExisting) ->
     for id in ids
       t = collection.collection[id]
-      t = t ? new Tile(levelForNonExisting, id) if levelForNonExisting != null
+      t = t ? new Tile(levelForNonExisting, id) if levelForNonExisting?
       @add(t)
     
   each: (func, params...) ->
@@ -86,7 +86,7 @@ class window.TileCollection
       ) for tile in @values
     else if typeof func == 'function'
       (
-        r = func.apply(testTile, params)
+        r = func.apply(tile, params)
         container.push tile if r
       ) for tile in @values
     container

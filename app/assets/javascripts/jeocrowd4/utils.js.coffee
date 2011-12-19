@@ -20,6 +20,9 @@ window.Util =
         return element
     null
     
+  allWithTimestamp: (tileCollection, t) ->
+    tileCollection.filter(-> @degree == t).map('getId')
+    
   lastMissingFromRange: (range) ->
     return null if range.length == 0
     for i in [(range.length - 1)..0]
