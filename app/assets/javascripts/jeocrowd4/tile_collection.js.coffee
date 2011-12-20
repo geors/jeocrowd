@@ -52,7 +52,7 @@ class window.TileCollection
     else if typeof func == 'function'
       (
         params.splice 0, 0, tile
-        func.apply(window, params)
+        func.apply(tile, params)
       ) for tile in @values
 
   map: (func, params...) ->
@@ -72,7 +72,7 @@ class window.TileCollection
       ) for tile in @values
     else if typeof func == 'function'
       (
-        r = func.apply(testTile, params)
+        r = func.apply(tile, params)
         container.push r if r
       ) for tile in @values
     container

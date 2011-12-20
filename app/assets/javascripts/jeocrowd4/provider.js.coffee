@@ -36,19 +36,29 @@ class window.Provider
     Util.firstWithTimestamp @pages, @timestamp
   
   updateAssignedTiles: (tiles, level) ->
+    t = @timestamp
     @assignedTiles = (if tiles? then tiles else null) # makes undefined -> null
     if tiles?
       @assignedTilesCollection = new TileCollection()
       @assignedTilesCollection.copyFrom @assignedTiles, Jeocrowd.grids(level).tiles
+      @assignedTilesCollection.each(-> @degree = -t)
     @assingedTiles
+    
+  allBoxesCompleted: (level) ->
+    Jeocrowd.grids(level).tiles.filter(-> @degree < 0).size() == 0
+    
+  noBoxForMe: (level) ->
+    t = @timestamp
+    console.log 'no box...'
+    console.log Jeocrowd.grids(level).tiles.filter(-> @degree == -t)
+    Jeocrowd.grids(level).tiles.filter(-> @degree == -t).size() == 0
   
   continueRefinementBlock: ->
     @assignedTiles.length > 0
   
   computeNextBox: (level) ->
     # returns the first element of the array and removes it from the assignedTiles list
-    console.log 'next box... '
-    if @assignedTiles? then @assignedTiles.splice(0, 1) else null
+    result = if @assignedTiles? then @assignedTiles.splice(0, 1) else null
 
   exploratorySearch: (keywords, callback) ->
     return null if (page = @computeNextPage()) == null

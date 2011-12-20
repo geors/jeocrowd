@@ -98,11 +98,13 @@ window.Jeocrowd =
         for level in [(@maxLevel - 1)..@refinementLevel]
           @reloadTiles(level) 
           @grids(level).clearBeforeRefinement(false) if @maxLevel > level > @refinementLevel
-        if @config.search.rfTiles[@refinementLevel] == null
+        if @config.search.rfTiles[@refinementLevel] == null          
           @gotoBelowLevel()
         else
-          @provider().updateAssignedTiles(Util.allWithTimestamp(@grids(@refinementLevel).tiles, -@config.timestamp), level);
-          @visibleLevel(@refinementLevel)
+          @provider().updateAssignedTiles(
+            Util.allWithTimestamp(@grids(@refinementLevel).tiles, -@config.timestamp), @refinementLevel
+          );
+          @visibleLevel(@refinementLevel)          
         $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
         $('#level_label label').text('max: ' + @maxLevel)
     @config
@@ -157,6 +159,9 @@ window.Jeocrowd =
       if @provider().continueRefinementBlock()
         @resumeSearch()
       else
+        console.log 'saving...'
+        console.log @provider().assignedTilesCollection
+        console.log @provider().assignedTilesCollection.toSimpleJSON(['degree'])
         @provider().saveRefinementResults @provider().assignedTilesCollection.toSimpleJSON(['degree']), 
                                           level, Jeocrowd.syncWithServer
       
@@ -219,6 +224,9 @@ window.Jeocrowd =
       console.log 'refining...'
       console.log newData
       @provider().updateAssignedTiles(newData.boxes, newData.level) # boxes can be either an array of ids to search for or null/undefined
+      console.log !@provider().allBoxesCompleted(@refinementLevel)
+      console.log @provider().noBoxForMe(@refinementLevel)
+      @waitAndReload() if !@provider().allBoxesCompleted(@refinementLevel) && @provider().noBoxForMe(@refinementLevel);
     @resumeSearch() unless @exitNow
   
   waitAndReload: ->

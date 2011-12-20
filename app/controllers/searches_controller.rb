@@ -6,6 +6,8 @@ class SearchesController < ApplicationController
 
   def show
     @search = Search.find(params[:id])
+    logger.debug "just started"
+    logger.debug  @search.rfTiles.to_yaml
     return if @search.nil?
     if params[:restart_exploratory]
       @search.phase = "exploratory"
