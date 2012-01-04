@@ -16,6 +16,9 @@ class window.Grid
   
   step: ->
     @_step ?= Math.pow(Jeocrowd.LEVEL_MULTIPLIER, @level) * Jeocrowd.BASE_GRID_STEP
+
+  sizeOfTile: ->
+    @_sizeOfTile ?= Math.pow(Jeocrowd.LEVEL_MULTIPLIER, @level) * Jeocrowd.ACTUAL_SIZE_OF_BASE_GRID_IN_METERS
   
   digitizeCoordinate: (c) ->
     c = parseFloat(c) if typeof c == 'string'
@@ -117,9 +120,21 @@ class window.Grid
     done / s if s > 0
 
   isSparse: ->
-    lonelyTilesCount = @tiles.filter('isLoner').size()
-    if @size() > 0 then lonelyTilesCount / @size() > 0.75 else false
-
+    # get the first Jeocrowd.HOT_TILES_COUNT_AVERAGE hottest tiles
+    hottestTiles = @tiles.valuesOrderedBy((a, b) -> return b.degree - a.degree).splice(0, Jeocrowd.HOT_TILES_COUNT_AVERAGE)
+    # calculate average distances
+    averages = {}
+    for i in [0..Jeocrowd.HOT_TILES_COUNT_AVERAGE - 1]
+      if i + 1 < Jeocrowd.HOT_TILES_COUNT_AVERAGE
+        for j in [i + 1..Jeocrowd.HOT_TILES_COUNT_AVERAGE - 1]
+          averages[i + ',' + j] = google.maps.geometry.spherical.computeDistanceBetween(hottestTiles[i].getCenter(), hottestTiles[j].getCenter())
+    sum = count = 0
+    for id, d of averages
+      sum += d
+      count += 1
+    avg = sum / count
+    avg > Jeocrowd.TILES_APART_FOR_SPARSE_GRIDS * @sizeOfTile()
+  
   isComplete: ->
     @tiles.map('getDegree').every( (t) -> t > 0 || Jeocrowd.MAX_NEIGHBORS <= -t <= 8)
 

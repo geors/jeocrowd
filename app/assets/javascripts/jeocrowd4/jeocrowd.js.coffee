@@ -9,12 +9,14 @@ MAX_LEVEL = 6
 
 window.Jeocrowd = 
   BASE_GRID_STEP: 0.0005
+  ACTUAL_SIZE_OF_BASE_GRID_IN_METERS: 50
   LEVEL_MULTIPLIER: 5
   COORDINATE_SEPARATOR: '^'
   HOT_TILES_COUNT_AVERAGE: 5
   MAX_XP_PAGES: 16
   MAX_NEIGHBORS: 7
   FULL_SEARCH_TIMES: 1  # DO NOT SET THIS TO ZERO
+  TILES_APART_FOR_SPARSE_GRIDS: 10
   
   config: {}
     
@@ -161,8 +163,6 @@ window.Jeocrowd =
         @resumeSearch()
       else
         console.log 'saving...'
-        console.log @provider().assignedTilesCollection
-        console.log @provider().assignedTilesCollection.toSimpleJSON(['degree'])
         @provider().saveRefinementResults @provider().assignedTilesCollection.toSimpleJSON(['degree']), 
                                           level, Jeocrowd.syncWithServer
       
@@ -175,6 +175,7 @@ window.Jeocrowd =
     @maxLevel = @calculateMaxLevel()
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     if @grids(@maxLevel).isSparse()
+      console.log 'sparse grid detected...'
       @maxLevel += 1
       @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     $('#level_label label').text('max: ' + @maxLevel)
@@ -223,10 +224,7 @@ window.Jeocrowd =
       @waitAndReload() if !@provider().allPagesCompleted() && @provider().noPagesForMe()
     else if @config.search.phase == 'refinement'
       console.log 'refining...'
-      console.log newData
       @provider().updateAssignedTiles(newData.boxes, newData.level) # boxes can be either an array of ids to search for or null/undefined
-      console.log !@provider().allBoxesCompleted(@refinementLevel)
-      console.log @provider().noBoxForMe(@refinementLevel)
       @waitAndReload() if !@provider().allBoxesCompleted(@refinementLevel) && @provider().noBoxForMe(@refinementLevel);
     @resumeSearch() unless @exitNow
   

@@ -14,6 +14,9 @@ class window.TileCollection
   
   get: (id) ->
     @collection[id] || null
+
+  getValues: ->
+    $.extend([], @values)
   
   add: (tile) ->
     if tile && !@collection[tile.id]
@@ -90,6 +93,11 @@ class window.TileCollection
         container.push tile if r
       ) for tile in @values
     container
+    
+  valuesOrderedBy: (func, params...) ->
+    copiedValues = @getValues()
+    copiedValues.sort(func)
+    return copiedValues
 
   reject: (func, params...) ->
     container = new TileCollection()

@@ -49,8 +49,6 @@ class window.Provider
     
   noBoxForMe: (level) ->
     t = @timestamp
-    console.log 'no box...'
-    console.log Jeocrowd.grids(level).tiles.filter(-> @degree == -t)
     Jeocrowd.grids(level).tiles.filter(-> @degree == -t).size() == 0
   
   continueRefinementBlock: ->
