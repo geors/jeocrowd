@@ -123,8 +123,17 @@ class window.Grid
   isComplete: ->
     @tiles.map('getDegree').every( (t) -> t > 0 || Jeocrowd.MAX_NEIGHBORS <= -t <= 8)
 
-
-
+  getHottestTilesAverageDegree: (force) ->
+    # because hottest tile is usually off the grid in comparison to the rest, we compare the degree of a tile with the average of
+    # the Jeocrowd.HOT_TILES_COUNT_AVERAGE hottest tiles in the same level
+    @hottestTilesAverageDegree = null if force
+    if !@hottestTilesAverageDegree?
+      sortedDegrees = @tiles.map('getDegree').filter((x) -> x > 0).sort((a, b) -> return b - a)
+      sum = 0
+      for i in [0..Jeocrowd.HOT_TILES_COUNT_AVERAGE - 1]
+        sum += sortedDegrees[i] if sortedDegrees[i]?
+      @hottestTilesAverageDegree = sum / Jeocrowd.HOT_TILES_COUNT_AVERAGE
+    @hottestTilesAverageDegree
 
 
 

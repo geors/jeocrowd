@@ -59,7 +59,7 @@ class window.Tile
       @grid.hottestTile = this 
       $('#hottest_tiles_value').html(@linkTo())
       $('#hottest_tiles_degree_value').text(degree)
-    @grid.hottestTilesAverageDegree = null
+      @grid.getHottestTilesAverageDegree(true)
     @degree = degree
     
   refined: ->
@@ -269,14 +269,6 @@ class window.Tile
     @getNeighbors().size() == 0
     
   willBeRemoved: ->
-    # because hottest tile is usually off the grid in comparison to the rest, we compare the degree of a tile with the average of
-    # the Jeocrowd.HOT_TILES_COUNT_AVERAGE hottest tiles in the same level
-	  if !@grid.hottestTilesAverageDegree?
-		  sortedDegrees = @grid.tiles.map('getDegree').filter((x) -> x > 0).sort((a, b) -> return b - a)
-		  sum = 0
-		  for i in [0..Jeocrowd.HOT_TILES_COUNT_AVERAGE - 1]
-		    sum += sortedDegrees[i] if sortedDegrees[i]?
-		  @grid.hottestTilesAverageDegree = sum / Jeocrowd.HOT_TILES_COUNT_AVERAGE
     # we cannot eliminate a tile just because it is alone, this might discard some small areas or point features
     # that even at a high level only one tile was left, or even multi clusters, ie. a few loner tiles were left
     @degree > 0 && ((@isLoner() && @degree < 0.5 * @grid.hottestTilesAverageDegree) || @degree < 0.02 * @grid.hottestTilesAverageDegree)
