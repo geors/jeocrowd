@@ -76,6 +76,7 @@ class window.Provider
     return null if (box = @computeNextBox(level)) == null
     if box.length == 0
       callback.apply Jeocrowd, [null, level, null]
+      return
     else
       box = Jeocrowd.grids(level).getTile box[0] # returned array from computeNextBox
     $('#current_input_tile_value').html(box.linkTo())
