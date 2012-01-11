@@ -33,11 +33,7 @@ class Search
       self.current_client = timestamp if pages.detect { |page| page == timestamp } .nil? unless pages.length == MAX_XP_PAGES
     elsif phase == "refinement"
       level = [levels.compact.min - 1, 0].max
-      logger.debug "\n\n---------\n\n"
-      logger.debug rfTiles.to_yaml
       assign_new_refinement_block(level, RF_BLOCK_SIZE, timestamp)
-      logger.debug "\n\n---------\n\n"
-      logger.debug rfTiles.to_yaml
     end
   end
   
@@ -91,8 +87,6 @@ class Search
     self.rfTiles[level] ||= {}
     self.rfTiles[level] = rfTiles[level].merge results
     self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
-    logger.debug "after update"
-    logger.debug level
     logger.debug rfTiles[level].to_yaml
     new_timestamp = (Time.now.to_f * 1000).to_i
     [assign_new_refinement_block(level, RF_BLOCK_SIZE, new_timestamp), new_timestamp]
@@ -109,9 +103,6 @@ class Search
         break if new_block.length >= num
       end
     end
-    logger.debug "after assign"
-    logger.debug level
-    logger.debug rfTiles[level].to_yaml
     new_block
   end
   
