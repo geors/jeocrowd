@@ -85,6 +85,7 @@ window.Jeocrowd =
       @config.timestamp = c.data('timestamp')
       @config.search = JSON.parse c.html()
     if @config.search
+      Benchmark.timesheet = @config.search.statistics
       $('#available_points_value').text(@config.search.statistics.total_available_points)
       $('#exploratory_pages_value').text(JSON.stringify @config.search.pages)
       @visibleLayer('neighbors')
@@ -138,20 +139,28 @@ window.Jeocrowd =
   resumeSearch: ->
     return if $('#running:checked').length == 0
     if @config.search.phase == 'exploratory'
+      Benchmark.start('exploratoryLoading')
       next = @provider().exploratorySearch @config.search.keywords, @receiveResults
       @switchToRefinementPhase() if next == null
     else if @config.search.phase == 'refinement'
+      Benchmark.start('refinementLoading')
       next = @provider().refinementSearch @config.search.keywords, @refinementLevel, @receiveResults
       @gotoBelowLevel() if next == null
     
   receiveResults: (data, pageOrLevel, box) ->
     if @config.search.phase == 'exploratory'
+      Benchmark.finish('exploratoryLoading')
+      Benchmark.start('exploratoryClientProcessing')
       page = pageOrLevel
       @grids(0).addPoints(data)
       @visibleGrid().draw()
       @map.panTo @visibleGrid().hottestTile.getCenter() if $('#pan_map:checked[value=hottest]').length > 0
+      Benchmark.finish('exploratoryClientProcessing')
+      Benchmark.start('exploratorySaving')
       @provider().saveExploratoryResults @grids(0).tiles.toJSON(['degree', 'points']), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
+      Benchmark.finish('refinementLoading')
+      Benchmark.start('refinementClientProcessing')
       level = pageOrLevel
       if box
         if box.degree > 0
@@ -159,10 +168,12 @@ window.Jeocrowd =
         else
           box.undraw() if level == @visibleLevel()
           @grids(level).removeTile box.id
+      Benchmark.finish('refinementClientProcessing')
       if @provider().continueRefinementBlock()
         @resumeSearch()
       else
         console.log 'saving...'
+        Benchmark.start('refinementSaving')
         @provider().saveRefinementResults @provider().assignedTilesCollection.toSimpleJSON(['degree']), 
                                           level, Jeocrowd.syncWithServer
       
@@ -215,17 +226,23 @@ window.Jeocrowd =
     console.log 'syncing...'
     @config.timestamp = @provider().timestamp = newData.timestamp
     if @config.search.phase == 'exploratory'
+      Benchmark.finish('exploratorySaving')
       console.log 'exploring...'
+      Benchmark.start('exploratoryClientProcessing')
       @provider().updatePages(newData.pages) if newData.pages
       # if provider has 16 pages AND all calculated get all the xpTiles data from the server
       # and resume to switch to refinement
       @grids(0).addTile(id, info.degree, info.points) for own id, info of newData.xpTiles if newData.xpTiles
       # if provider has 16 pages but not all calculated wait a few minutes the reload the page (without ?x=y....)
       @waitAndReload() if !@provider().allPagesCompleted() && @provider().noPagesForMe()
+      Benchmark.finish('exploratoryClientProcessing')
     else if @config.search.phase == 'refinement'
+      Benchmark.finish('refinementSaving')
       console.log 'refining...'
+      Benchmark.start('refinementClientProcessing')
       @provider().updateAssignedTiles(newData.boxes, newData.level) # boxes can be either an array of ids to search for or null/undefined
       @waitAndReload() if !@provider().allBoxesCompleted(@refinementLevel) && @provider().noBoxForMe(@refinementLevel);
+      Benchmark.finish('refinementClientProcessing')
     @resumeSearch() unless @exitNow
   
   waitAndReload: ->
