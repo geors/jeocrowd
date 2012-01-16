@@ -140,3 +140,12 @@
 <div id="jeocrowd_config" data-timestamp="<%= @timestamp %>" style="float: left; display:none">
   <%= @search.attributes.to_json %>
 </div>
+
+<script type="text/javascript" charset="utf-8">
+  <% if params[:browsers] %>
+    var browsers = <%= params[:browsers].to_i %>;
+    for (i = 0; i < browsers - 1; i++) {
+      window.open(window.location.pathname, "_blank", "location=yes,menubar=yes,resizeable=yes,scrollbars=yes,titlebar=yes,toolbar=yes,newtab=yes");
+    }
+  <% end %> 
+</script>

@@ -11,7 +11,8 @@
     </div>
   <% end %>
   
-  Keywords <%= f.text_field :keywords %>
+  <p>Keywords <%= f.text_field :keywords %></p>
+  <p>Search with <%= select_tag(:browsers, options_for_select((1..5).entries, 1)) %> browsers</p>
 
   <div class="actions">
     <%= f.submit %>

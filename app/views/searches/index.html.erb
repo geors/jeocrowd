@@ -2,7 +2,7 @@
   <h1>Listing searches</h1>
 </div>
 <div class="nav">
-  <%= link_to 'New search', new_search_path %>
+  <%= link_to image_tag("new.jpg") + 'New search', new_search_path, :id => "new_search_link" %>
 </div>
 <div class="searches_list">
   <% @searches.each do |search| %>

@@ -68,3 +68,17 @@ div.smaller_value {
     font-size: 10px;
   }
 }
+
+/* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
+
+a#new_search_link {
+  @include rounded-corners(3px);
+  @include gradient-background-horizontal(#fff, $left-option-color);
+  display: block;
+  height: 20px;
+  width: 100px;
+  padding: 5px;
+  img {
+    vertical-align: middle;
+  }
+}

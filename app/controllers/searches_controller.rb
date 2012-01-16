@@ -6,8 +6,6 @@ class SearchesController < ApplicationController
 
   def show
     @search = Search.find(params[:id])
-    logger.debug "just started"
-    logger.debug  @search.rfTiles.to_yaml
     return if @search.nil?
     if params[:restart_exploratory]
       @search.phase = "exploratory"
@@ -35,7 +33,7 @@ class SearchesController < ApplicationController
   def create
     @search = Search.find_by_keywords(params[:search] && params[:search][:keywords]) || Search.new(params[:search])
     if @search.save
-      redirect_to @search
+      redirect_to search_url(@search, :browsers => params[:browsers])
     else
       render action: "new"
     end
