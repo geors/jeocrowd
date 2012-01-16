@@ -5,6 +5,11 @@ jQuery ->
   Jeocrowd.resumeSearch() if Jeocrowd.autoStart()
 
 giveLifeToPage = ->
+  $('.browsers_select').change ->
+    searchId = $(this).attr('id').replace('browsers_', '')
+    links = ['continue', 'show', 'restart_xp', 'restart_rf']
+    links.every (x) =>
+      $("##{x}_#{searchId}").attr 'href', $("##{x}_#{searchId}").attr('href') + "&browsers=" + $(this).val()
   $('#layer').change ->
     Jeocrowd.visibleLayer($(this).val())    
   $('#level').change ->
