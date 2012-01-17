@@ -32,6 +32,7 @@ class SearchesController < ApplicationController
 
   def create
     @search = Search.find_by_keywords(params[:search] && params[:search][:keywords]) || Search.new(params[:search])
+    @search.statistics = {:created_at => Time.now}
     if @search.save
       redirect_to search_url(@search, :browsers => params[:browsers])
     else
@@ -42,14 +43,15 @@ class SearchesController < ApplicationController
   def update
     @search = Search.find(params[:id])
     @search.statistics[:total_available_points] = params[:total_available_points].to_i if params[:total_available_points]
-    @new_timestamp = @search.updateExploratory(
-                       params[:xpTiles], params[:page].to_i, params[:timestamp].to_i
-                     ) if (params[:xpTiles] && params[:page])
-    @new_block, @new_timestamp = @search.updateRefinement(
-                                   params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i)
-                                 ) if params[:rfTiles] && params[:level]
+    if params[:xpTiles] && params[:page]
+      @new_timestamp = @search.updateExploratory(params[:xpTiles], params[:page].to_i, params[:timestamp].to_i)
+    end
+    if params[:rfTiles] && params[:level]
+      @new_block, @new_timestamp = @search.updateRefinement(params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i))
+    end
     @level = params[:level]
     @search.save
+    @search.reload
   end
 
   def destroy

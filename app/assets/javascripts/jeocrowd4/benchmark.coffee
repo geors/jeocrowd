@@ -2,12 +2,10 @@
 
 window.Benchmark = 
   
-  list: []
-  
-  timesheet: null
-    
+  list: []          # where all different benchmarks are stored
+      
   start: (name) ->
-    @list[name] ?= new Benchmarker(name, @timesheet)
+    @list[name] ?= new Benchmarker(name)
     @list[name].start()
   
   finish: (name) ->
@@ -16,9 +14,12 @@ window.Benchmark =
     
 class window.Benchmarker
       
-  constructor: (@name, @timesheet) ->
+  constructor: (@name) ->
     @running = false
     @duration = 0
+    @timesInClient = []
+    @timesInServer = []
+    @placeholder = @name.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/(exploratory|refinement)_/, '') + '_time_value'
   
   start: (force) ->
     if !force && @running
@@ -27,11 +28,14 @@ class window.Benchmarker
     @running = true
     @startTime = @now()
   
-  finish: (record = true) ->
+  finish: (record = true, display = true, remove = 0) ->
     @finishTime = @now()
-    @duration += @finishTime - @startTime
-    @timesheet[@name] = @duration if record
+    diff = @finishTime - @startTime - remove
+    console.log 'Negative duration in benchmark! Incorrect remove time?' if diff < 0
+    @timesInClient.push diff
+    @duration += diff
     @running = false
+    $('#' + @placeholder).text(@duration)
     @duration
     
   now: ->

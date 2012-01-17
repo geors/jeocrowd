@@ -10,6 +10,7 @@ MAX_LEVEL = 6
 window.Jeocrowd = 
   BASE_GRID_STEP: 0.0005
   ACTUAL_SIZE_OF_BASE_GRID_IN_METERS: 50
+  VISUALIZE_CLEARING_TIME: 2000
   LEVEL_MULTIPLIER: 5
   COORDINATE_SEPARATOR: '^'
   HOT_TILES_COUNT_AVERAGE: 5
@@ -85,7 +86,6 @@ window.Jeocrowd =
       @config.timestamp = c.data('timestamp')
       @config.search = JSON.parse c.html()
     if @config.search
-      Benchmark.timesheet = @config.search.statistics
       $('#available_points_value').text(@config.search.statistics.total_available_points)
       $('#exploratory_pages_value').text(JSON.stringify @config.search.pages)
       @visibleLayer('neighbors')
@@ -141,11 +141,15 @@ window.Jeocrowd =
     if @config.search.phase == 'exploratory'
       Benchmark.start('exploratoryLoading')
       next = @provider().exploratorySearch @config.search.keywords, @receiveResults
-      @switchToRefinementPhase() if next == null
+      if next == null
+        Benchmark.finish('exploratoryLoading')
+        @switchToRefinementPhase()
     else if @config.search.phase == 'refinement'
       Benchmark.start('refinementLoading')
       next = @provider().refinementSearch @config.search.keywords, @refinementLevel, @receiveResults
-      @gotoBelowLevel() if next == null
+      if next == null
+        Benchmark.finish('refinementLoading')
+        @gotoBelowLevel()
     
   receiveResults: (data, pageOrLevel, box) ->
     if @config.search.phase == 'exploratory'
@@ -183,12 +187,14 @@ window.Jeocrowd =
       return
     @config.search.phase = 'refinement'
     $('#phase').text('refinement')
+    Benchmark.start('refinementClientProcessing')
     @maxLevel = @calculateMaxLevel()
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     if @grids(@maxLevel).isSparse()
       console.log 'sparse grid detected...'
       @maxLevel += 1
       @grids(@maxLevel).growUp Tile.prototype.atLeastOne
+    Benchmark.finish('refinementClientProcessing')
     $('#level_label label').text('max: ' + @maxLevel)
     @visibleLevel(@maxLevel)
     @map.panTo @visibleGrid().hottestTile.getCenter()
@@ -205,6 +211,7 @@ window.Jeocrowd =
   # this means that eventually when a grid is complete it will be stored before it got refined.
   # this is good because it allows us to view the before-after refinement-clearing of each level.
   gotoBelowLevel: ->
+    Benchmark.start('refinementClientProcessing')
     if @refinementLevel == 0
       @grids(@refinementLevel).clearBeforeRefinement true
       @markAsCompleted()
@@ -216,6 +223,8 @@ window.Jeocrowd =
     @refinementLevel -= 1
     @grids(@refinementLevel).growDown(Tile.prototype.notFull)
     @visibleLevel(@refinementLevel)
+    Benchmark.finish('refinementClientProcessing', true, Jeocrowd.VISUALIZE_CLEARING_TIME)
+    Benchmark.start('refinementSaving')
     @provider().saveRefinementResults @grids(@refinementLevel).tiles.toSimpleJSON('degree'),
                                       @refinementLevel, Jeocrowd.syncWithServer
   

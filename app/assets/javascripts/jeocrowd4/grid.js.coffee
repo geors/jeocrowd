@@ -107,7 +107,7 @@ class window.Grid
       ids = @tiles.filter('willBeRemoved').each('highlight2', true)
       thisGrid = this
       continueFunc = -> thisGrid.clearBeforeRefinement(false, callback)
-      setTimeout continueFunc, 2000
+      setTimeout continueFunc, Jeocrowd.VISUALIZE_CLEARING_TIME
     else
       @tiles.filter('willBeRemoved').each('highlight2', false)
       ids = @tiles.filter('willBeRemoved').map('getId')
