@@ -270,6 +270,12 @@ window.Jeocrowd =
   
   markAsCompleted: ->
     $('#phase').text('completed')
+    jQuery.ajax({
+      'url': @provider().serverURL,
+      'type': 'PUT',
+      'data': {'completed': 'completed'},
+      'dataType': 'json'
+    });
   
   calculateMaxLevel: ->
     @visibleGrid().undraw()

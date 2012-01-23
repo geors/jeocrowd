@@ -34,7 +34,7 @@ class Search
     self.xpTiles = {}
     self.levels = []
     self.rfTiles = []
-    self.statistics = {}
+    self.statistics = {:created_at => Time.now}
     self.exploratory_loading_time = 0
     self.exploratory_saving_time = 0
     self.exploratory_client_processing_time = 0
@@ -154,6 +154,18 @@ class Search
       end
     end
     new_block
+  end
+  
+  def total_running_time(force_date = false)
+    if statistics[:created_at] && statistics[:completed_at]
+      if force_date
+        (statistics[:completed_at] - statistics[:created_at].to_f)
+      else
+        (statistics[:completed_at].to_f - statistics[:created_at].to_f) * 1000
+      end
+    else
+      "not completed yet"
+    end
   end
   
 end

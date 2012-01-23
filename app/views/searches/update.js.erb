@@ -4,11 +4,11 @@
   ,
   "timestamp": <%= @new_timestamp %>
   <% end %>
-  <% if @search.phase == "exploratory" %>
+  <% if params[:page] && @search.phase == "exploratory" %>
   ,
   "pages": <%= @search.pages.to_json %>
   <% end %>
-  <% if @search.phase == "exploratory" && @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
+  <% if params[:level] && @search.phase == "exploratory" && @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
   ,
   "xpTiles": <%= @search.xpTiles.to_json.html_safe %>
   <% end %>
