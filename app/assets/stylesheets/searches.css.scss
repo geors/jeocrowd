@@ -90,6 +90,7 @@ div.search_item{
     margin: 2px;
     @include rounded-corners(10px);
     &:hover {
+      text-decoration: none;
       background: #B9B9B9;
     };
   }
