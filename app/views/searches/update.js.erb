@@ -18,4 +18,8 @@
   ,
   "level": <%= @level %>
   <% end %>
+  <% if params[:benchmarks] %>
+  ,
+  "benchmarks": <%= @search.client_benchmarks.to_json.html_safe %>
+  <% end %>
 }

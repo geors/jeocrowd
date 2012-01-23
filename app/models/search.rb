@@ -13,15 +13,60 @@ class Search
   key :levels,     Array,   :default => []   # Array of Fixnum
   key :rfTiles,    Array,   :default => []   # Array of Hashes
   key :statistics, Hash,    :default => {}
-  key :loading_time,  Fixnum, :default => 0
-  key :saving_time,   Fixnum, :default => 0
-  key :client_processing_time, Fixnum, :default => 0
-  key :server_processing_time, Fixnum, :default => 0
+  key :exploratory_loading_time,  Fixnum, :default => 0
+  key :exploratory_saving_time,   Fixnum, :default => 0
+  key :exploratory_client_processing_time, Fixnum, :default => 0
+  key :exploratory_server_processing_time, Fixnum, :default => 0
+  key :refinement_loading_time,  Fixnum, :default => 0
+  key :refinement_saving_time,   Fixnum, :default => 0
+  key :refinement_client_processing_time, Fixnum, :default => 0
+  key :refinement_server_processing_time, Fixnum, :default => 0
 
   ensure_index :keywords, :unique => true
   
   def logger
     ActiveRecord::Base.logger
+  end
+  
+  def xp_reset
+    self.phase = "exploratory"
+    self.pages = []
+    self.xpTiles = {}
+    self.levels = []
+    self.rfTiles = []
+    self.statistics = {}
+    self.exploratory_loading_time = 0
+    self.exploratory_saving_time = 0
+    self.exploratory_client_processing_time = 0
+    self.exploratory_server_processing_time = 0
+    self.refinement_loading_time = 0
+    self.refinement_saving_time = 0
+    self.refinement_client_processing_time = 0
+    self.refinement_server_processing_time = 0
+    save
+  end
+  
+  def rf_reset
+    self.phase = "exploratory"
+    self.levels = []
+    self.rfTiles = []
+    self.refinement_loading_time = 0
+    self.refinement_saving_time = 0
+    self.refinement_client_processing_time = 0
+    self.refinement_server_processing_time = 0
+    save
+  end
+  
+  def benchmarks
+    attributes.reject{ |k, v| k.index("_time").nil? }
+  end
+  
+  def client_benchmarks
+    b = {}
+    benchmarks.each do |k, v|
+      b[k.camelize] = v if k.to_s.index(phase)
+    end
+    b
   end
   
   def current_client=(timestamp)
@@ -60,7 +105,6 @@ class Search
     self.current_client = new_timestamp = (Time.now.to_f * 1000).to_i
     logger.debug "Sending pages: #{pages.inspect}"
     
-    benchmark = (Time.now.to_f * 1000).to_i
     self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
       if !old_val.nil?
         val = {}
@@ -69,7 +113,6 @@ class Search
         val
       end
     end
-    increment :server_processing_time => (Time.now.to_f * 1000).to_i - benchmark
     new_timestamp
   end
   
@@ -86,7 +129,6 @@ class Search
       self.levels[level + 1] = level + 1 if level < levels.length
     end
     self.phase = "refinement"
-    benchmark = (Time.now.to_f * 1000).to_i
     results.each_pair do |id, degree|
       results[id] = degree.to_i
     end
@@ -97,7 +139,6 @@ class Search
     # logger.debug rfTiles[level].to_yaml
     new_timestamp = (Time.now.to_f * 1000).to_i
     new_block = assign_new_refinement_block(level, RF_BLOCK_SIZE, new_timestamp)
-    increment :server_processing_time => (Time.now.to_f * 1000).to_i - benchmark
     [new_block, new_timestamp]
   end
   

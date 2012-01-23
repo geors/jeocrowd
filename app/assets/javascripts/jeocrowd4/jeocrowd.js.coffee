@@ -1,16 +1,14 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 # to do:
-# add parallelization to refinement like in exploratory but with batches of boxes
-# zoom map to include all tile (some tiles with high degree)
-# check how we can draw hybrid grids (with tiles from bigger levels!!)
-# -- > check if possible again to not use negative degrees for the tiles
+# - zoom map to include all tile (some tiles with high degree)
+# - when switching from xp to rf save benchmarks to statistics hash, when restarting rf copy these back
 
 MAX_LEVEL = 6
 
 window.Jeocrowd = 
   BASE_GRID_STEP: 0.0005
   ACTUAL_SIZE_OF_BASE_GRID_IN_METERS: 50
-  VISUALIZE_CLEARING_TIME: 2000
+  VISUALIZE_CLEARING_TIME: 2000 # in ms
   LEVEL_MULTIPLIER: 5
   COORDINATE_SEPARATOR: '^'
   HOT_TILES_COUNT_AVERAGE: 5
@@ -18,6 +16,7 @@ window.Jeocrowd =
   MAX_NEIGHBORS: 7
   FULL_SEARCH_TIMES: 1  # DO NOT SET THIS TO ZERO
   TILES_APART_FOR_SPARSE_GRIDS: 10
+  BENCHMARK_PUBLISH_INTERVAL: 5000 # in ms
   
   config: {}
     
@@ -111,6 +110,10 @@ window.Jeocrowd =
           @visibleLevel(@refinementLevel)          
         $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
         $('#level_label label').text('max: ' + @maxLevel)
+      Benchmark.reportURL = window.location.pathname
+      Benchmark.setupPublishing Jeocrowd.BENCHMARK_PUBLISH_INTERVAL
+      Benchmark.create 'exploratoryServerProcessing'
+      Benchmark.create 'refinementServerProcessing'
     @config
     
   loadConfigIntoTree: ->
@@ -136,8 +139,11 @@ window.Jeocrowd =
   autoStart: ->
     @config.autoStart || true
     
+  running: ->
+    $('#running:checked').length > 0
+    
   resumeSearch: ->
-    return if $('#running:checked').length == 0
+    return if !@running()
     if @config.search.phase == 'exploratory'
       Benchmark.start('exploratoryLoading')
       next = @provider().exploratorySearch @config.search.keywords, @receiveResults

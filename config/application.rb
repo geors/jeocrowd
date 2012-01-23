@@ -44,5 +44,8 @@ module Jeocrowd4s
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+    
+    # filter from log
+    config.filter_parameters += [:xpTiles]
   end
 end
