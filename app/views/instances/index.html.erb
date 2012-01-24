@@ -1,0 +1,27 @@
+<h1>Listing instances</h1>
+
+<table class="pretty">
+  <tr>
+    <th>Host</th>
+    <th>Port</th>
+    <th>Priority</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @instances.each do |instance| %>
+  <tr>
+    <td><%= instance.host %></td>
+    <td><%= instance.port %></td>
+    <td><%= instance.priority %></td>
+    <td><%= link_to 'Show', instance %></td>
+    <td><%= link_to 'Edit', edit_instance_path(instance) %></td>
+    <td><%= link_to 'Destroy', instance, confirm: 'Are you sure?', method: :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Instance', new_instance_path %>

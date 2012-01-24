@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Host:</b>
+  <%= @instance.host %>
+</p>
+
+<p>
+  <b>Port:</b>
+  <%= @instance.port %>
+</p>
+
+<p>
+  <b>Priority:</b>
+  <%= @instance.priority %>
+</p>
+
+
+<%= link_to 'Edit', edit_instance_path(@instance) %> |
+<%= link_to 'Back', instances_path %>

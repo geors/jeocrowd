@@ -69,20 +69,19 @@ class Search
     b
   end
   
+  def current_level
+    [levels.compact.min - 1, 0].max
+  end
+  
   def current_client=(timestamp)
     if phase == "exploratory"
       current_page = next_available_xp_page(timestamp)
       self.pages[current_page] = timestamp if current_page
-      if current_page == pages.length
-        push :pages => timestamp unless current_page == MAX_XP_PAGES
-      else
-        set :pages => pages
-      end
+      set :pages => pages
       reload
       self.current_client = timestamp if pages.detect { |page| page == timestamp } .nil? unless pages.length == MAX_XP_PAGES
     elsif phase == "refinement"
-      level = [levels.compact.min - 1, 0].max
-      assign_new_refinement_block(level, RF_BLOCK_SIZE, timestamp)
+      assign_new_refinement_block(current_level, RF_BLOCK_SIZE, timestamp)
     end
   end
   
@@ -98,7 +97,7 @@ class Search
   end
   
   def updateExploratory(results, page, original_timestamp)
-    ActiveRecord::Base.logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
+    logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
     logger.debug "Current pages: #{pages.inspect}"
     self.pages[page] = page
     logger.debug "Calculated pages: #{pages.inspect}"

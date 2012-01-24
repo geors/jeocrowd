@@ -144,8 +144,11 @@
 <script type="text/javascript" charset="utf-8">
   <% if params[:browsers] %>
     var browsers = <%= params[:browsers].to_i %>;
+    var websites = <%= Instance.websites.to_json.html_safe %>;
+    websites.splice(websites.indexOf(window.location.host), 1);
+    console.log(websites);
     for (i = 0; i < browsers - 1; i++) {
-      window.open(window.location.pathname, "_blank", "location=yes,menubar=yes,resizeable=yes,scrollbars=yes,titlebar=yes,toolbar=yes,newtab=yes");
+      window.open('http://' + websites[i % websites.length] + window.location.pathname, "_blank", "location=yes,menubar=yes,resizeable=yes,scrollbars=yes,titlebar=yes,toolbar=yes,newtab=yes");
     }
   <% end %> 
 </script>

@@ -3,10 +3,10 @@ source 'http://rubygems.org'
 gem 'rails', '3.1.1'
 
 # gem 'couchrest_model'
-gem 'bson_ext'
-gem 'mongo_mapper'
 gem 'mysql2', :group => [:development, :test]
 gem 'pg', :group => [:production]
+gem 'bson_ext'
+gem 'mongo_mapper'
 
 # Gems used only for assets and not required
 # in production environments by default.
