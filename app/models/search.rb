@@ -73,15 +73,25 @@ class Search
     [levels.compact.min - 1, 0].max
   end
   
-  def current_client=(timestamp)
+  def mark_levels(level, max_level)
+    if max_level
+      self.levels = []
+      self.levels[max_level] = max_level
+    else
+      self.levels[level + 1] = level + 1 if level < levels.length
+    end
+  end
+  
+  def set_current_client(timestamp)
     if phase == "exploratory"
       current_page = next_available_xp_page(timestamp)
       self.pages[current_page] = timestamp if current_page
       set :pages => pages
       reload
-      self.current_client = timestamp if pages.detect { |page| page == timestamp } .nil? unless pages.length == MAX_XP_PAGES
+      set_current_client(timestamp) if pages.detect { |page| page == timestamp } .nil? unless pages.length == MAX_XP_PAGES
+      timestamp
     elsif phase == "refinement"
-      assign_new_refinement_block(current_level, RF_BLOCK_SIZE, timestamp)
+      next_available_rf_block(current_level, RF_BLOCK_SIZE, timestamp)
     end
   end
   
@@ -96,52 +106,7 @@ class Search
     [pages.length, MAX_XP_PAGES - 1].min
   end
   
-  def updateExploratory(results, page, original_timestamp)
-    logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
-    logger.debug "Current pages: #{pages.inspect}"
-    self.pages[page] = page
-    logger.debug "Calculated pages: #{pages.inspect}"
-    self.current_client = new_timestamp = (Time.now.to_f * 1000).to_i
-    logger.debug "Sending pages: #{pages.inspect}"
-    
-    self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
-      if !old_val.nil?
-        val = {}
-        val["points"] = (new_val["points"] + old_val["points"]).uniq
-        val["degree"] = val["points"].size
-        val
-      end
-    end
-    new_timestamp
-  end
-  
-  def exploratory_completed?
-    pages.length == MAX_XP_PAGES && pages.all? { |page| page < MAX_XP_PAGES }
-  end
-  
-  def updateRefinement(results, level, max_level = nil)
-    ActiveRecord::Base.logger.debug "updating from refinement search... with level #{level}"
-    if max_level
-      self.levels = []
-      self.levels[max_level] = max_level
-    else
-      self.levels[level + 1] = level + 1 if level < levels.length
-    end
-    self.phase = "refinement"
-    results.each_pair do |id, degree|
-      results[id] = degree.to_i
-    end
-    results = Hash[results]
-    self.rfTiles[level] ||= {}
-    self.rfTiles[level] = rfTiles[level].merge results
-    self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
-    # logger.debug rfTiles[level].to_yaml
-    new_timestamp = (Time.now.to_f * 1000).to_i
-    new_block = assign_new_refinement_block(level, RF_BLOCK_SIZE, new_timestamp)
-    [new_block, new_timestamp]
-  end
-  
-  def assign_new_refinement_block(level, num, timestamp)
+  def next_available_rf_block(level, num, timestamp)
     new_block = []
     if !rfTiles[level].nil?
       rfTiles[level].keys.sort.each do |key|
@@ -152,7 +117,44 @@ class Search
         break if new_block.length >= num
       end
     end
-    new_block
+    [new_block, timestamp]
+  end
+  
+  def updateExploratory(results, page, original_timestamp)
+    logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
+    
+    self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
+      if !old_val.nil?
+        val = {}
+        val["points"] = (new_val["points"] + old_val["points"]).uniq
+        val["degree"] = val["points"].size
+        val
+      end
+    end
+    
+    self.pages[page] = page
+    logger.debug "Calculated pages: #{pages.inspect}"
+    set_current_client (Time.now.to_f * 1000).to_i
+  end
+  
+  def exploratory_completed?
+    pages.length == MAX_XP_PAGES && pages.all? { |page| page < MAX_XP_PAGES }
+  end
+  
+  def updateRefinement(results, level, max_level = nil)
+    logger.debug "updating from refinement search... with level #{level}"
+    self.phase = "refinement"
+    
+    results.each_pair do |id, degree|
+      results[id] = degree.to_i
+    end
+    results = Hash[results]
+    self.rfTiles[level] ||= {}
+    self.rfTiles[level] = rfTiles[level].merge results
+    self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
+
+    mark_levels(level, max_level)
+    set_current_client (Time.now.to_f * 1000).to_i
   end
   
   def total_running_time(force_date = false)
