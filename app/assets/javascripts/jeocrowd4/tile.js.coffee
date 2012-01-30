@@ -181,7 +181,7 @@ class window.Tile
     if @willBeDrawnFromHigherLevel()
       '#1E719F'
     else if @degree < 0
-      '#DDDDDD'
+      '#BBBBBB'
     else if Jeocrowd.visibleLayer() == 'degree'
       '#FF0000'
     else
