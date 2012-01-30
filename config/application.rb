@@ -47,5 +47,6 @@ module Jeocrowd4s
     
     # filter from log
     config.filter_parameters += [:xpTiles]
+    config.assets.logger = false
   end
 end
