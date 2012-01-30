@@ -1,3 +1,7 @@
+module MongoMapper::Document
+  include MongoMapper::Plugins::UpdatingModifiers
+end
+
 case Rails.env
 when "development"
   MongoMapper.connection = Mongo::Connection.new('localhost', 27017, { :logger => Rails.logger })

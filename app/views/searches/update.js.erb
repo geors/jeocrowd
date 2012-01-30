@@ -16,7 +16,7 @@
   ,
   "boxes": <%= @new_block.blank? ? nil.to_json : @new_block.to_json.html_safe %>
   ,
-  "level": <%= @level %>
+  "level": <%= params[:level] %>
   <% end %>
   <% if params[:benchmarks] %>
   ,

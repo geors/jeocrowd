@@ -1,10 +1,15 @@
 class Search
   include MongoMapper::Document
+  versioned_update
 
   MAX_XP_PAGES = 16
   XP_TIMEOUT = 15.seconds * 1000
   RF_BLOCK_SIZE = 5
   RF_TIMEOUT = (3 * RF_BLOCK_SIZE).seconds * 1000
+
+  attr_accessor :new_timestamp
+  attr_accessor :new_page
+  attr_accessor :new_block
   
   key :keywords,   String
   key :phase,      String,  :default => "exploratory"
@@ -43,7 +48,7 @@ class Search
     self.refinement_saving_time = 0
     self.refinement_client_processing_time = 0
     self.refinement_server_processing_time = 0
-    save
+    save :safe => true
   end
   
   def rf_reset
@@ -54,7 +59,7 @@ class Search
     self.refinement_saving_time = 0
     self.refinement_client_processing_time = 0
     self.refinement_server_processing_time = 0
-    save
+    save :safe => true
   end
   
   def benchmarks
@@ -81,20 +86,7 @@ class Search
       self.levels[level + 1] = level + 1 if level < levels.length
     end
   end
-  
-  def set_current_client(timestamp)
-    if phase == "exploratory"
-      current_page = next_available_xp_page(timestamp)
-      self.pages[current_page] = timestamp if current_page
-      set :pages => pages
-      reload
-      set_current_client(timestamp) if pages.detect { |page| page == timestamp } .nil? unless pages.length == MAX_XP_PAGES
-      timestamp
-    elsif phase == "refinement"
-      next_available_rf_block(current_level, RF_BLOCK_SIZE, timestamp)
-    end
-  end
-  
+
   def next_available_xp_page(timestamp)
     return nil if pages.length == MAX_XP_PAGES
     pages.each_with_index do |page, index|
@@ -117,12 +109,31 @@ class Search
         break if new_block.length >= num
       end
     end
-    [new_block, timestamp]
+    new_block
   end
   
-  def updateExploratory(results, page, original_timestamp)
+  def update_values(params)
+    r = {}
+    params.values_to_i!
+    statistics[:total_available_points] = params[:total_available_points]             if params[:total_available_points]
+    statistics[:completed_at]           = Time.now                                    if params[:completed] == "completed"
+    save :safe => true if changed?
+    update_benchmarks params[:benchmarks]                                             if params[:benchmarks]
+    updateXP params[:xpTiles], params[:page], params[:timestamp]                      if params[:xpTiles] && params[:page]
+    updateRF params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel]  if params[:rfTiles] && params[:level]
+  rescue
+    update_values(params)
+  end
+  
+  def update_benchmarks b
+    b.values_to_i!
+    increment b
+    reload
+  end
+  
+  def updateXP(results, page, original_timestamp)
     logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
-    
+
     self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
       if !old_val.nil?
         val = {}
@@ -134,14 +145,17 @@ class Search
     
     self.pages[page] = page
     logger.debug "Calculated pages: #{pages.inspect}"
-    set_current_client (Time.now.to_f * 1000).to_i
+    self.new_page = next_available_xp_page(timestamp)
+    self.pages[new_page] = timestamp if new_page
+    save :safe => true
+    self.new_timestamp = timestamp
   end
   
   def exploratory_completed?
     pages.length == MAX_XP_PAGES && pages.all? { |page| page < MAX_XP_PAGES }
   end
   
-  def updateRefinement(results, level, max_level = nil)
+  def updateRF(results, level, original_timestamp, max_level = nil)
     logger.debug "updating from refinement search... with level #{level}"
     self.phase = "refinement"
     
@@ -154,7 +168,9 @@ class Search
     self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
 
     mark_levels(level, max_level)
-    set_current_client (Time.now.to_f * 1000).to_i
+    self.new_block = next_available_rf_block(current_level, RF_BLOCK_SIZE, timestamp)
+    save :safe => true
+    self.new_timestamp = timestamp
   end
   
   def total_running_time(force_date = false)
@@ -166,6 +182,17 @@ class Search
       end
     else
       "not completed yet"
+    end
+  end
+  
+end
+
+
+class Hash
+  
+  def values_to_i!
+    each_pair do |k, v|
+      self[k] = v.to_i if v.is_a?(String) && v =~ /\d+/
     end
   end
   

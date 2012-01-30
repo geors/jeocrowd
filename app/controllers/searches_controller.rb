@@ -33,22 +33,10 @@ class SearchesController < ApplicationController
   def update
     benchmark = (Time.now.to_f * 1000).to_i
     @search = Search.find(params[:id])
-    @search.statistics[:total_available_points] = params[:total_available_points].to_i if params[:total_available_points]
-    @search.statistics[:completed_at]           = Time.now                             if params[:completed] == "completed"
-    if params[:xpTiles] && params[:page]
-      @new_timestamp = @search.updateExploratory params[:xpTiles], params[:page].to_i, params[:timestamp].to_i
-    end
-    if params[:rfTiles] && params[:level]
-      @new_block, @new_timestamp = @search.updateRefinement params[:rfTiles], params[:level].to_i, params[:maxLevel].try(:to_i)
-    end
-    @search.save
-    if params[:benchmarks]
-      params[:benchmarks].each do |k, v|
-        params[:benchmarks][k] = v.to_i
-      end
-      @search.increment params[:benchmarks]
-    end
-    @level = params[:level]
+    @search.update_values(params)
+    @new_timestamp = @search.new_timestamp
+    @new_page = @search.new_page
+    @new_block = @search.new_block
     @search.increment :"#{@search.phase}_server_processing_time" => (Time.now.to_f * 1000).to_i - benchmark
     @search.reload
   end
