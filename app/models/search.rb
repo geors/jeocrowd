@@ -13,15 +13,16 @@ class Search
   key :keywords,                            String
   key :phase,                               String, :default => "exploratory"
   key :pages,                               Array,  :default => []   # Array of Fixnum
-  key :xp_tiles,                            Hash,   :default => {}
   (0..15).each do |i|                       
     key :"xp_page_#{i}",                    Hash,   :default => {}    
   end                                       
-  key :levels,                              Array,  :default => []   # Array of Fixnum
-  key :rfTiles,                             Array,  :default => []   # Array of Hashes
+  key :levels,                              Array,  :default => []   # Array of Fixnum  
+  (0..6).each do |i|                       
+    key :"rf_level_assing_keys_#{i}",       Array,  :default => []   # Array of Hashes
+    key :"rf_level_mark_keys_#{i}",         Array,  :default => []   # Array of Hashes
+    key :"rf_level_#{i}",                   Array,  :default => []   # Array of Hashes
+  end
   key :statistics,                          Hash,   :default => {}
-  key :created_at,                          Time,   :default => Time.now
-  key :completed_at,                        Time,   :default => nil
   key :exploratory_loading_time,            Fixnum, :default => 0
   key :exploratory_saving_time,             Fixnum, :default => 0
   key :exploratory_client_processing_time,  Fixnum, :default => 0
@@ -30,6 +31,8 @@ class Search
   key :refinement_saving_time,              Fixnum, :default => 0
   key :refinement_client_processing_time,   Fixnum, :default => 0
   key :refinement_server_processing_time,   Fixnum, :default => 0
+  key :completed_at,                        Time,   :default => nil
+  timestamps!
 
   ensure_index :keywords, :unique => true
   
@@ -40,10 +43,16 @@ class Search
   def xp_reset
     self.phase = "exploratory"
     self.pages = []
-    self.xpTiles = {}
+    (0..15).each do |i|                       
+      self[:"xp_page_#{i}"] = {}
+    end                                       
     self.levels = []
-    self.rfTiles = []
-    self.statistics = {:created_at => Time.now}
+    (0..6).each do |i|                       
+      self[:"rf_level_assing_keys_#{i}"] = []
+      self[:"rf_level_mark_keys_#{i}"]   = []
+      self[:"rf_level_#{i}"]             = []
+    end
+    self.created_at = Time.now
     self.exploratory_loading_time = 0
     self.exploratory_saving_time = 0
     self.exploratory_client_processing_time = 0
@@ -58,7 +67,11 @@ class Search
   def rf_reset
     self.phase = "exploratory"
     self.levels = []
-    self.rfTiles = []
+    (0..6).each do |i|                       
+      self[:"rf_level_assing_keys_#{i}"] = []
+      self[:"rf_level_mark_keys_#{i}"]   = []
+      self[:"rf_level_#{i}"]             = []
+    end
     self.refinement_loading_time = 0
     self.refinement_saving_time = 0
     self.refinement_client_processing_time = 0
@@ -91,11 +104,18 @@ class Search
     else
       self.levels[level + 1] = level + 1 if level < levels.length
     end
+    set :levels => levels
+  end
+  
+  def change_phase(p)
+    self.phase = p
+    set :phase => phase
   end
 
   #############################################################################
     
   def set_current_client(timestamp)
+    reload
     if phase == "exploratory"
       next_available_xp_page(timestamp)
     elsif phase == "refinement"
@@ -126,6 +146,7 @@ class Search
       else
         # add if old_page_index(timestamp)
         # there might be a pending job that has not exceeded the timeout
+        # OR maybe consider re-assinging if there is no job for current client and the xp is incomplete
         pages[old_page_index(timestamp)] = timestamp if old_page_index(timestamp)
         set :pages => pages
       end
@@ -159,29 +180,64 @@ class Search
     set_current_client (Time.now.to_f * 1000).to_i
   end
   
+  def hollow_level?(results)
+    results.all? { |k, v| v == -1 }
+  end
+  
+  def set_hollow_level_keys(results, level)
+    self[:"rf_level_assing_keys_#{level}"] = self[:"rf_level_mark_keys_#{level}"] = results.keys
+    set :"rf_level_assing_keys_#{level}" => results.keys, :"rf_level_mark_keys_#{level}" => results.keys
+  end
+  
   def next_available_rf_block(level, num, timestamp)
-    new_block = []
-    if !rfTiles[level].nil?
-      rfTiles[level].keys.sort.each do |key|
-        if rfTiles[level][key] == -1 || (rfTiles[level][key] < 0 && timestamp.abs - rfTiles[level][key].abs > RF_TIMEOUT)
-          new_block << key
-          self.rfTiles[level][key] = -timestamp
-        end
-        break if new_block.length >= num
+    self.new_block = self[:"rf_level_assing_keys_#{level}"].slice! 0, num
+    pull_all :"rf_level_assing_keys_#{level}" => new_block unless new_block.nil?
+    if new_block.blank? && !self[:"rf_level_mark_keys_#{level}"].blank?
+      push_all :"rf_level_assing_keys_#{level}" => self[:"rf_level_mark_keys_#{level}"]
+      reload
+      next_available_rf_block(level, num, timestamp)
+    end
+  end
+  
+  def merged_rf_tiles
+    m = []
+    levels.reject!(&:nil?)
+    (levels | [[(levels.min || 0) - 1, 0].max]).sort.reverse.each do |level|
+      m[level] = {}
+      self[:"rf_level_mark_keys_#{level}"].each do |k|
+        m[level][k] = -1
+      end
+      self[:"rf_level_#{level}"].each do |hsh|
+        m[level].merge! hsh
       end
     end
-    new_block
+    m
+  end
+  
+  def update_rf(results, level, original_timestamp, max_level = nil)
+    logger.debug "updating from refinement search... with level #{level}"
+    change_phase "refinement"
+    mark_levels level, max_level
+    results = Hash[results].values_to_i!.remove_dots_from_keys_and_convert_values_to_integers
+    if !hollow_level? results
+      new_results = results.reject{ |k, v| v == 0 }
+      push :"rf_level_#{level}" => new_results unless new_results.blank?
+      pull_all :"rf_level_mark_keys_#{level}" => results.keys
+    else
+      set_hollow_level_keys results, level
+    end
+    set_current_client (Time.now.to_f * 1000).to_i
   end
   
   def update_values(params)
     params.values_to_i!
     statistics.merge! :total_available_points => params[:total_available_points]      if params[:total_available_points]
-    statistics.merge! :completed_at           => Time.now                             if params[:completed] == "completed"
-    set :statistics => statistics
+    set :statistics             => statistics
+    set :completed_at           => Time.now                                           if params[:completed] == "completed"
     update_benchmarks params[:benchmarks]                                             if params[:benchmarks]
     logger.debug params[:xpTiles].class
-    update_xp params[:xpTiles], params[:page],  params[:timestamp]                     if params[:xpTiles] && params[:page]
-    update_rf params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel]  if params[:rfTiles] && params[:level]
+    update_xp params[:xpTiles], params[:page],  params[:timestamp]                    if params[:xpTiles] && params[:page]
+    update_rf params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel] if params[:rfTiles] && params[:level]
   end
   
   def update_benchmarks b
@@ -190,32 +246,12 @@ class Search
     reload
   end
   
-  
-  def updateRF(results, level, original_timestamp, max_level = nil)
-    logger.debug "updating from refinement search... with level #{level}"
-    self.phase = "refinement"
-    
-
-    mark_levels(level, max_level)
-    set_current_client (Time.now.to_f * 1000).to_i
-  end
-  
-  def merge_rf_results
-    results.each_pair do |id, degree|
-      results[id] = degree.to_i
-    end
-    results = Hash[results]
-    self.rfTiles[level] ||= {}
-    self.rfTiles[level] = rfTiles[level].merge results
-    self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }    
-  end
-  
   def total_running_time(force_date = false)
-    if statistics[:created_at] && statistics[:completed_at]
+    if created_at && completed_at
       if force_date
-        (statistics[:completed_at] - statistics[:created_at].to_f)
+        completed_at - created_at.to_f
       else
-        (statistics[:completed_at].to_f - statistics[:created_at].to_f) * 1000
+        (completed_at.to_f - created_at.to_f) * 1000
       end
     else
       "not completed yet"

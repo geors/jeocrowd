@@ -1,7 +1,8 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 # to do:
 # - zoom map to include all tile (some tiles with high degree)
-# - when switching from xp to rf save benchmarks to statistics hash, when restarting rf copy these back
+# - fix: Uncaught TypeError: Cannot set property 'timeInServer' of undefined in first benchmark call
+# - in xp send only each page to the server not all the results
 
 MAX_LEVEL = 6
 
@@ -104,9 +105,7 @@ window.Jeocrowd =
         if @config.search.rfTiles[@refinementLevel] == null          
           @gotoBelowLevel()
         else
-          @provider().updateAssignedTiles(
-            Util.allWithTimestamp(@grids(@refinementLevel).tiles, -@config.timestamp), @refinementLevel
-          );
+          @provider().updateAssignedTiles @config.search.startingBlock, @refinementLevel
           @visibleLevel(@refinementLevel)          
         $('#refinement_boxes_value').text((@grids(level).refinementPercent() * 100).toFixed(2) + '%') if @grids(level)
         $('#level_label label').text('max: ' + @maxLevel)

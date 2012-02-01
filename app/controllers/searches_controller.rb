@@ -13,7 +13,6 @@ class SearchesController < ApplicationController
       @search.rf_reset
     end
     @search.set_current_client(@timestamp = (Time.now.to_f * 1000).to_i)
-    @search.save
   end
 
   def new
@@ -22,7 +21,6 @@ class SearchesController < ApplicationController
 
   def create
     @search = Search.find_by_keywords(params[:search] && params[:search][:keywords]) || Search.new(params[:search])
-    @search.created_at = Time.now
     if @search.save
       redirect_to search_url(@search, :browsers => params[:browsers])
     else

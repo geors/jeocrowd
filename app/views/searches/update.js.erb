@@ -14,7 +14,7 @@
   <% end %>
   <% if @new_block %>
   ,
-  "boxes": <%= @new_block.blank? ? nil.to_json : @new_block.to_json.html_safe %>
+  "boxes": <%= @new_block.blank? ? nil.to_json : @new_block.map(&:replace_circumflex_with_dots).to_json.html_safe %>
   ,
   "level": <%= params[:level] %>
   <% end %>

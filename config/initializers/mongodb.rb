@@ -44,3 +44,11 @@ class Hash
   end
   
 end
+
+class String 
+  
+  def replace_circumflex_with_dots
+    to_s.gsub("^^", ".")
+  end
+  
+end
