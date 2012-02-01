@@ -22,7 +22,7 @@ class SearchesController < ApplicationController
 
   def create
     @search = Search.find_by_keywords(params[:search] && params[:search][:keywords]) || Search.new(params[:search])
-    @search.statistics[:created_at] = Time.now
+    @search.created_at = Time.now
     if @search.save
       redirect_to search_url(@search, :browsers => params[:browsers])
     else

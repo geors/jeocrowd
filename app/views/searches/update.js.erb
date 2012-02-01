@@ -8,15 +8,15 @@
   ,
   "pages": <%= @search.pages.to_json %>
   <% end %>
-  <% if params[:level] && @search.phase == "exploratory" && @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
+  <% if @search.phase == "exploratory" && @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
   ,
-  "xpTiles": <%= @search.xpTiles.to_json.html_safe %>
+  "xpTiles": <%= @search.merged_xp_tiles.to_json.html_safe %>
   <% end %>
   <% if @new_block %>
   ,
   "boxes": <%= @new_block.blank? ? nil.to_json : @new_block.to_json.html_safe %>
   ,
-  "level": <%= @level %>
+  "level": <%= params[:level] %>
   <% end %>
   <% if params[:benchmarks] %>
   ,

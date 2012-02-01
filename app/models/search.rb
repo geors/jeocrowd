@@ -1,6 +1,5 @@
 class Search
   include MongoMapper::Document
-  versioned_update
 
   MAX_XP_PAGES = 16
   XP_TIMEOUT = 15.seconds * 1000
@@ -11,21 +10,26 @@ class Search
   attr_accessor :new_page
   attr_accessor :new_block
   
-  key :keywords,   String
-  key :phase,      String,  :default => "exploratory"
-  key :pages,      Array,   :default => []   # Array of Fixnum
-  key :xpTiles,    Hash,    :default => {}
-  key :levels,     Array,   :default => []   # Array of Fixnum
-  key :rfTiles,    Array,   :default => []   # Array of Hashes
-  key :statistics, Hash,    :default => {}
-  key :exploratory_loading_time,  Fixnum, :default => 0
-  key :exploratory_saving_time,   Fixnum, :default => 0
-  key :exploratory_client_processing_time, Fixnum, :default => 0
-  key :exploratory_server_processing_time, Fixnum, :default => 0
-  key :refinement_loading_time,  Fixnum, :default => 0
-  key :refinement_saving_time,   Fixnum, :default => 0
-  key :refinement_client_processing_time, Fixnum, :default => 0
-  key :refinement_server_processing_time, Fixnum, :default => 0
+  key :keywords,                            String
+  key :phase,                               String, :default => "exploratory"
+  key :pages,                               Array,  :default => []   # Array of Fixnum
+  key :xp_tiles,                            Hash,   :default => {}
+  (0..15).each do |i|                       
+    key :"xp_page_#{i}",                    Hash,   :default => {}    
+  end                                       
+  key :levels,                              Array,  :default => []   # Array of Fixnum
+  key :rfTiles,                             Array,  :default => []   # Array of Hashes
+  key :statistics,                          Hash,   :default => {}
+  key :created_at,                          Time,   :default => Time.now
+  key :completed_at,                        Time,   :default => nil
+  key :exploratory_loading_time,            Fixnum, :default => 0
+  key :exploratory_saving_time,             Fixnum, :default => 0
+  key :exploratory_client_processing_time,  Fixnum, :default => 0
+  key :exploratory_server_processing_time,  Fixnum, :default => 0
+  key :refinement_loading_time,             Fixnum, :default => 0
+  key :refinement_saving_time,              Fixnum, :default => 0
+  key :refinement_client_processing_time,   Fixnum, :default => 0
+  key :refinement_server_processing_time,   Fixnum, :default => 0
 
   ensure_index :keywords, :unique => true
   
@@ -62,6 +66,8 @@ class Search
     save :safe => true
   end
   
+  #############################################################################
+
   def benchmarks
     attributes.reject{ |k, v| k.index("_time").nil? }
   end
@@ -87,15 +93,70 @@ class Search
     end
   end
 
-  def next_available_xp_page(timestamp)
-    return nil if pages.length == MAX_XP_PAGES
-    pages.each_with_index do |page, index|
-      # You cannot use Time.now.to_i here because you might steal the job of another client
-      # that you started together with, after XP_TIMEOUT time during the initiation of the search
-      # since in xp search timestamps are not auto-updated
-      return index if (timestamp - page > XP_TIMEOUT) && (page > MAX_XP_PAGES - 1)
+  #############################################################################
+    
+  def set_current_client(timestamp)
+    if phase == "exploratory"
+      next_available_xp_page(timestamp)
+    elsif phase == "refinement"
+      next_available_rf_block(current_level, RF_BLOCK_SIZE, timestamp)
     end
-    [pages.length, MAX_XP_PAGES - 1].min
+    self.new_timestamp = timestamp
+  end
+  
+  def old_page_index(current_timestamp)
+    pages.each_with_index do |page, index|
+      return index if (current_timestamp - page > XP_TIMEOUT) && (page > MAX_XP_PAGES - 1)
+    end
+    nil
+  end
+  
+  def xp_full?
+    pages.length == MAX_XP_PAGES
+  end
+  
+  def xp_completed?
+    pages.length == MAX_XP_PAGES && pages.all? { |page| page < MAX_XP_PAGES }
+  end
+  
+  def next_available_xp_page(timestamp)
+    if xp_full?
+      if xp_completed?
+        return nil
+      else
+        # add if old_page_index(timestamp)
+        # there might be a pending job that has not exceeded the timeout
+        pages[old_page_index(timestamp)] = timestamp if old_page_index(timestamp)
+        set :pages => pages
+      end
+    else
+      push :pages => timestamp
+    end
+    reload
+  end
+  
+  def merged_xp_tiles
+    m = {}
+    (0..15).each do |i|
+      m.merge! self[:"xp_page_#{i}"] do |key, old_val, new_val|
+        if !old_val.nil?
+          val = {}
+          val["points"] = (new_val["points"] + old_val["points"]).uniq
+          val["degree"] = val["points"].size
+          val
+        end
+      end
+    end
+    m
+  end
+  
+  def update_xp(results, page, original_timestamp)
+    logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
+
+    results = Hash[results].values_to_i!.remove_dots_from_keys_and_convert_values_to_integers
+    pages[page] = page
+    set :"xp_page_#{page}" => results, :pages => pages
+    set_current_client (Time.now.to_f * 1000).to_i
   end
   
   def next_available_rf_block(level, num, timestamp)
@@ -113,16 +174,14 @@ class Search
   end
   
   def update_values(params)
-    r = {}
     params.values_to_i!
-    statistics[:total_available_points] = params[:total_available_points]             if params[:total_available_points]
-    statistics[:completed_at]           = Time.now                                    if params[:completed] == "completed"
-    save :safe => true if changed?
+    statistics.merge! :total_available_points => params[:total_available_points]      if params[:total_available_points]
+    statistics.merge! :completed_at           => Time.now                             if params[:completed] == "completed"
+    set :statistics => statistics
     update_benchmarks params[:benchmarks]                                             if params[:benchmarks]
-    updateXP params[:xpTiles], params[:page], params[:timestamp]                      if params[:xpTiles] && params[:page]
-    updateRF params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel]  if params[:rfTiles] && params[:level]
-  rescue
-    update_values(params)
+    logger.debug params[:xpTiles].class
+    update_xp params[:xpTiles], params[:page],  params[:timestamp]                     if params[:xpTiles] && params[:page]
+    update_rf params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel]  if params[:rfTiles] && params[:level]
   end
   
   def update_benchmarks b
@@ -131,46 +190,24 @@ class Search
     reload
   end
   
-  def updateXP(results, page, original_timestamp)
-    logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
-
-    self.xpTiles = xpTiles.merge Hash[results] do |key, old_val, new_val|
-      if !old_val.nil?
-        val = {}
-        val["points"] = (new_val["points"] + old_val["points"]).uniq
-        val["degree"] = val["points"].size
-        val
-      end
-    end
-    
-    self.pages[page] = page
-    logger.debug "Calculated pages: #{pages.inspect}"
-    self.new_page = next_available_xp_page(timestamp)
-    self.pages[new_page] = timestamp if new_page
-    save :safe => true
-    self.new_timestamp = timestamp
-  end
-  
-  def exploratory_completed?
-    pages.length == MAX_XP_PAGES && pages.all? { |page| page < MAX_XP_PAGES }
-  end
   
   def updateRF(results, level, original_timestamp, max_level = nil)
     logger.debug "updating from refinement search... with level #{level}"
     self.phase = "refinement"
     
+
+    mark_levels(level, max_level)
+    set_current_client (Time.now.to_f * 1000).to_i
+  end
+  
+  def merge_rf_results
     results.each_pair do |id, degree|
       results[id] = degree.to_i
     end
     results = Hash[results]
     self.rfTiles[level] ||= {}
     self.rfTiles[level] = rfTiles[level].merge results
-    self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }
-
-    mark_levels(level, max_level)
-    self.new_block = next_available_rf_block(current_level, RF_BLOCK_SIZE, timestamp)
-    save :safe => true
-    self.new_timestamp = timestamp
+    self.rfTiles[level] = rfTiles[level].reject { |id, degree| degree == 0 }    
   end
   
   def total_running_time(force_date = false)
@@ -188,12 +225,3 @@ class Search
 end
 
 
-class Hash
-  
-  def values_to_i!
-    each_pair do |k, v|
-      self[k] = v.to_i if v.is_a?(String) && v =~ /\d+/
-    end
-  end
-  
-end
