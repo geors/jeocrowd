@@ -1,9 +1,29 @@
 <div class="search_item">
-  <%= search.attributes.reject { |a| a =~ /tiles/i }.inspect %><br/>
-  <%= link_to "[continue]", search_path(search, :continue => 1), :id => "continue_#{search.id}", :class => "continue_search_link" %>
-  <%= link_to "[just show]", search_path(search, :display => 1), :id => "show_#{search.id}", :class => "show_search_link" %>
-  <%= link_to "[restart exploratory]", search_path(search, :restart_exploratory => 1), :id => "restart_xp_#{search.id}", :class => "restart_xp_link" %>
-  <%= link_to "[restart refinement]", search_path(search, :restart_refinement => 1), :id => "restart_rf_#{search.id}", :class => "restart_rf_link" %>
-  with <%= select_tag(:browsers, options_for_select((1..Instance.count).entries, 1), :id => "browsers_#{search.id}", :class => "browsers_select") %> browsers
-  <%= link_to "[x]", search, :method => :delete, :confirm => "Are you sure?" %>
+  <div class="info">
+    <div class="grid_10">
+      <div class="keywords">
+        <%= search.keywords %>
+      </div>
+    </div>
+    <div class="grid_15">
+      <div class="time">
+        <% time = search.total_running_time(true) %>
+        <%= time.is_a?(String) ? time : "total execution time " + l(search.total_running_time(true), :format => :only_time)  %>
+      </div>
+    </div>
+  </div>
+  <%#= search.attributes.reject { |a| a =~ /tiles/i }.inspect %>
+  <div class="clear"></div>
+  <div class="links">
+    <%= link_to "continue", search_path(search, :continue => 1), :id => "continue_#{search.id}", :class => "continue_search_link" %>
+    <%= link_to "just show", search_path(search, :display => 1), :id => "show_#{search.id}", :class => "show_search_link" %>
+    <%= link_to "restart exploratory", search_path(search, :restart_exploratory => 1), :id => "restart_xp_#{search.id}", :class => "restart_xp_link" %>
+    <%= link_to "restart refinement", search_path(search, :restart_refinement => 1), :id => "restart_rf_#{search.id}", :class => "restart_rf_link" %>
+    with
+    <%= select_tag(:browsers, options_for_select((1..Instance.count).entries, 1), :id => "browsers_#{search.id}", :class => "browsers_select") %>
+    browsers
+  </div>
+  <div class="delete_link">
+    <%= link_to "&nbsp;x&nbsp;".html_safe, search, :method => :delete, :confirm => "Are you sure?" %>
+  </div>
 </div>

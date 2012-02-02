@@ -161,12 +161,14 @@ window.Jeocrowd =
       Benchmark.finish('exploratoryLoading')
       Benchmark.start('exploratoryClientProcessing')
       page = pageOrLevel
+      tempgrid = new Grid(0)
+      tempgrid.addPoints(data)
       @grids(0).addPoints(data)
       @visibleGrid().draw()
       @map.panTo @visibleGrid().hottestTile.getCenter() if $('#pan_map:checked[value=hottest]').length > 0
       Benchmark.finish('exploratoryClientProcessing')
       Benchmark.start('exploratorySaving')
-      @provider().saveExploratoryResults @grids(0).tiles.toJSON(['degree', 'points']), page, Jeocrowd.syncWithServer
+      @provider().saveExploratoryResults tempgrid.tiles.toJSON(['degree', 'points']), page, Jeocrowd.syncWithServer
     else if @config.search.phase == 'refinement'
       Benchmark.finish('refinementLoading')
       Benchmark.start('refinementClientProcessing')
