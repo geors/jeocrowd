@@ -35,7 +35,7 @@ class SearchesController < ApplicationController
     @new_timestamp = @search.new_timestamp
     @new_page = @search.new_page
     @new_block = @search.new_block
-    @search.increment :"#{@search.phase}_server_processing_time" => (Time.now.to_f * 1000).to_i - benchmark
+    @search.increment(:"#{@search.phase}_server_processing_time" => (Time.now.to_f * 1000).to_i - benchmark) unless params[:benchmarks]
     @search.reload
   end
 

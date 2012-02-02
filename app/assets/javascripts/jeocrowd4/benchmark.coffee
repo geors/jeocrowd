@@ -25,7 +25,8 @@ window.Benchmark =
     return if !Jeocrowd.running()
     times = {}
     for key, b of @list
-      times[b.serverName] = b.unpublishedDuration() unless b.serverName.indexOf('server') >= 0
+      dur = b.unpublishedDuration()
+      times[b.serverName] = dur if dur > 0 && b.serverName.indexOf('server') == -1
       b.clearClientTimes()
     console.log 'publish benchmarks...'
     jQuery.ajax {
