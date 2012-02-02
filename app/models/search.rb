@@ -173,7 +173,7 @@ class Search
   
   def update_xp(results, page, original_timestamp)
     logger.debug "updating exploratory search... with page #{page} and timestamp #{original_timestamp}"
-
+    results ||= {}
     results = Hash[results].values_to_i!.remove_dots_from_keys_and_convert_values_to_integers
     pages[page] = page
     set :"xp_page_#{page}" => results, :pages => pages
@@ -236,7 +236,7 @@ class Search
     set :completed_at           => Time.now                                           if params[:completed] == "completed"
     update_benchmarks params[:benchmarks]                                             if params[:benchmarks]
     logger.debug params[:xpTiles].class
-    update_xp params[:xpTiles], params[:page],  params[:timestamp]                    if params[:xpTiles] && params[:page]
+    update_xp params[:xpTiles], params[:page],  params[:timestamp]                    if params[:page]
     update_rf params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel] if params[:rfTiles] && params[:level]
   end
   
