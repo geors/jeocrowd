@@ -102,8 +102,10 @@ class window.Provider
     callback.apply Jeocrowd, [newData, page]
 
   refinementCallback: (data, level, box, callback) ->
-    total = data.photos.total
-    total = parseInt total if typeof total == 'string'
+    total = 0
+    if data && data.photos && data.photos.total
+      total = data.photos.total
+      total = parseInt total if typeof total == 'string'
     box.setDegree total
     $('#refinement_boxes_value').text((Jeocrowd.grids(level).refinementPercent() * 100).toFixed(2) + '%')
     callback.apply Jeocrowd, [data, level, box]
@@ -150,13 +152,16 @@ class window.Provider
     }
   
   convertData: (data) ->
-    points = data.photos.photo.map (p) ->
-      point = {}
-      point.latitude = p.latitude
-      point.longitude = p.longitude
-      point.title = p.title
-      point.url = "http://farm" + p.farm + ".static.flickr.com/" + p.server + "/" + p.id + "_" + p.secret + ".jpg"
-      point
+    if data && data.photos && data.photos.photo
+      points = data.photos.photo.map (p) ->
+        point = {}
+        point.latitude = p.latitude
+        point.longitude = p.longitude
+        point.title = p.title
+        point.url = "http://farm" + p.farm + ".static.flickr.com/" + p.server + "/" + p.id + "_" + p.secret + ".jpg"
+        point
+    else
+      []
     
 # different providers for later expansion
     
