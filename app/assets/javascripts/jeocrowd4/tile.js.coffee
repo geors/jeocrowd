@@ -271,7 +271,8 @@ class window.Tile
   willBeRemoved: ->
     # we cannot eliminate a tile just because it is alone, this might discard some small areas or point features
     # that even at a high level only one tile was left, or even multi clusters, ie. a few loner tiles were left
-    @degree > 0 && ((@isLoner() && @degree < 0.5 * @grid.hottestTilesAverageDegree) || @degree < 0.02 * @grid.hottestTilesAverageDegree)
+    @degree > 0 && ((@isLoner() && @degree < 0.5 * @grid.hottestTilesAverageDegree) || 
+      @degree < Jeocrowd.THRESHOLD_FOR_REMOVAL * @grid.hottestTilesAverageDegree)
     
   fullyOccupied: ->
     @getNeighborCount() >= Jeocrowd.MAX_NEIGHBORS
