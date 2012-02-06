@@ -4,6 +4,7 @@
  * the top of the compiled file, but it's generally better to create a new file per style scope.
  *= require_self
  *= require 980_49_0_0
+ *= require jquery-ui-1.8.17.custom.css
  *= require reset
  *= require text
  *= require_tree . 

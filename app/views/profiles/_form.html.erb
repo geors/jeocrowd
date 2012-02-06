@@ -1,0 +1,58 @@
+<%= form_for(@profile) do |f| %>
+  <% if @profile.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@profile.errors.count, "error") %> prohibited this profile from being saved:</h2>
+
+      <ul>
+      <% @profile.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :full_search_times %><br />
+    <%= f.number_field :full_search_times %> Must be greater than zero (Default: 1 time)
+  </div>
+  <div class="field">
+    <%= f.label :max_neighbors_for_core %><br />
+    <%= f.number_field :max_neighbors_for_core %> Must be in [4..8] (Default: 7 neighbors)
+  </div>
+  <div class="field">
+    <%= f.label :threshold_for_removal %><br />
+    <%= f.text_field :threshold_for_removal, :style => "width: 120px;" %> Must be greater than zero (Default: 2%, enter as 0.02)
+  </div>
+  <div class="field">
+    <%= f.label :hot_tiles_average %><br />
+    <%= f.number_field :hot_tiles_average %> (Default: 5 top entries)
+  </div>
+  <div class="field">
+    <%= f.label :tiles_apart_for_sparse_grids %><br />
+    <%= f.number_field :tiles_apart_for_sparse_grids %> (Default: 10 tiles)
+  </div>
+  <div class="field">
+    <%= f.label :visualize_clearing_time %><br />
+    <%= f.number_field :visualize_clearing_time %> (Default: 2000 ms)
+  </div>
+  <div class="field">
+    <%= f.label :benchmark_publish_interval %><br />
+    <%= f.number_field :benchmark_publish_interval %> (Default: 30000 ms)
+  </div>
+  <div class="field">
+    <%= f.label :browsers %><br />
+    <%= f.number_field :browsers %> (Default: 1 browser)
+  </div>
+  <div class="field">
+    <%= f.label :active %>
+    <%= f.check_box :active %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

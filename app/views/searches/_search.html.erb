@@ -12,18 +12,18 @@
       </div>
     </div>
   </div>
-  <%#= search.attributes.reject { |a| a =~ /tiles/i }.inspect %>
   <div class="clear"></div>
   <div class="links">
+    <%= link_to "view profile", "javascript: $('#profile#{search.id}').dialog()", :id => "continue_#{search.id}", :class => "continue_search_link" %>
     <%= link_to "continue", search_path(search, :continue => 1), :id => "continue_#{search.id}", :class => "continue_search_link" %>
     <%= link_to "just show", search_path(search, :display => 1), :id => "show_#{search.id}", :class => "show_search_link" %>
     <%= link_to "restart exploratory", search_path(search, :restart_exploratory => 1), :id => "restart_xp_#{search.id}", :class => "restart_xp_link" %>
     <%= link_to "restart refinement", search_path(search, :restart_refinement => 1), :id => "restart_rf_#{search.id}", :class => "restart_rf_link" %>
-    with
-    <%= select_tag(:browsers, options_for_select((1..Instance.count).entries, 1), :id => "browsers_#{search.id}", :class => "browsers_select") %>
-    browsers
   </div>
   <div class="delete_link">
     <%= link_to "&nbsp;x&nbsp;".html_safe, search, :method => :delete, :confirm => "Are you sure?" %>
   </div>
+</div>
+<div id="profile<%= search.id %>" class="dialog" style="display:none;" title="Profile details">
+  <%= render search.profile unless search.profile.nil? %>
 </div>

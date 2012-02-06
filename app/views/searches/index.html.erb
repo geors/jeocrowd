@@ -1,5 +1,10 @@
+<div class="clear"></div>
 <div class="searches_header">
-  <h1>Listing searches</h1>
+  <h1>
+    Listing searches with profile
+    <%= select_tag :profile, options_for_select(Profile.all.map{ |p| [p.name, p.id]}, params[:profile]),
+      :include_blank => true, :id => "pr", :class => "reload_on_change" %>
+  </h1>
 </div>
 <div class="nav">
   <%= link_to image_tag("new.jpg") + 'New search', new_search_path, :id => "new_search_link" %>

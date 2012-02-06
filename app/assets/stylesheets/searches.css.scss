@@ -84,15 +84,19 @@ a#new_search_link {
 div.search_item{
   position: relative;
   a {
+    text-decoration: none;
     border: 1px solid silver;
     padding: 2px 4px 4px 4px;
     margin: 2px;
     @include rounded-corners(10px);
     &:hover {
-      text-decoration: none;
       background: #B9B9B9;
     };
   }
+}
+
+div.links {
+  margin: 5px auto;
 }
 
 div.delete_link {

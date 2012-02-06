@@ -148,8 +148,8 @@
 </div>
 
 <script type="text/javascript" charset="utf-8">
-  <% if params[:browsers] %>
-    var browsers = <%= params[:browsers].to_i %>;
+  <% if @search.profile %>
+    var browsers = <%= @search.profile.browsers %>;
     var websites = <%= Instance.websites.to_json.html_safe %>;
     websites.splice(websites.indexOf(window.location.host), 1);
     console.log(websites);

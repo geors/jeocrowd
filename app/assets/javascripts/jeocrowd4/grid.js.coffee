@@ -136,7 +136,7 @@ class window.Grid
     avg > Jeocrowd.TILES_APART_FOR_SPARSE_GRIDS * @sizeOfTile()
   
   isComplete: ->
-    @tiles.map('getDegree').every( (t) -> t > 0 || Jeocrowd.MAX_NEIGHBORS <= -t <= 8)
+    @tiles.map('getDegree').every( (t) -> t > 0 || Jeocrowd.MAX_NEIGHBORS_FOR_CORE <= -t <= 8)
 
   getHottestTilesAverageDegree: (force) ->
     # because hottest tile is usually off the grid in comparison to the rest, we compare the degree of a tile with the average of

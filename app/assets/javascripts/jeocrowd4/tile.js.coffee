@@ -275,7 +275,7 @@ class window.Tile
       @degree < Jeocrowd.THRESHOLD_FOR_REMOVAL * @grid.hottestTilesAverageDegree)
     
   fullyOccupied: ->
-    @getNeighborCount() >= Jeocrowd.MAX_NEIGHBORS
+    @getNeighborCount() >= Jeocrowd.MAX_NEIGHBORS_FOR_CORE
     
   willBeDrawnFromHigherLevel: ->
     !@willBeRemoved() && @fullyOccupied() && !Jeocrowd.searchEverything(@grid.level) && @level > Jeocrowd.visibleLevel()

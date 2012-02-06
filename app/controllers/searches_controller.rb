@@ -1,7 +1,7 @@
 class SearchesController < ApplicationController
 
   def index
-    @searches = Search.all
+    @searches = !params[:profile].blank? ? Search.find_all_by_profile_id(params[:profile]) : Search.all
   end
 
   def show
@@ -20,8 +20,11 @@ class SearchesController < ApplicationController
   end
 
   def create
-    @search = Search.find_by_keywords(params[:search] && params[:search][:keywords]) || Search.new(params[:search])
-    if @search.save
+    active_profile = Profile.find_by_active(true)
+    @search = Search.find_by_keywords_and_profile_id(params[:search][:keywords], active_profile.id) || Search.new(params[:search])
+    logger.debug @search.new_record?
+    @search.profile = active_profile
+    if @search.save :safe => true
       redirect_to search_url(@search, :browsers => params[:browsers])
     else
       render action: "new"

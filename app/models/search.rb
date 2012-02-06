@@ -33,9 +33,15 @@ class Search
   key :refinement_server_processing_time,   Fixnum, :default => 0
   key :completed_at,                        Time,   :default => nil
   timestamps!
-
-  ensure_index :keywords, :unique => true
   
+  belongs_to :profile
+
+  ensure_index :keywords
+  ensure_index :profile_id
+  ensure_index [[:keywords, 1], [:profile_id, 1]]
+  
+  validates_presence_of :profile
+    
   def logger
     ActiveRecord::Base.logger
   end

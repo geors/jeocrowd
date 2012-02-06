@@ -1,0 +1,10 @@
+<div class="profile">
+  <ul>
+    <% profile.attributes.each do |key, value| %>
+      <% next if key == "_id" %>
+      <li>
+        <%= key %> : <%= value %>
+      </li>
+    <% end %>
+  </ul>
+</div>

@@ -1,0 +1,41 @@
+<h1>Listing profiles</h1>
+
+<p id="notice"><%= notice %></p>
+
+<table class="scaffold">
+  <tr>
+    <th>Name</th>
+    <th>Full search times</th>
+    <th>Max neighbors for core</th>
+    <th>Threshold for removal</th>
+    <th>Hot tiles average</th>
+    <th>Tiles apart for sparse grids</th>
+    <th>Visualize clearing time</th>
+    <th>Benchmark publish interval</th>
+    <th>Browsers</th>
+  </tr>
+
+<% @profiles.each do |profile| %>
+  <tr class="<%= "active" if profile.active %> <%= cycle "norm", "alt" %>">
+    <td><%= profile.name %></td>
+    <td class="number"><%= profile.full_search_times %></td>
+    <td class="number"><%= profile.max_neighbors_for_core %></td>
+    <td class="number"><%= number_to_percentage profile.threshold_for_removal * 100, :precision => 1 %></td>
+    <td class="number"><%= profile.hot_tiles_average %></td>
+    <td class="number"><%= profile.tiles_apart_for_sparse_grids %></td>
+    <td class="number"><%= profile.visualize_clearing_time %></td>
+    <td class="number"><%= profile.benchmark_publish_interval %></td>
+    <td class="number"><%= profile.browsers %></td>
+    <td>
+      <%= link_to_unless profile.active, 'Activate', activate_profile_path(profile) do "Active" end %>
+      <%= link_to 'Duplicate', duplicate_profile_path(profile) %>
+      <%= link_to 'Edit', edit_profile_path(profile) %>
+      <%= link_to 'Destroy', profile, confirm: 'Are you sure?', method: :delete %>
+    </td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Profile', new_profile_path %>
