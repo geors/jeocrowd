@@ -22,7 +22,7 @@ module SearchesHelper
       end
     else
       v
-    end
+    end.to_s
   end
   
   def secondary_show(v)
@@ -34,8 +34,7 @@ module SearchesHelper
       end
     else
       v
-    end
-    
+    end.to_s
   end
   
 end
