@@ -3,7 +3,7 @@
     <% profile.attributes.each do |key, value| %>
       <% next if key == "_id" %>
       <li>
-        <%= key %> : <%= value %>
+        <%= key.to_s.humanize %> : <%= value %>
       </li>
     <% end %>
   </ul>

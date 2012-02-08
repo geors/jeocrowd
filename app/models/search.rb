@@ -91,6 +91,14 @@ class Search
     attributes.reject{ |k, v| k.index("_time").nil? }
   end
   
+  def xp_benchmarks
+    benchmarks.reject{ |k, v| k.index("exploratory").nil? }
+  end
+  
+  def rf_benchmarks
+    benchmarks.reject{ |k, v| k.index("refinement").nil? }
+  end
+  
   def client_benchmarks
     b = {}
     benchmarks.each do |k, v|

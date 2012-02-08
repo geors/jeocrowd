@@ -8,17 +8,62 @@
     <div class="grid_15">
       <div class="time">
         <% time = search.total_running_time(true) %>
-        <%= time.is_a?(String) ? time : "total execution time " + l(search.total_running_time(true), :format => :only_time)  %>
+        <%= time.is_a?(String) ? time : "total execution time " + primary_show(search.total_running_time) %>
+      </div>
+    </div>
+    <div class="grid_22">
+      <div class="time">
+        <% total = search.benchmarks.values.sum %>
+        <% xp = search.xp_benchmarks.values.sum %>
+        <% rf = search.rf_benchmarks.values.sum %>
+        Benchmarked time: <%= primary_show total %>
+        <br/>
+        (xp: <%= primary_show xp %> [<%= number_to_percentage xp / total.to_f * 100, :precision => 1 %>] |
+        rf: <%= primary_show rf %> [<%= number_to_percentage rf / total.to_f * 100, :precision => 1 %>])
       </div>
     </div>
   </div>
   <div class="clear"></div>
+  <div class="benchmarks">
+    <div class="benchmarks_graph_bar xp"> XP
+      <% search.xp_benchmarks.each do |k, v| %>
+        <span class="<%= k.gsub("exploratory_", "") %>" style="width: <%= benchmark_width v, xp %>px">
+          <span title="<%= secondary_show v %>"><%= primary_show v %></span><br/>
+          <%= number_to_percentage v / xp.to_f * 100, :precision => 2 %><br/>
+          <%= number_to_percentage v / total.to_f * 100, :precision => 2 %>
+        </span>
+      <% end %>
+    </div>
+    <% if search.phase == "refinement" %>
+    <div class="benchmarks_graph_bar rf"> RF
+      <% search.rf_benchmarks.each do |k, v| %>
+        <span class="<%= k.gsub("refinement_", "") %>" style="width: <%= benchmark_width v, rf %>px">
+          <span title="<%= secondary_show v %>"><%= primary_show v %></span><br/>
+          <%= number_to_percentage v / rf.to_f * 100, :precision => 2 %><br/>
+          <%= number_to_percentage v / total.to_f * 100, :precision => 2 %>
+        </span>
+      <% end %>
+    </div>
+    <% end %>
+    <div class="benchmarks_graph_bar rf">
+      <span class="loading_time">&nbsp;</span> Loading time
+      <span class="saving_time">&nbsp;</span> Saving time
+      <span class="client_processing_time">&nbsp;</span> Client processing time
+      <span class="server_processing_time">&nbsp;</span> Server processing time
+    </div>
+  </div>
+  <div class="clear"></div>
   <div class="links">
-    <%= link_to "view profile", "javascript: $('#profile#{search.id}').dialog()", :id => "continue_#{search.id}", :class => "continue_search_link" %>
-    <%= link_to "continue", search_path(search, :continue => 1), :id => "continue_#{search.id}", :class => "continue_search_link" %>
-    <%= link_to "just show", search_path(search, :display => 1), :id => "show_#{search.id}", :class => "show_search_link" %>
-    <%= link_to "restart exploratory", search_path(search, :restart_exploratory => 1), :id => "restart_xp_#{search.id}", :class => "restart_xp_link" %>
-    <%= link_to "restart refinement", search_path(search, :restart_refinement => 1), :id => "restart_rf_#{search.id}", :class => "restart_rf_link" %>
+    <%= link_to "view profile", "javascript: $('#profile#{search.id}').dialog()",
+      :id => "continue_#{search.id}", :class => "continue_search_link" %>
+    <%= link_to "continue", search_path(search, :continue => 1),
+      :id => "continue_#{search.id}", :class => "continue_search_link" %>
+    <%= link_to "just show", search_path(search, :display => 1),
+      :id => "show_#{search.id}", :class => "show_search_link" %>
+    <%= link_to "restart exploratory", search_path(search, :restart_exploratory => 1),
+      :id => "restart_xp_#{search.id}", :class => "restart_xp_link" %>
+    <%= link_to "restart refinement", search_path(search, :restart_refinement => 1),
+      :id => "restart_rf_#{search.id}", :class => "restart_rf_link" %>
   </div>
   <div class="delete_link">
     <%= link_to "&nbsp;x&nbsp;".html_safe, search, :method => :delete, :confirm => "Are you sure?" %>

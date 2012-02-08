@@ -95,6 +95,38 @@ div.search_item{
   }
 }
 
+div.time {
+  margin: 3px;
+  padding: 3px;
+}
+
+div.benchmarks_graph_bar {
+  width: 950px;
+  margin: 10px;
+  span {
+    display: inline-block;
+    padding: 0 3px;
+    text-align: center;
+    margin: 0;
+    &.loading_time {
+      background-color: #B8FFB7;
+      border: 1px solid darken(#B8FFB7, 20%);
+    }
+    &.saving_time {
+      background-color: #FFEAB5;
+      border: 1px solid darken(#FFEAB5, 20%);
+    }
+    &.client_processing_time {
+      background-color: #FFB0B6;
+      border: 1px solid darken(#FFB0B6, 20%);
+    }
+    &.server_processing_time {
+      background-color: #A5CFFF;
+      border: 1px solid darken(#A5CFFF, 20%);
+    }
+  }
+}
+
 div.links {
   margin: 5px auto;
 }
