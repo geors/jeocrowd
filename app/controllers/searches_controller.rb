@@ -1,7 +1,8 @@
 class SearchesController < ApplicationController
 
   def index
-    @searches = !params[:profile].blank? ? Search.find_all_by_profile_id(params[:profile]) : Search.all
+    @searches = !params[:profile].blank? ? Search.find_all_by_profile_id(params[:profile]) : 
+      params[:keywords].blank? ? Search.all : Search.find_all_by_keywords(params[:keywords])
   end
 
   def show

@@ -1,13 +1,27 @@
 <div class="clear"></div>
 <div class="searches_header">
   <h1>
-    Listing searches with profile
-    <%= select_tag :profile, options_for_select(Profile.all.map{ |p| [p.name, p.id]}, params[:profile]),
-      :include_blank => true, :id => "pr", :class => "reload_on_change" %>
+    Listing searches 
+    <% if params[:keywords] %>
+      for keywords <%= params[:keywords] %> | <%= link_to "View all", searches_path %>
+    <% else %>
+      with profile
+      <%= select_tag :profile, options_for_select(Profile.all.map{ |p| [p.name, p.id]}, params[:profile]),
+        :include_blank => true, :id => "pr", :class => "reload_on_change" %>
+    <% end %>
   </h1>
 </div>
 <div class="nav">
   <%= link_to image_tag("new.jpg") + 'New search', new_search_path, :id => "new_search_link" %>
+  <%= form_tag searches_path, :method => :get do %>
+    <%= label_tag :keywords, "or find searches with keywords" %>
+    <%= text_field_tag :keywords, params[:keywords] %>
+    <%= submit_tag "Search" %>
+  <% end %>
+  |
+  <%= link_to_if params[:show_time].blank?, "Display times in human readable form", params.merge(:show_time => true) do %>
+    <%= link_to "Display times in ms", params.merge(:show_time => nil) %>
+  <% end %>
 </div>
 <div class="searches_list">
   <% @searches.each do |search| %>

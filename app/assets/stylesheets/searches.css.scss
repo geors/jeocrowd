@@ -72,12 +72,18 @@ div.search_item {
 a#new_search_link {
   @include rounded-corners(3px);
   @include gradient-background-horizontal(#fff, $left-option-color);
-  display: block;
+  display: inline-block;
   height: 20px;
   width: 100px;
   padding: 5px;
   img {
     vertical-align: middle;
+  }
+}
+
+div.nav {
+  form {
+    display: inline-block;
   }
 }
 

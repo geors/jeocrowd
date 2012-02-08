@@ -1,8 +1,11 @@
 <div class="search_item">
   <div class="info">
-    <div class="grid_10">
+    <div class="grid_11">
       <div class="keywords">
         <%= search.keywords %>
+      </div>
+      <div>
+        <%= link_to "Compare with other profiles", searches_path(:keywords => search.keywords, :profile => nil) %>
       </div>
     </div>
     <div class="grid_15">
