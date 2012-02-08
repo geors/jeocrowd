@@ -13,6 +13,9 @@
         <% time = search.total_running_time(true) %>
         <%= time.is_a?(String) ? time : "total execution time " + primary_show(search.total_running_time) %>
       </div>
+      <div class="time">
+        Total available points <%= search.statistics[:total_available_points] %>
+      </div>
     </div>
     <div class="grid_22">
       <div class="time">
@@ -20,7 +23,8 @@
         <% xp = search.xp_benchmarks.values.sum %>
         <% rf = search.rf_benchmarks.values.sum %>
         Benchmarked time: <%= primary_show total %>
-        <br/>
+      </div>
+      <div class="time">
         (xp: <%= primary_show xp %> [<%= number_to_percentage xp / total.to_f * 100, :precision => 1 %>] |
         rf: <%= primary_show rf %> [<%= number_to_percentage rf / total.to_f * 100, :precision => 1 %>])
       </div>

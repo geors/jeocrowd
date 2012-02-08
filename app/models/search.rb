@@ -27,10 +27,14 @@ class Search
   key :exploratory_saving_time,             Fixnum, :default => 0
   key :exploratory_client_processing_time,  Fixnum, :default => 0
   key :exploratory_server_processing_time,  Fixnum, :default => 0
+  key :exploratory_loading_data,            Fixnum, :default => 0
+  key :exploratory_saving_data,             Fixnum, :default => 0
   key :refinement_loading_time,             Fixnum, :default => 0
   key :refinement_saving_time,              Fixnum, :default => 0
   key :refinement_client_processing_time,   Fixnum, :default => 0
   key :refinement_server_processing_time,   Fixnum, :default => 0
+  key :refinement_loading_data,             Fixnum, :default => 0
+  key :refinement_saving_data,              Fixnum, :default => 0
   key :completed_at,                        Time,   :default => nil
   timestamps!
   
@@ -39,6 +43,7 @@ class Search
   ensure_index :keywords
   ensure_index :profile_id
   ensure_index [[:keywords, 1], [:profile_id, 1]]
+  ensure_index :created_at
   
   validates_presence_of :profile
     
