@@ -2,7 +2,9 @@
 # to do:
 # - zoom map to include all tile (some tiles with high degree)
 # - fix: Uncaught TypeError: Cannot set property 'timeInServer' of undefined in first benchmark call
-# - in xp send only each page to the server not all the results
+# check difference between initial rf when using multible browsers
+# remove browser spawner on reloading pages when waiting
+# add finish level in profiles (can be absolute or relative)
 
 MAX_LEVEL = 6
 
@@ -12,7 +14,7 @@ window.Jeocrowd =
   LEVEL_MULTIPLIER: 5
   COORDINATE_SEPARATOR: '^'
   MAX_XP_PAGES: 16
-  FULL_SEARCH_TIMES: 1  # DO NOT SET THIS TO ZERO
+  FULL_SEARCH_TIMES: 1 # DO NOT SET THIS TO ZERO
   MAX_NEIGHBORS_FOR_CORE: 7
   THRESHOLD_FOR_REMOVAL: 0.02
   HOT_TILES_COUNT_AVERAGE: 5
