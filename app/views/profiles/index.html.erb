@@ -8,7 +8,7 @@
     <th>Full search times</th>
     <th>Max neighbors for core</th>
     <th>Threshold for removal</th>
-    <th>Hot tiles average</th>
+    <th>Hot tiles count average</th>
     <th>Tiles apart for sparse grids</th>
     <th>Visualize clearing time</th>
     <th>Benchmark publish interval</th>
@@ -21,7 +21,7 @@
     <td class="number"><%= profile.full_search_times %></td>
     <td class="number"><%= profile.max_neighbors_for_core %></td>
     <td class="number"><%= number_to_percentage profile.threshold_for_removal * 100, :precision => 1 %></td>
-    <td class="number"><%= profile.hot_tiles_average %></td>
+    <td class="number"><%= profile.hot_tiles_count_average %></td>
     <td class="number"><%= profile.tiles_apart_for_sparse_grids %></td>
     <td class="number"><%= profile.visualize_clearing_time %></td>
     <td class="number"><%= profile.benchmark_publish_interval %></td>

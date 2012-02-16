@@ -144,6 +144,7 @@
     reject{ |k, v| k.starts_with?("rf") }.
     merge("rfTiles" => @search.merged_rf_tiles.map{ |l| l.replace_circumflex_with_dots_in_keys unless l.nil?}).
     merge("startingBlock" => @search.new_block ? @search.new_block.map(&:replace_circumflex_with_dots) : nil).
+    merge("profile" => @search.profile.attributes).
     to_json %>
 </div>
 

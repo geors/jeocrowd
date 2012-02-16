@@ -7,7 +7,7 @@ describe "profiles/edit" do
       :max_neighbors_for_core => 1,
       :{threshold_for_removal => "",
       :{threshold_for_removal => "",
-      :hot_tiles_average => 1,
+      :hot_tiles_count_average => 1,
       :tiles_apart_for_sparse_grids => 1,
       :visualize_clearing_time => 1,
       :benchmark_publish_interval => 1
@@ -23,7 +23,7 @@ describe "profiles/edit" do
       assert_select "input#profile_max_neighbors_for_core", :name => "profile[max_neighbors_for_core]"
       assert_select "input#profile_{threshold_for_removal", :name => "profile[{threshold_for_removal]"
       assert_select "input#profile_{threshold_for_removal", :name => "profile[{threshold_for_removal]"
-      assert_select "input#profile_hot_tiles_average", :name => "profile[hot_tiles_average]"
+      assert_select "input#profile_hot_tiles_count_average", :name => "profile[hot_tiles_count_average]"
       assert_select "input#profile_tiles_apart_for_sparse_grids", :name => "profile[tiles_apart_for_sparse_grids]"
       assert_select "input#profile_visualize_clearing_time", :name => "profile[visualize_clearing_time]"
       assert_select "input#profile_benchmark_publish_interval", :name => "profile[benchmark_publish_interval]"

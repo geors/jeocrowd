@@ -7,7 +7,7 @@ describe "profiles/show" do
       :max_neighbors_for_core => 1,
       :{threshold_for_removal => "",
       :{threshold_for_removal => "",
-      :hot_tiles_average => 1,
+      :hot_tiles_count_average => 1,
       :tiles_apart_for_sparse_grids => 1,
       :visualize_clearing_time => 1,
       :benchmark_publish_interval => 1

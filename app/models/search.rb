@@ -252,9 +252,8 @@ class Search
     params.values_to_i!
     statistics.merge! :total_available_points => params[:total_available_points]      if params[:total_available_points]
     set :statistics             => statistics
-    set :completed_at           => Time.now                                           if params[:completed] == "completed"
-    update_benchmarks params[:benchmarks]                                             if params[:benchmarks]
-    logger.debug params[:xpTiles].class
+    set :completed_at           => Time.now    if completed_at.nil? && params[:completed] == "completed"
+    update_benchmarks params[:benchmarks]      if params[:benchmarks]
     update_xp params[:xpTiles], params[:page],  params[:timestamp]                    if params[:page]
     update_rf params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel] if params[:rfTiles] && params[:level]
   end
