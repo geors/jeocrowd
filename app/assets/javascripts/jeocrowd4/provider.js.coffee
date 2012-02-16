@@ -145,11 +145,7 @@ class window.Provider
     }
 
   saveTotalAvailablePoints: (total) ->
-    jQuery.ajax {
-      'url': @serverURL,
-      'type': 'PUT',
-      'data': {'total_available_points': total}
-    }
+    @storeSimpleKeyValue({'total_available_points': total})
   
   convertData: (data) ->
     if data && data.photos && data.photos.photo
@@ -162,6 +158,18 @@ class window.Provider
         point
     else
       []
+      
+  storeSimpleKeyValue: (data, callback) ->
+    jQuery.ajax({
+      'url': @serverURL,
+      'type': 'PUT',
+      'data': data,
+      'dataType': 'json'
+      'success': (data, xmlhttp, textStatus) ->
+        callback.apply Jeocrowd, [data] if callback
+      'complete': (jqXHR, textStatus) ->
+        console.log textStatus if textStatus != 'success'
+    })
     
 # different providers for later expansion
     

@@ -277,12 +277,7 @@ window.Jeocrowd =
   
   markAsCompleted: ->
     $('#phase').text('completed')
-    jQuery.ajax({
-      'url': @provider().serverURL,
-      'type': 'PUT',
-      'data': {'completed': 'completed'},
-      'dataType': 'json'
-    });
+    @provider().storeSimpleKeyValue({'completed': 'completed'})
   
   calculateMaxLevel: ->
     @visibleGrid().undraw()
@@ -292,6 +287,8 @@ window.Jeocrowd =
     i-- while @grids(i).tiles.size() == 0
     grid.dirty = grid.level > 0 for grid in Jeocrowd.grids()
     @maxLevel = i
+    
+
 
     
 
