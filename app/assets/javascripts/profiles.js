@@ -9,7 +9,7 @@ $(document).ready(function() {
       // console.log(kv)
       for (var p in kv) {
         var data = kv[p].split('=');
-        // console.log(data);
+        // console.log(data)
         if (data[0].indexOf('[]') == -1) {
           params[data[0]] = data[1];
         } else {
@@ -18,7 +18,7 @@ $(document).ready(function() {
         }
       }
     }
-    // console.log(key);
+    // console.log(key)
     params[key] = $(this).val();
     location.search = '?' + jQuery.param(params);
   });

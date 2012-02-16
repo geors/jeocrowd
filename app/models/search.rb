@@ -64,6 +64,7 @@ class Search
       self[:"rf_level_#{i}"]             = []
     end
     self.created_at = Time.now
+    self.completed_at = nil
     self.exploratory_loading_time = 0
     self.exploratory_saving_time = 0
     self.exploratory_client_processing_time = 0
@@ -83,6 +84,7 @@ class Search
       self[:"rf_level_mark_keys_#{i}"]   = []
       self[:"rf_level_#{i}"]             = []
     end
+    self.completed_at = nil
     self.refinement_loading_time = 0
     self.refinement_saving_time = 0
     self.refinement_client_processing_time = 0

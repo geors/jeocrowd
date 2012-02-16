@@ -22,9 +22,9 @@ class SearchesController < ApplicationController
   end
 
   def create
-    active_profile = Profile.find_by_active(true)
-    @search = Search.find_by_keywords_and_profile_id(params[:search][:keywords], active_profile.id) || Search.new(params[:search])
-    @search.profile = active_profile
+    active_profile_id = Profile.find_by_active(true).try(:id)
+    @search = Search.find_by_keywords_and_profile_id(params[:search][:keywords], active_profile_id) || Search.new(params[:search])
+    @search.profile_id = active_profile_id
     if @search.save :safe => true
       redirect_to search_url(@search, :browsers => params[:browsers])
     else
