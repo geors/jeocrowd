@@ -63,13 +63,13 @@
   <div class="links">
     <%= link_to "view profile", "javascript: $('#profile#{search.id}').dialog()",
       :id => "continue_#{search.id}", :class => "continue_search_link" %>
-    <%= link_to "continue", search_path(search, :continue => 1),
+    <%= link_to "continue", search_path(search, :continue => 1, :init => 1),
       :id => "continue_#{search.id}", :class => "continue_search_link" %>
     <%= link_to "just show", search_path(search, :display => 1),
       :id => "show_#{search.id}", :class => "show_search_link" %>
-    <%= link_to "restart exploratory", search_path(search, :restart_exploratory => 1),
+    <%= link_to "restart exploratory", search_path(search, :restart_exploratory => 1, :init => 1),
       :id => "restart_xp_#{search.id}", :class => "restart_xp_link" %>
-    <%= link_to "restart refinement", search_path(search, :restart_refinement => 1),
+    <%= link_to "restart refinement", search_path(search, :restart_refinement => 1, :init => 1),
       :id => "restart_rf_#{search.id}", :class => "restart_rf_link" %>
   </div>
   <div class="delete_link">
