@@ -147,8 +147,8 @@
     to_json %>
 </div>
 
-<script type="text/javascript" charset="utf-8">
-  <% if @search.profile %>
+<% if @search.profile && params[:init] %>
+  <script type="text/javascript" charset="utf-8">
     var browsers = <%= @search.profile.browsers %>;
     var websites = <%= Instance.websites.to_json.html_safe %>;
     websites.splice(websites.indexOf(window.location.host), 1);
@@ -156,5 +156,5 @@
     for (i = 0; i < browsers - 1; i++) {
       window.open('http://' + websites[i % websites.length] + window.location.pathname, "_blank", "location=yes,menubar=yes,resizeable=yes,scrollbars=yes,titlebar=yes,toolbar=yes,newtab=yes");
     }
-  <% end %> 
-</script>
+  </script>
+<% end %> 

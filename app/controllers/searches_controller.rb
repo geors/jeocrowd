@@ -26,7 +26,7 @@ class SearchesController < ApplicationController
     @search = Search.find_by_keywords_and_profile_id(params[:search][:keywords], active_profile.id) || Search.new(params[:search])
     @search.profile = active_profile
     if @search.save :safe => true
-      redirect_to search_url(@search, :browsers => params[:browsers])
+      redirect_to search_url(@search, :init => 1)
     else
       render action: "new"
     end
