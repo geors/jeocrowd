@@ -5,6 +5,7 @@
 # check difference between initial rf when using multible browsers
 # remove browser spawner on reloading pages when waiting
 # add finish level in profiles (can be absolute or relative)
+# add waiting time for reloadin in profiles == XP timeout () -- server use only
 
 MAX_LEVEL = 6
 

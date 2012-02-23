@@ -18,8 +18,8 @@ class Search
   end                                       
   key :levels,                              Array,  :default => []   # Array of Fixnum  
   (0..6).each do |i|                       
-    key :"rf_level_assing_keys_#{i}",       Array,  :default => []   # Array of Hashes
-    key :"rf_level_mark_keys_#{i}",         Array,  :default => []   # Array of Hashes
+    key :"rf_level_assing_keys_#{i}",       Array,  :default => []   # Array of String ids
+    key :"rf_level_mark_keys_#{i}",         Array,  :default => []   # Array of String ids
     key :"rf_level_#{i}",                   Array,  :default => []   # Array of Hashes
   end
   key :statistics,                          Hash,   :default => {}

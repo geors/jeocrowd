@@ -182,7 +182,7 @@ window.Providers =
       has_geo:  true,
       accuracy: 12,
       extras:   "geo",
-      sort:     "date-posted-desc",
+      sort:     "relevance,interestingness-desc",
       format:   "json"
     }
   }

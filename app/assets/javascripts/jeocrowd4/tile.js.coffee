@@ -179,7 +179,7 @@ class window.Tile
 
   getColor: ->
     if @willBeDrawnFromHigherLevel()
-      '#1E719F'
+      '#4682B4'
     else if @degree < 0
       '#BBBBBB'
     else if Jeocrowd.visibleLayer() == 'degree'
