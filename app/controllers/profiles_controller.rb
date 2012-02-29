@@ -77,7 +77,7 @@ class ProfilesController < ApplicationController
   end
   
   def activate
-    Profile.set({:active => true}, :active => false)
+    Profile.set({:active => true}, {:active => false})
     Profile.set params[:id], :active => true
     redirect_to :back, notice: "Profile activated!"
   end

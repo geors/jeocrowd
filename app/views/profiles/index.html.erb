@@ -12,6 +12,9 @@
     <th>Tiles apart for sparse grids</th>
     <th>Visualize clearing time</th>
     <th>Benchmark publish interval</th>
+    <th>Waiting on reload</th>
+    <th>Finish level</th>
+    <th>Refinement block size</th>
     <th>Browsers</th>
   </tr>
 
@@ -25,6 +28,9 @@
     <td class="number"><%= profile.tiles_apart_for_sparse_grids %></td>
     <td class="number"><%= profile.visualize_clearing_time %></td>
     <td class="number"><%= profile.benchmark_publish_interval %></td>
+    <td class="number"><%= profile.waiting_on_reload %></td>
+    <td class="number"><%= profile.finish_level %></td>
+    <td class="number"><%= profile.rf_block_size %></td>
     <td class="number"><%= profile.browsers %></td>
     <td>
       <%= link_to_unless profile.active, 'Activate', activate_profile_path(profile) do "Active" end %>

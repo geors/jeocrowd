@@ -56,9 +56,10 @@ class window.Tile
         
   setDegree: (degree) ->
     if @grid.hottestTile == null || @grid.hottestTile.degree < degree
-      @grid.hottestTile = this 
-      $('#hottest_tiles_value').html(@linkTo())
-      $('#hottest_tiles_degree_value').text(degree)
+      @grid.hottestTile = this
+      unless @grid.temp 
+        $('#hottest_tiles_value').html(@linkTo())
+        $('#hottest_tiles_degree_value').text(degree)
       @grid.getHottestTilesAverageDegree(true)
     @degree = degree
     

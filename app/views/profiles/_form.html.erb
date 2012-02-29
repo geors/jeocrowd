@@ -45,6 +45,18 @@
     <%= f.number_field :benchmark_publish_interval %> (Default: 30000 ms)
   </div>
   <div class="field">
+    <%= f.label :waiting_on_reload %><br />
+    <%= f.number_field :waiting_on_reload %> (Default: 10000 ms)
+  </div>
+  <div class="field">
+    <%= f.label :finish_level %><br />
+    <%= f.number_field :finish_level %> (Default: level 0)
+  </div>
+  <div class="field">
+    <%= f.label :rf_block_size %><br />
+    <%= f.number_field :rf_block_size %> (Default: 5)
+  </div>
+  <div class="field">
     <%= f.label :browsers %><br />
     <%= f.number_field :browsers %> (Default: 1 browser)
   </div>

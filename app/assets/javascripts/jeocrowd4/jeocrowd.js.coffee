@@ -4,7 +4,6 @@
 # - fix: Uncaught TypeError: Cannot set property 'timeInServer' of undefined in first benchmark call
 # check difference between initial rf when using multible browsers
 # remove browser spawner on reloading pages when waiting
-# add finish level in profiles (can be absolute or relative)
 # add waiting time for reloadin in profiles == XP timeout () -- server use only
 
 MAX_LEVEL = 6
@@ -22,6 +21,8 @@ window.Jeocrowd =
   TILES_APART_FOR_SPARSE_GRIDS: 10
   VISUALIZE_CLEARING_TIME: 2000 # in ms
   BENCHMARK_PUBLISH_INTERVAL: 30000 # in ms
+  FINISH_LEVEL: 0
+  WAITING_ON_RELOAD: 10000 #in ms
   
   config: {}
     
@@ -169,6 +170,7 @@ window.Jeocrowd =
       Benchmark.start('exploratoryClientProcessing')
       page = pageOrLevel
       tempgrid = new Grid(0)
+      tempgrid.temp = true
       tempgrid.addPoints(data)
       @grids(0).addPoints(data)
       @visibleGrid().draw()
@@ -226,7 +228,7 @@ window.Jeocrowd =
   # this is good because it allows us to view the before-after refinement-clearing of each level.
   gotoBelowLevel: ->
     Benchmark.start('refinementClientProcessing')
-    if @refinementLevel == 0
+    if @refinementLevel == Jeocrowd.FINISH_LEVEL
       @grids(@refinementLevel).clearBeforeRefinement true
       @markAsCompleted()
       return
@@ -271,7 +273,7 @@ window.Jeocrowd =
   waitAndReload: ->
     $('#phase').text('waiting')
     @exitNow = true
-    setTimeout(Jeocrowd.reloadWithoutParams, 10000)
+    setTimeout(Jeocrowd.reloadWithoutParams, Jeocrowd.WAITING_ON_RELOAD)
     
   reloadWithoutParams: ->
     window.location = window.location.pathname

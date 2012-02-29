@@ -2,9 +2,8 @@ class Search
   include MongoMapper::Document
 
   MAX_XP_PAGES = 16
-  XP_TIMEOUT = 15.seconds * 1000
+  XP_TIMEOUT = 10000 # is ms
   RF_BLOCK_SIZE = 5
-  RF_TIMEOUT = (3 * RF_BLOCK_SIZE).seconds * 1000
 
   attr_accessor :new_timestamp
   attr_accessor :new_page
@@ -49,6 +48,13 @@ class Search
     
   def logger
     ActiveRecord::Base.logger
+  end
+  
+  def get_paramater(p)
+    case p
+    when :XP_TIMEOUT    then return (profile && profile.waiting_on_reload) || XP_TIMEOUT
+    when :RF_BLOCK_SIZE then return (profile && profile.rf_block_size)     || RF_BLOCK_SIZE
+    end
   end
   
   def xp_reset
@@ -140,14 +146,14 @@ class Search
     if phase == "exploratory"
       next_available_xp_page(timestamp)
     elsif phase == "refinement"
-      next_available_rf_block(current_level, RF_BLOCK_SIZE, timestamp)
+      next_available_rf_block(current_level, get_paramater(:RF_BLOCK_SIZE), timestamp)
     end
     self.new_timestamp = timestamp
   end
   
   def old_page_index(current_timestamp)
     pages.each_with_index do |page, index|
-      return index if (current_timestamp - page > XP_TIMEOUT) && (page > MAX_XP_PAGES - 1)
+      return index if (current_timestamp - page > get_paramater(:XP_TIMEOUT)) && (page > MAX_XP_PAGES - 1)
     end
     nil
   end

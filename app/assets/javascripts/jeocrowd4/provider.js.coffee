@@ -62,37 +62,43 @@ class window.Provider
     return null if (page = @computeNextPage()) == null
     @params.page = page + 1
     @params.text = keywords
-    @params.jsoncallback = 'Jeocrowd._provider.callbacks.exploratory_page_' + page
-    @callbacks['exploratory_page_' + page] = (data) -> # called from the global namespace
+    # @params.jsoncallback = 'Jeocrowd._provider.callbacks.exploratory_page_' + page
+    # @callbacks['exploratory_page_' + page] = (data) -> # called from the global namespace
+    #   Jeocrowd.provider().exploratoryCallback data, page, callback
+    # jQuery.getScript(@apiURL + "?" + jQuery.param(@params)).fail (jqxhr, settings, exception) ->
+    #   console.log exception
+    #   Jeocrowd.provider().exploratorySearch keywords, callback
+    jQuery.getJSON(@apiURL + "?" + jQuery.param(@params))
+    .success (data, textStatus, jqXHR) ->
       Jeocrowd.provider().exploratoryCallback data, page, callback
-    try
-      jQuery.getScript @apiURL + "?" + jQuery.param(@params)
-      true
-    catch error
-      console.log error
-      @exploratorySearch keywords, callback
+    .error (jqXHR, textStatus, errorThrown) ->
+      Jeocrowd.provider().refinementSearch keywords, callback
     
   refinementSearch: (keywords, level, callback) ->
-    return null if (box = @computeNextBox(level)) == null
-    if box.length == 0
+    return null if (tile = @computeNextBox(level)) == null
+    if tile.length == 0
       callback.apply Jeocrowd, [null, level, null]
       return
     else
-      box = Jeocrowd.grids(level).getTile box[0] # returned array from computeNextBox
+      box = Jeocrowd.grids(level).getTile tile[0] # returned array from computeNextBox
     $('#current_input_tile_value').html(box.linkTo())
     Jeocrowd.map.panTo box.getCenter() if $('#pan_map:checked[value=input]').length > 0
     @params.bbox = box.getBoundingBoxString()
     @params.text = keywords
     @params.per_page = 1
-    @params.jsoncallback = 'Jeocrowd._provider.callbacks.refinement_level_' + level + '_box_' + box.sanitizedId()
+    # @params.jsoncallback = 'Jeocrowd._provider.callbacks.refinement_level_' + level + '_box_' + box.sanitizedId()
     @callbacks['refinement_level_' + level + '_box_' + box.sanitizedId()] = (data) -> # called from the global namespace
       Jeocrowd.provider().refinementCallback data, level, box, callback
-    try
-      jQuery.getScript @apiURL + "?" + jQuery.param(@params)
-      true
-    catch error
-      console.log error
-      @exploratorySearch keywords, callback
+    # jQuery.getScript(@apiURL + "?" + jQuery.param(@params)).fail (jqxhr, settings, exception) ->
+    #   console.log exception
+    #   Jeocrowd.provider().assignedTiles.push(tile[0]);
+    #   Jeocrowd.provider().refinementSearch keywords, level, callback
+    jQuery.getJSON(@apiURL + "?" + jQuery.param(@params))
+    .success (data, textStatus, jqXHR) ->
+      Jeocrowd.provider().refinementCallback data, level, box, callback
+    .error (jqXHR, textStatus, errorThrown) ->
+      Jeocrowd.provider().assignedTiles.push(tile[0]);
+      Jeocrowd.provider().refinementSearch keywords, level, callback
 
   exploratoryCallback: (data, page, callback) ->
     newData = @convertData(data)
@@ -184,5 +190,6 @@ window.Providers =
       extras:   "geo",
       sort:     "relevance,interestingness-desc",
       format:   "json"
+      nojsoncallback: "1"
     }
   }
