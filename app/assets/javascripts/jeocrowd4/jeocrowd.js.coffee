@@ -18,6 +18,7 @@ window.Jeocrowd =
   MAX_NEIGHBORS_FOR_CORE: 7
   THRESHOLD_FOR_REMOVAL: 0.02
   HOT_TILES_COUNT_AVERAGE: 5
+  DETECT_SPARSE_GRIDS: true
   TILES_APART_FOR_SPARSE_GRIDS: 10
   VISUALIZE_CLEARING_TIME: 2000 # in ms
   BENCHMARK_PUBLISH_INTERVAL: 30000 # in ms
@@ -207,7 +208,7 @@ window.Jeocrowd =
     Benchmark.start('refinementClientProcessing')
     @maxLevel = @calculateMaxLevel()
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
-    if @grids(@maxLevel).isSparse()
+    if @grids(@maxLevel).isSparse() && Jeocrowd.DETECT_SPARSE_GRIDS
       console.log 'sparse grid detected...'
       @maxLevel += 1
       @grids(@maxLevel).growUp Tile.prototype.atLeastOne

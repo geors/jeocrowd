@@ -33,6 +33,10 @@
     <%= f.number_field :hot_tiles_count_average %> (Default: 5 top entries)
   </div>
   <div class="field">
+    <%= f.label :detect_sparse_grids %>
+    <%= f.check_box :detect_sparse_grids %>
+  </div>
+  <div class="field">
     <%= f.label :tiles_apart_for_sparse_grids %><br />
     <%= f.number_field :tiles_apart_for_sparse_grids %> (Default: 10 tiles)
   </div>
