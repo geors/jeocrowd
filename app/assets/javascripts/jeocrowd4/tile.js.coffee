@@ -60,7 +60,6 @@ class window.Tile
       unless @grid.temp 
         $('#hottest_tiles_value').html(@linkTo())
         $('#hottest_tiles_degree_value').text(degree)
-      @grid.getHottestTilesAverageDegree(true)
     @degree = degree
     
   refined: ->

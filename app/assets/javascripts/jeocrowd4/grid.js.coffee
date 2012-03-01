@@ -103,6 +103,8 @@ class window.Grid
       aboveGrid.tiles.each('toChildren', algorithm)
 
   clearBeforeRefinement: (showProgress = false, callback = null) ->
+    x = @getHottestTilesAverageDegree()
+    console.log "Kmost average = #{x}"
     if showProgress
       ids = @tiles.filter('willBeRemoved').each('highlight2', true)
       thisGrid = this
