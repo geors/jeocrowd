@@ -93,7 +93,8 @@ window.Jeocrowd =
     if @config.search
       if @config.search.profile
         for profileKey, profileValue of @config.search.profile
-          Jeocrowd[profileKey.toUpperCase()] = profileValue if Jeocrowd[profileKey.toUpperCase()]
+          Jeocrowd[profileKey.toUpperCase()] = profileValue if Jeocrowd[profileKey.toUpperCase()]?
+          
       $('#available_points_value').text(@config.search.statistics.total_available_points)
       $('#exploratory_pages_value').text(JSON.stringify @config.search.pages)
       @visibleLayer('neighbors')
