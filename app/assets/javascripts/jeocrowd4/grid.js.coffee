@@ -103,7 +103,7 @@ class window.Grid
       aboveGrid.tiles.each('toChildren', algorithm)
 
   clearBeforeRefinement: (showProgress = false, callback = null) ->
-    x = @getHottestTilesAverageDegree()
+    x = @getHottestTilesAverageDegree(true)
     console.log "Kmost average = #{x}"
     if showProgress
       ids = @tiles.filter('willBeRemoved').each('highlight2', true)
@@ -138,9 +138,9 @@ class window.Grid
     avg > Jeocrowd.TILES_APART_FOR_SPARSE_GRIDS * @sizeOfTile()
   
   isComplete: ->
-    @tiles.map('getDegree').every( (t) -> t > 0 || Jeocrowd.MAX_NEIGHBORS_FOR_CORE <= -t <= 8)
+    @tiles.map('getDegree').every( (t) -> t > 0 )
 
-  getHottestTilesAverageDegree: (force) ->
+  getHottestTilesAverageDegree: (force = false) ->
     # because hottest tile is usually off the grid in comparison to the rest, we compare the degree of a tile with the average of
     # the Jeocrowd.HOT_TILES_COUNT_AVERAGE hottest tiles in the same level
     @hottestTilesAverageDegree = null if force

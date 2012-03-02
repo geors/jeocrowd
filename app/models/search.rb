@@ -35,6 +35,7 @@ class Search
   key :refinement_loading_data,             Fixnum, :default => 0
   key :refinement_saving_data,              Fixnum, :default => 0
   key :completed_at,                        Time,   :default => nil
+  key :profile_change,                      Boolean,:deafult => false
   timestamps!
   
   belongs_to :profile
@@ -79,6 +80,7 @@ class Search
     self.refinement_saving_time = 0
     self.refinement_client_processing_time = 0
     self.refinement_server_processing_time = 0
+    self.profile_change = false
     save :safe => true
   end
   

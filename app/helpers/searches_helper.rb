@@ -14,7 +14,7 @@ module SearchesHelper
   end
   
   def primary_show(v)
-    if params[:show_time]
+    if session[:show_time]
       if v / 1000 == 0
         "#{v} ms"
       else
@@ -26,7 +26,7 @@ module SearchesHelper
   end
   
   def secondary_show(v)
-    unless params[:show_time]
+    unless session[:show_time]
       if v / 1000 == 0
         "#{v} ms"
       else

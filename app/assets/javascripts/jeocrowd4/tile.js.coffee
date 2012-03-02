@@ -112,6 +112,7 @@ class window.Tile
         zIndex: 10
       }
       google.maps.event.addListener(@visual, 'click', Util.createDelegate(this, Tile.prototype.visualClicked));
+      google.maps.event.addListener(@visual, 'dblclick', Util.createDelegate(this, Tile.prototype.visualDClicked));
     if @shouldDisplay()
       @visual.setMap Jeocrowd.map
     else
@@ -127,6 +128,14 @@ class window.Tile
     $('#selected_tile_degree_value').text(@degree)
     $('#selected_tile_neighbors_value').text(@getNeighborCount())
 
+  visualDClicked: ->
+    @grid.selectedTile = this
+    console.log(this);
+    @highlight(true);
+    setTimeout(=>
+      @highlight(false)
+    , 1000
+    )
     
   highlight: (display) ->
     return if @isHighlighted1 == display
@@ -271,8 +280,9 @@ class window.Tile
   willBeRemoved: ->
     # we cannot eliminate a tile just because it is alone, this might discard some small areas or point features
     # that even at a high level only one tile was left, or even multi clusters, ie. a few loner tiles were left
-    @degree > 0 && ((@isLoner() && @degree < 0.5 * @grid.hottestTilesAverageDegree) || 
-      @degree < Jeocrowd.THRESHOLD_FOR_REMOVAL * @grid.hottestTilesAverageDegree)
+    return false unless @grid.isComplete()
+    @degree > 0 && ((@isLoner() && @degree < 0.5 * @grid.getHottestTilesAverageDegree()) || 
+      @degree < Jeocrowd.THRESHOLD_FOR_REMOVAL * @grid.getHottestTilesAverageDegree())
     
   fullyOccupied: ->
     @getNeighborCount() >= Jeocrowd.MAX_NEIGHBORS_FOR_CORE

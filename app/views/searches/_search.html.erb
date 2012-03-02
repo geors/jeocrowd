@@ -3,6 +3,9 @@
     <div class="grid_11">
       <div class="keywords">
         <%= search.keywords %>
+        <% if search.profile_change %>
+          <span class="red_bubble">Profile changed</span>
+        <% end %>
       </div>
       <div>
         <%= link_to "Compare with other profiles", searches_path(:keywords => search.keywords, :profile => nil) %>
@@ -31,35 +34,37 @@
     </div>
   </div>
   <div class="clear"></div>
-  <div class="benchmarks">
-    <div class="benchmarks_graph_bar xp"> XP
-      <% search.xp_benchmarks.each do |k, v| %>
-        <span class="<%= k.gsub("exploratory_", "") %>" style="width: <%= benchmark_width v, xp %>px">
-          <span title="<%= secondary_show v %>"><%= primary_show v %></span><br/>
-          <%= number_to_percentage v / xp.to_f * 100, :precision => 2 %><br/>
-          <%= number_to_percentage v / total.to_f * 100, :precision => 2 %>
-        </span>
+  <% if session[:show_benchmark_bars] %>
+    <div class="benchmarks">
+      <div class="benchmarks_graph_bar xp"> XP
+        <% search.xp_benchmarks.each do |k, v| %>
+          <span class="<%= k.gsub("exploratory_", "") %>" style="width: <%= benchmark_width v, xp %>px">
+            <span title="<%= secondary_show v %>"><%= primary_show v %></span><br/>
+            <%= number_to_percentage v / xp.to_f * 100, :precision => 2 %><br/>
+            <%= number_to_percentage v / total.to_f * 100, :precision => 2 %>
+          </span>
+        <% end %>
+      </div>
+      <% if search.phase == "refinement" %>
+      <div class="benchmarks_graph_bar rf"> RF
+        <% search.rf_benchmarks.each do |k, v| %>
+          <span class="<%= k.gsub("refinement_", "") %>" style="width: <%= benchmark_width v, rf %>px">
+            <span title="<%= secondary_show v %>"><%= primary_show v %></span><br/>
+            <%= number_to_percentage v / rf.to_f * 100, :precision => 2 %><br/>
+            <%= number_to_percentage v / total.to_f * 100, :precision => 2 %>
+          </span>
+        <% end %>
+      </div>
       <% end %>
+      <div class="benchmarks_graph_bar rf">
+        <span class="loading_time">&nbsp;</span> Loading time
+        <span class="saving_time">&nbsp;</span> Saving time
+        <span class="client_processing_time">&nbsp;</span> Client processing time
+        <span class="server_processing_time">&nbsp;</span> Server processing time
+      </div>
     </div>
-    <% if search.phase == "refinement" %>
-    <div class="benchmarks_graph_bar rf"> RF
-      <% search.rf_benchmarks.each do |k, v| %>
-        <span class="<%= k.gsub("refinement_", "") %>" style="width: <%= benchmark_width v, rf %>px">
-          <span title="<%= secondary_show v %>"><%= primary_show v %></span><br/>
-          <%= number_to_percentage v / rf.to_f * 100, :precision => 2 %><br/>
-          <%= number_to_percentage v / total.to_f * 100, :precision => 2 %>
-        </span>
-      <% end %>
-    </div>
-    <% end %>
-    <div class="benchmarks_graph_bar rf">
-      <span class="loading_time">&nbsp;</span> Loading time
-      <span class="saving_time">&nbsp;</span> Saving time
-      <span class="client_processing_time">&nbsp;</span> Client processing time
-      <span class="server_processing_time">&nbsp;</span> Server processing time
-    </div>
-  </div>
-  <div class="clear"></div>
+    <div class="clear"></div>
+  <% end %>
   <div class="links">
     <%= link_to "view profile", "javascript: $('#profile#{search.id}').dialog()",
       :id => "continue_#{search.id}", :class => "continue_search_link" %>

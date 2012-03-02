@@ -22,7 +22,7 @@ window.Benchmark =
     @list[name]
   
   publish: ->
-    return if !Jeocrowd.running()
+    return if !Jeocrowd.running() || Jeocrowd.completed()
     times = {}
     for key, b of @list
       dur = b.unpublishedDuration()

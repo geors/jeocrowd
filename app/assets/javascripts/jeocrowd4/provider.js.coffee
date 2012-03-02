@@ -81,6 +81,12 @@ class window.Provider
       return
     else
       box = Jeocrowd.grids(level).getTile tile[0] # returned array from computeNextBox
+      if !box?
+        console.log 'next box computed'
+        console.log tile[0]
+        console.log 'but not found in grid!'
+        refinementSearch(keywors, level, callback)
+        return
     $('#current_input_tile_value').html(box.linkTo())
     Jeocrowd.map.panTo box.getCenter() if $('#pan_map:checked[value=input]').length > 0
     @params.bbox = box.getBoundingBoxString()

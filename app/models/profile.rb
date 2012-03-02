@@ -1,7 +1,7 @@
 class Profile  
   include MongoMapper::Document
   
-  before_create :update_others_if_active
+  before_save :update_others_if_active
   
   key :name                        , String 
   key :full_search_times           , Fixnum , :required => true, :numeric => true, :not_in => [0]       , :default => 1
@@ -25,6 +25,7 @@ class Profile
   
   def update_others_if_active
     Profile.set({:active => true}, {:active => false}) if active?
+    Search.set({:profile_id => id}, {:profile_change => true}) if changed?
   end
   
 end

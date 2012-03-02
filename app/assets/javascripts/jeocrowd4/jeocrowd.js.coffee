@@ -79,7 +79,7 @@ window.Jeocrowd =
     @maxLevel - level < Jeocrowd.FULL_SEARCH_TIMES
   
   buildMap: (div) ->
-    initialOptions = { zoom: 10, mapTypeId: google.maps.MapTypeId.ROADMAP }
+    initialOptions = { zoom: 10, mapTypeId: google.maps.MapTypeId.ROADMAP, disableDoubleClickZoom: true }
     initialLocation = new google.maps.LatLng 37.97918, 23.716647
     if placeholder = document.getElementById div 
       @map = new google.maps.Map placeholder, initialOptions 
@@ -150,6 +150,9 @@ window.Jeocrowd =
     
   running: ->
     $('#running:checked').length > 0
+    
+  completed: ->
+    @config.search.phase == 'completed'
     
   resumeSearch: ->
     return if !@running()
@@ -275,13 +278,15 @@ window.Jeocrowd =
   waitAndReload: ->
     $('#phase').text('waiting')
     @exitNow = true
+    Benchmark.publish()
     setTimeout(Jeocrowd.reloadWithoutParams, Jeocrowd.WAITING_ON_RELOAD)
     
   reloadWithoutParams: ->
     window.location = window.location.pathname
   
   markAsCompleted: ->
-    $('#phase').text('completed')
+    @config.search.phase = 'completed'
+    $('#phase').text(@config.search.phase)
     @provider().storeSimpleKeyValue({'completed': 'completed'})
   
   calculateMaxLevel: ->

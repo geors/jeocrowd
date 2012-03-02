@@ -19,9 +19,16 @@
     <%= submit_tag "Search" %>
   <% end %>
   |
-  <%= link_to_if params[:show_time].blank?, "Display times in human readable form", params.merge(:show_time => true) do %>
+  <%= link_to_if session[:show_time].blank?, "Display times in human readable form", params.merge(:show_time => true) do %>
     <%= link_to "Display times in ms", params.merge(:show_time => nil) %>
   <% end %>
+  |
+  <%= link_to_if session[:show_benchmark_bars].blank?, "Display bar graphs", params.merge(:show_benchmark_bars => true) do %>
+    <%= link_to "Hide bar graphs", params.merge(:show_benchmark_bars => false)%>
+  <% end %>
+</div>
+<div class="nav">
+  Active profile: <%= Profile.where(:active => true ).first.try(:name) %>
 </div>
 <div class="searches_list">
   <% @searches.each do |search| %>
