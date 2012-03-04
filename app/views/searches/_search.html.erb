@@ -66,6 +66,9 @@
     <div class="clear"></div>
   <% end %>
   <div class="links">
+    <div class="grid_11">
+      <%= search.profile.name %>
+    </div>
     <%= link_to "view profile", "javascript: $('#profile#{search.id}').dialog()",
       :id => "continue_#{search.id}", :class => "continue_search_link" %>
     <%= link_to "continue", search_path(search, :continue => 1, :init => 1),
