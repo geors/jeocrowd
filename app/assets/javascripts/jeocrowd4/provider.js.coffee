@@ -62,16 +62,11 @@ class window.Provider
     return null if (page = @computeNextPage()) == null
     @params.page = page + 1
     @params.text = keywords
-    # @params.jsoncallback = 'Jeocrowd._provider.callbacks.exploratory_page_' + page
-    # @callbacks['exploratory_page_' + page] = (data) -> # called from the global namespace
-    #   Jeocrowd.provider().exploratoryCallback data, page, callback
-    # jQuery.getScript(@apiURL + "?" + jQuery.param(@params)).fail (jqxhr, settings, exception) ->
-    #   console.log exception
-    #   Jeocrowd.provider().exploratorySearch keywords, callback
     jQuery.getJSON(@apiURL + "?" + jQuery.param(@params))
     .success (data, textStatus, jqXHR) ->
       Jeocrowd.provider().exploratoryCallback data, page, callback
     .error (jqXHR, textStatus, errorThrown) ->
+      console.log errorThrown
       Jeocrowd.provider().refinementSearch keywords, callback
     
   refinementSearch: (keywords, level, callback) ->
@@ -92,17 +87,11 @@ class window.Provider
     @params.bbox = box.getBoundingBoxString()
     @params.text = keywords
     @params.per_page = 1
-    # @params.jsoncallback = 'Jeocrowd._provider.callbacks.refinement_level_' + level + '_box_' + box.sanitizedId()
-    @callbacks['refinement_level_' + level + '_box_' + box.sanitizedId()] = (data) -> # called from the global namespace
-      Jeocrowd.provider().refinementCallback data, level, box, callback
-    # jQuery.getScript(@apiURL + "?" + jQuery.param(@params)).fail (jqxhr, settings, exception) ->
-    #   console.log exception
-    #   Jeocrowd.provider().assignedTiles.push(tile[0]);
-    #   Jeocrowd.provider().refinementSearch keywords, level, callback
     jQuery.getJSON(@apiURL + "?" + jQuery.param(@params))
     .success (data, textStatus, jqXHR) ->
       Jeocrowd.provider().refinementCallback data, level, box, callback
     .error (jqXHR, textStatus, errorThrown) ->
+      console.log errorThrown
       Jeocrowd.provider().assignedTiles.push(tile[0]);
       Jeocrowd.provider().refinementSearch keywords, level, callback
 
