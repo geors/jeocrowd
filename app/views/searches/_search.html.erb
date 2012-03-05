@@ -79,6 +79,9 @@
       :id => "restart_xp_#{search.id}", :class => "restart_xp_link" %>
     <%= link_to "restart refinement", search_path(search, :restart_refinement => 1, :init => 1),
       :id => "restart_rf_#{search.id}", :class => "restart_rf_link" %>
+    <%= link_to "run in active profile", searches_path(:search => {:keywords => search.keywords}),
+      :id => "restart_rf_#{search.id}", :class => "restart_rf_link",
+      :method => :post if Search.find_by_keywords_and_profile_id(search.keywords, Profile.where(:active => true).first.try(:id)).nil? %>      
   </div>
   <div class="delete_link">
     <%= link_to "&nbsp;x&nbsp;".html_safe, search, :method => :delete, :confirm => "Are you sure?" %>
