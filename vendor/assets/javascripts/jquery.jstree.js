@@ -1469,15 +1469,16 @@
 	});
 	// autodetect themes path
 	$(function () {
-		if($.jstree._themes === false) {
-			$("script").each(function () { 
-				if(this.src.toString().match(/jquery\.jstree[^\/]*?\.js(\?.*)?$/)) { 
-					$.jstree._themes = this.src.toString().replace(/jquery\.jstree[^\/]*?\.js(\?.*)?$/, "") + 'themes/'; 
-					return false; 
-				}
-			});
-		}
-		if($.jstree._themes === false) { $.jstree._themes = "themes/"; }
+    // if($.jstree._themes === false) {
+    //  $("script").each(function () { 
+    //    if(this.src.toString().match(/jquery\.jstree[^\/]*?\.js(\?.*)?$/)) { 
+    //      $.jstree._themes = this.src.toString().replace(/jquery\.jstree[^\/]*?\.js(\?.*)?$/, "") + 'themes/'; 
+    //      return false; 
+    //    }
+    //  });
+    // }
+    // if($.jstree._themes === false) { $.jstree._themes = "themes/"; }
+    $.jstree._themes = "/assets/themes/";
 	});
 	// include the themes plugin by default
 	$.jstree.defaults.plugins.push("themes");
