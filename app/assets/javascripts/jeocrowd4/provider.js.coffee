@@ -85,7 +85,7 @@ class window.Provider
         console.log 'next box computed'
         console.log tile[0]
         console.log 'but not found in grid!'
-        refinementSearch(keywords, level, callback)
+        @refinementSearch(keywords, level, callback)
         return
     $('#current_input_tile_value').html(box.linkTo())
     Jeocrowd.map.panTo box.getCenter() if $('#pan_map:checked[value=input]').length > 0
