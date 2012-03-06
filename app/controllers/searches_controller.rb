@@ -51,7 +51,7 @@ class SearchesController < ApplicationController
   
   def export
     params[:m] ||= "total_running_time"
-    profiles = Profile.sort(:id).all
+    profiles = Profile.sort(:name).all
     keywords = Search.fields(:keywords).all.collect(&:keywords).uniq
     cvs = ["search_term," + profiles.collect(&:name).join(",")]
     keywords.each do |keyword|

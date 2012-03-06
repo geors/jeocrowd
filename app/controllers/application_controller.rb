@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   end
   
   def set_session_vars
-    session[:show_benchmark_bars] = params[:show_benchmark_bars].to_s == "true" ? true : false
-    session[:show_time] = params[:show_time].to_s == "true" ? true : false    
+    session[:show_benchmark_bars] = params[:show_benchmark_bars].to_s == "true" ? true : false if params[:show_benchmark_bars]
+    session[:show_time] = params[:show_time].to_s == "true" ? true : false if params[:show_time]
   end
 end
