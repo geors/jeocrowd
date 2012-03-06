@@ -11,16 +11,16 @@
         <%= link_to "Compare with other profiles", searches_path(:keywords => search.keywords, :profile => nil) %>
       </div>
     </div>
-    <div class="grid_15">
+    <div class="grid_11">
       <div class="time">
         <% time = search.total_running_time(true) %>
-        <%= time.is_a?(String) ? time : "total execution time " + primary_show(search.total_running_time) %>
+        <%= time.is_a?(String) ? time : "Total execution time: " + primary_show(search.total_running_time) %>
       </div>
       <div class="time">
-        Total available points <%= search.statistics[:total_available_points] %>
+        Total available points: <%= search.statistics[:total_available_points] %>
       </div>
     </div>
-    <div class="grid_22">
+    <div class="grid_11">
       <div class="time">
         <% total = search.benchmarks.values.sum %>
         <% xp = search.xp_benchmarks.values.sum %>
@@ -28,8 +28,25 @@
         Benchmarked time: <%= primary_show total %>
       </div>
       <div class="time">
-        (xp: <%= primary_show xp %> [<%= number_to_percentage xp / total.to_f * 100, :precision => 1 %>] |
-        rf: <%= primary_show rf %> [<%= number_to_percentage rf / total.to_f * 100, :precision => 1 %>])
+        xp: <%= primary_show xp %> [<%= number_to_percentage xp / total.to_f * 100, :precision => 1 %>]<br/>
+        rf: <%= primary_show rf %> [<%= number_to_percentage rf / total.to_f * 100, :precision => 1 %>]
+      </div>
+    </div>
+    <div class="grid_15">
+      <div class="time">
+        Data exchanged:
+        Tx&uarr; <%= number_to_human_size search.to_provider_data %>,
+        Rx&darr; <%= number_to_human_size search.from_provider_data %>
+      </div>
+      <div class="time">
+        xp: &uarr; <%= number_to_human_size search.exploratory_to_provider_data %>
+            (<%= number_to_percentage search.xp_to_data_percentage, :precision => 1 %>),
+            &darr; <%= number_to_human_size search.exploratory_from_provider_data %>
+            (<%= number_to_percentage search.xp_from_data_percentage, :precision => 1 %>)<br/>
+        rf: &uarr; <%= number_to_human_size search.refinement_to_provider_data %>
+            (<%= number_to_percentage search.rf_to_data_percentage, :precision => 1 %>),
+            &darr; <%= number_to_human_size search.refinement_from_provider_data %>
+            (<%= number_to_percentage search.rf_from_data_percentage, :precision => 1 %>)<br/>
       </div>
     </div>
   </div>

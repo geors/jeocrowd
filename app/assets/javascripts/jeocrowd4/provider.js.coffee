@@ -10,6 +10,8 @@ class window.Provider
     else
       url.substring(0, q) + '.js' + url.substring(q)
     @pages = search.pages
+    @dataSentToProvider = 0
+    @dataReceivedFromProvider = 0
     @className = 'Provider'
     
   callbacks: {}
@@ -62,7 +64,9 @@ class window.Provider
     return null if (page = @computeNextPage()) == null
     @params.page = page + 1
     @params.text = keywords
-    jQuery.getJSON(@apiURL + "?" + jQuery.param(@params))
+    request = @apiURL + "?" + jQuery.param(@params)
+    @dataSentToProvider = JSON.stringify(request).length
+    jQuery.getJSON(request)
     .success (data, textStatus, jqXHR) ->
       Jeocrowd.provider().exploratoryCallback data, page, callback
     .error (jqXHR, textStatus, errorThrown) ->
@@ -87,15 +91,18 @@ class window.Provider
     @params.bbox = box.getBoundingBoxString()
     @params.text = keywords
     @params.per_page = 1
-    jQuery.getJSON(@apiURL + "?" + jQuery.param(@params))
+    request = @apiURL + "?" + jQuery.param(@params)
+    @dataSentToProvider += JSON.stringify(request).length
+    jQuery.getJSON(request)
     .success (data, textStatus, jqXHR) ->
       Jeocrowd.provider().refinementCallback data, level, box, callback
     .error (jqXHR, textStatus, errorThrown) ->
       console.log errorThrown
-      Jeocrowd.provider().assignedTiles.push(tile[0]);
+      Jeocrowd.provider().assignedTiles.push(tile[0])
       Jeocrowd.provider().refinementSearch keywords, level, callback
 
   exploratoryCallback: (data, page, callback) ->
+    @dataReceivedFromProvider = JSON.stringify(data).length
     newData = @convertData(data)
     @updatePages(page)
     $('#available_points_value').text(data.photos.total)
@@ -103,6 +110,7 @@ class window.Provider
     callback.apply Jeocrowd, [newData, page]
 
   refinementCallback: (data, level, box, callback) ->
+    @dataReceivedFromProvider = JSON.stringify(data).length
     total = 0
     if data && data.photos && data.photos.total
       total = data.photos.total
@@ -116,12 +124,16 @@ class window.Provider
     data['xpTiles'] = results
     data['page'] = page
     data['timestamp'] = @timestamp
+    data['data_counters'] = {}
+    data['data_counters']['exploratory_to_provider_data'] = @dataSentToProvider
+    data['data_counters']['exploratory_from_provider_data'] = @dataReceivedFromProvider
     jQuery.ajax {
       'url': @serverURL,
       'type': 'PUT',
       'data': data,
       'dataType': 'json',
-      'success': (data, xmlhttp, textStatus) ->
+      'success': (data, xmlhttp, textStatus) =>
+        @dataSentToProvider = @dataReceivedFromProvider = 0
         callback.apply Jeocrowd, [data]
       'complete': (jqXHR, textStatus) ->
         console.log textStatus if textStatus != 'success'
@@ -134,6 +146,9 @@ class window.Provider
     if level + 1 == Jeocrowd.maxLevel
       data['phase'] = 'refinement' 
       data['maxLevel'] = Jeocrowd.maxLevel
+    data['data_counters'] = {}
+    data['data_counters']['refinement_to_provider_data'] = @dataSentToProvider
+    data['data_counters']['refinement_from_provider_data'] = @dataReceivedFromProvider
     jQuery.ajax {
       'url': @serverURL,
       'type': 'PUT',

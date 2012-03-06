@@ -26,14 +26,14 @@ class Search
   key :exploratory_saving_time,             Fixnum, :default => 0
   key :exploratory_client_processing_time,  Fixnum, :default => 0
   key :exploratory_server_processing_time,  Fixnum, :default => 0
-  key :exploratory_loading_data,            Fixnum, :default => 0
-  key :exploratory_saving_data,             Fixnum, :default => 0
+  key :exploratory_to_provider_data,        Fixnum, :default => 0
+  key :exploratory_from_provider_data,      Fixnum, :default => 0
   key :refinement_loading_time,             Fixnum, :default => 0
   key :refinement_saving_time,              Fixnum, :default => 0
   key :refinement_client_processing_time,   Fixnum, :default => 0
   key :refinement_server_processing_time,   Fixnum, :default => 0
-  key :refinement_loading_data,             Fixnum, :default => 0
-  key :refinement_saving_data,              Fixnum, :default => 0
+  key :refinement_to_provider_data,         Fixnum, :default => 0
+  key :refinement_from_provider_data,       Fixnum, :default => 0
   key :completed_at,                        Time,   :default => nil
   key :profile_change,                      Boolean,:deafult => false
   timestamps!
@@ -76,10 +76,14 @@ class Search
     self.exploratory_saving_time = 0
     self.exploratory_client_processing_time = 0
     self.exploratory_server_processing_time = 0
+    self.exploratory_to_provider_data = 0
+    self.exploratory_from_provider_data = 0
     self.refinement_loading_time = 0
     self.refinement_saving_time = 0
     self.refinement_client_processing_time = 0
     self.refinement_server_processing_time = 0
+    self.refinement_to_provider_data = 0
+    self.refinement_from_provider_data = 0
     self.profile_change = false
     save :safe => true
   end
@@ -97,6 +101,8 @@ class Search
     self.refinement_saving_time = 0
     self.refinement_client_processing_time = 0
     self.refinement_server_processing_time = 0
+    self.refinement_to_provider_data = 0
+    self.refinement_from_provider_data = 0
     save :safe => true
   end
   
@@ -112,6 +118,34 @@ class Search
   
   def rf_benchmarks
     benchmarks.reject{ |k, v| k.index("refinement").nil? }
+  end
+  
+  def total_provider_data
+    to_provider_data + from_provider_data
+  end
+  
+  def to_provider_data
+    exploratory_to_provider_data + refinement_to_provider_data
+  end
+
+  def from_provider_data
+    exploratory_from_provider_data + refinement_from_provider_data
+  end
+  
+  def xp_to_data_percentage
+    exploratory_to_provider_data / to_provider_data.to_f * 100 rescue "NaN"
+  end
+
+  def rf_to_data_percentage
+    refinement_to_provider_data / to_provider_data.to_f * 100 rescue "NaN"
+  end
+  
+  def xp_from_data_percentage
+    exploratory_from_provider_data / from_provider_data.to_f * 100 rescue "NaN"
+  end
+
+  def rf_from_data_percentage
+    refinement_from_provider_data / from_provider_data.to_f * 100 rescue "NaN"
   end
   
   def client_benchmarks
@@ -262,15 +296,16 @@ class Search
     params.values_to_i!
     statistics.merge! :total_available_points => params[:total_available_points]      if params[:total_available_points]
     set :statistics             => statistics
-    set :completed_at           => Time.now    if completed_at.nil? && params[:completed] == "completed"
-    update_benchmarks params[:benchmarks]      if params[:benchmarks]
+    set :completed_at           => Time.now                       if completed_at.nil? && params[:completed] == "completed"
+    update_hash params[:data_counters]                                                if params[:data_counters]
+    update_hash params[:benchmarks]                                                   if params[:benchmarks]
     update_xp params[:xpTiles], params[:page],  params[:timestamp]                    if params[:page]
     update_rf params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel] if params[:rfTiles] && params[:level]
   end
   
-  def update_benchmarks b
-    b.values_to_i!
-    increment b
+  def update_hash h
+    h.values_to_i!
+    increment h
     reload
   end
   

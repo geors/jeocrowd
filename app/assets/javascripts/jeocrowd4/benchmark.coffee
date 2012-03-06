@@ -73,7 +73,7 @@ class window.Benchmarker
     @timesInClient.push diff
     @duration += diff
     @running = false
-    @display()
+    @display() if display
     @duration
     
   display: ->
