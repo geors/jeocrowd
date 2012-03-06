@@ -20,7 +20,7 @@
   <% end %>
   |
   <%= link_to_if session[:show_time].blank?, "Display times in human readable form", params.merge(:show_time => true) do %>
-    <%= link_to "Display times in ms", params.merge(:show_time => nil) %>
+    <%= link_to "Display times in ms", params.merge(:show_time => false) %>
   <% end %>
   |
   <%= link_to_if session[:show_benchmark_bars].blank?, "Display bar graphs", params.merge(:show_benchmark_bars => true) do %>
