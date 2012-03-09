@@ -30,6 +30,9 @@ class window.Grid
   size: ->
     @tiles.size()
     
+  count: (func) ->
+    @tiles.filter(func).size()
+    
   setMinVisibleDegree: (d) ->
     @minVisibleDegree = d
   

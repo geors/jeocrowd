@@ -34,6 +34,7 @@ class Search
   key :refinement_server_processing_time,   Fixnum, :default => 0
   key :refinement_to_provider_data,         Fixnum, :default => 0
   key :refinement_from_provider_data,       Fixnum, :default => 0
+  key :filtering_counts,                    Hash,   :default => {}
   key :completed_at,                        Time,   :default => nil
   key :profile_change,                      Boolean,:deafult => false
   timestamps!
@@ -296,9 +297,10 @@ class Search
     params.values_to_i!
     statistics.merge! :total_available_points => params[:total_available_points]      if params[:total_available_points]
     set :statistics             => statistics
-    set :completed_at           => Time.now                       if completed_at.nil? && params[:completed] == "completed"
+    set :completed_at           => Time.now                      if completed_at.nil? && params[:completed] == "completed"
     update_hash params[:data_counters]                                                if params[:data_counters]
     update_hash params[:benchmarks]                                                   if params[:benchmarks]
+    set :filtering_counts => params[:counts]                                          if params[:counts]
     update_xp params[:xpTiles], params[:page],  params[:timestamp]                    if params[:page]
     update_rf params[:rfTiles], params[:level], params[:timestamp], params[:maxLevel] if params[:rfTiles] && params[:level]
   end

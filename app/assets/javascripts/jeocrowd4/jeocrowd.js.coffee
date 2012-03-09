@@ -144,6 +144,26 @@ window.Jeocrowd =
         'data': @treedata
       }
     })
+    
+  countDiscardedTiles: ->
+    counts = {}
+    for level in [(@maxLevel - 1)..Jeocrowd.FINISH_LEVEL]
+      counts[level] = []
+      @reloadTiles(level)
+      counts[level].push @grids(level).size()
+      @grids(level).clearBeforeRefinement(false)
+      counts[level].push @grids(level).size()
+      counts[level].push @grids(level).count('notFull')
+    @buildRefinementStartGrid()
+    counts[@maxLevel] = []
+    counts[@maxLevel].push @grids(@maxLevel).size()
+    @grids(@maxLevel).clearBeforeRefinement(false)
+    counts[@maxLevel].push @grids(@maxLevel).size()
+    counts[@maxLevel].push @grids(@maxLevel).count('notFull')
+    counts
+    
+  submitDiscardedTiles: ->
+    @provider().storeSimpleKeyValue({'counts': @countDiscardedTiles(), 'multiplier': Jeocrowd.LEVEL_MULTIPLIER})
   
   autoStart: ->
     @config.autoStart || true
@@ -213,6 +233,7 @@ window.Jeocrowd =
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     if @grids(@maxLevel).isSparse() && Jeocrowd.DETECT_SPARSE_GRIDS
       console.log 'sparse grid detected...'
+      @sparseGrid = true
       @maxLevel += 1
       @grids(@maxLevel).growUp Tile.prototype.atLeastOne
     Benchmark.finish('refinementClientProcessing')
@@ -225,6 +246,17 @@ window.Jeocrowd =
     @levels[i] = null for i in [0..@maxLevel]
     @refinementLevel = @maxLevel
     @gotoBelowLevel()
+    
+  buildRefinementStartGrid: ->
+    delete(@_grids)
+    @grids(0).addTile(id, info.degree, info.points) for own id, info of @config.search.xpTiles
+    @maxLevel = @calculateMaxLevel()
+    @grids(@maxLevel).growUp Tile.prototype.atLeastOne
+    if @grids(@maxLevel).isSparse() && Jeocrowd.DETECT_SPARSE_GRIDS
+      console.log 'sparse grid detected...'
+      @maxLevel += 1
+      @grids(@maxLevel).growUp Tile.prototype.atLeastOne
+    @grids
   
   # maximum level is not stored on the server
   # it can be computed by calling 'switchToRefinementPhase' from the exploratory search final results
@@ -287,6 +319,7 @@ window.Jeocrowd =
   markAsCompleted: ->
     @config.search.phase = 'completed'
     $('#phase').text(@config.search.phase)
+    Benchmark.publish()
     @provider().storeSimpleKeyValue({'completed': 'completed'})
   
   calculateMaxLevel: ->
