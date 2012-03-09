@@ -298,7 +298,7 @@ class window.Tile
   # or when growing down -> make children
   # available functions:
   # always:
-  # notFull: neighbors are beign counted after the parent grid has been refined
+  # notFull: neighbors are being counted after the parent grid has been refined
   # atLeastOne:
   # atLeastTwo:
   
@@ -329,7 +329,7 @@ class window.Tile
   
   toChildren: (algorithm) ->
     childDegree = -1        # use this fake degree for tiles that
-    if algorithm.apply this # algorithm used to decide growing down or not, eg always...
+    if algorithm.apply this # algorithm used to decide growing down or not, eg always, notFull... etc...
       belowGrid = Jeocrowd.grids @grid.level - 1
       # children given -parentNeighborCount as initial degree
       belowGrid.addTile child.id, childDegree for child in @getChildren(true).values
