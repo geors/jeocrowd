@@ -149,6 +149,12 @@ class Search
     refinement_from_provider_data / from_provider_data.to_f * 100 rescue "NaN"
   end
   
+  (0..6).each do |i|
+    define_method "fc#{i}" do
+      filtering_counts[i.to_s]
+    end
+  end
+  
   def client_benchmarks
     b = {}
     benchmarks.each do |k, v|
