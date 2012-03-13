@@ -10,7 +10,7 @@
   <% end %>
   <% if @search.phase == "exploratory" && @search.pages == (0..(Search::MAX_XP_PAGES - 1)).entries %>
   ,
-  "xpTiles": <%= @search.merged_xp_tiles.to_json.html_safe %>
+  "xpTiles": <%= @search.merged_xp_tiles.replace_circumflex_with_dots_in_keys.to_json.html_safe %>
   <% end %>
   <% if @new_block %>
   ,
