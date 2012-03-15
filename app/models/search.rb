@@ -151,7 +151,11 @@ class Search
   
   (0..6).each do |i|
     define_method "fc#{i}" do
-      filtering_counts[i.to_s].empty? ? [0, 0, 0] : filtering_counts[i.to_s]
+      begin
+        filtering_counts[i.to_s].empty? ? [0, 0, 0] : filtering_counts[i.to_s]
+      rescue
+        [0, 0, 0]
+      end
     end
   end
   
