@@ -29,7 +29,7 @@ namespace :experiment do
     Search.where(:keywords => Regexp.new(keywords, "i"), :profile_id.in => remaining_profiles.map(&:id)).each_with_index do |search, index|
       puts "Launching #{search.profile.browsers} browsers"
       search.profile.browsers.times do |i|
-        `open http://#{instances[i].address}/searches/#{search.id}`
+        `firefox http://#{instances[i].address}/searches/#{search.id}`
       end
       loop do
         sleep(30)
