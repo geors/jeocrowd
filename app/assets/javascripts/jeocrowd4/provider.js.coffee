@@ -154,7 +154,8 @@ class window.Provider
       'type': 'PUT',
       'data': data,
       'dataType': 'json',
-      'success': (data, xmlhttp, textStatus) ->
+      'success': (data, xmlhttp, textStatus) =>
+        @dataSentToProvider = @dataReceivedFromProvider = 0
         callback.apply Jeocrowd, [data]
       'complete': (jqXHR, textStatus) ->
         console.log textStatus if textStatus != 'success'

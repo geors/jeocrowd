@@ -83,5 +83,7 @@ giveLifeToPage = ->
       else
         Jeocrowd.reloadTiles(Jeocrowd.visibleLevel())
         Jeocrowd.visibleGrid().draw()
+  $('#link_to_submit_discarder_tiles_count').click ->
+    Jeocrowd.submitDiscardedTiles()
   
 

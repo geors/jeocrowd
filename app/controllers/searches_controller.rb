@@ -51,14 +51,19 @@ class SearchesController < ApplicationController
   
   def export
     params[:m] ||= "total_running_time"
+    methods = params[:m].split(".")
     profiles = Profile.sort(:name).all
     keywords = Search.fields(:keywords).all.collect(&:keywords).uniq
-    cvs = ["search_term," + profiles.collect(&:name).join(",")]
+    cvs = []
+    cvs << ["search_term," + profiles.collect(&:name).map{ |c| Array.wrap(c) * methods.length * (params[:length] || 1).to_i}.join(",")]
+    cvs << ["search_term," + (methods * profiles.length).map { |c| Array.wrap(c) * (params[:length] || 1).to_i}.join(",")]
     keywords.each do |keyword|
       row = []
       row << keyword
       profiles.each do |profile|
-        row << Search.find_by_keywords_and_profile_id(keyword, profile.id).try(params[:m].to_sym)
+        methods.each do |method|
+          row << Search.find_by_keywords_and_profile_id(keyword, profile.id).try(method.to_sym) rescue row << "--not supported--"
+        end
       end
       cvs << row.join(",")
     end
