@@ -45,6 +45,9 @@ class Search
   ensure_index [[:keywords, 1], [:profile_id, 1]]
   ensure_index :created_at
   
+  scope :incomplete, where(:completed_at => nil)
+  scope :completed, where(:completed_at.ne => nil)
+  
   validates_presence_of :profile
     
   def logger
