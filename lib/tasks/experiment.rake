@@ -48,10 +48,10 @@ namespace :experiment do
         sleep(30)
         search_completed = !Search.find_by_id(search.id).completed_at.nil?
         if search_completed
-          puts "#{"%03d" % (index + 1)}. search '#{keywords}' with profile '#{search.profile.try(:name) || "[no_profile]"}'"
+          puts "\n#{"%03d" % (index + 1)}. search '#{keywords}' with profile '#{search.profile.try(:name) || "[no_profile]"}' COMPLETED"
           puts "Killing browsers..."
           pids.each do |pid|
-            `kill #{pid}`
+            Process.kill("KILL", pid)
           end
           pids.clear
           break
