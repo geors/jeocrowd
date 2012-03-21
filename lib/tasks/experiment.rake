@@ -29,11 +29,13 @@ namespace :experiment do
     Search.where(:keywords => Regexp.new(keywords, "i"), :profile_id.in => remaining_profiles.map(&:id)).each_with_index do |search, index|
       puts "Launching #{search.profile.browsers} browsers"
       search.profile.browsers.times do |i|
-        `firefox http://#{instances[i].address}/searches/#{search.id}`
+        # `firefox http://#{instances[i].address}/searches/#{search.id}`
+        pid = Process.spawn({}, "firefox", "http://#{instances[i].address}/searches/#{search.id}")
+        Process.detach pid
       end
       loop do
-        sleep(30)
         print "."
+        sleep(30)
         search_completed = !Search.find_by_id(search.id).completed_at.nil?
         if search_completed
           puts "#{"%03d" % (index + 1)}. search '#{keywords}' with profile '#{search.profile.try(:name) || "[no_profile]"}'"
