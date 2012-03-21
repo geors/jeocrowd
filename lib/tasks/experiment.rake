@@ -26,12 +26,22 @@ namespace :experiment do
       puts "No remaining profiles for the specified category to search for... exiting."
     end
     instances = Instance.all
+    pids = []
     Search.where(:keywords => Regexp.new(keywords, "i"), :profile_id.in => remaining_profiles.map(&:id)).each_with_index do |search, index|
       puts "Launching #{search.profile.browsers} browsers"
       search.profile.browsers.times do |i|
         # `firefox http://#{instances[i].address}/searches/#{search.id}`
-        pid = Process.spawn({}, "firefox", "http://#{instances[i].address}/searches/#{search.id}")
-        Process.detach pid
+        command = if OsFunctions.is_mac?
+          "open"
+        elsif OsFunctions.is_linux?
+          "gnome-open"
+        else
+          puts "Could not find applicable operating system... Exit"
+          exit 0
+        end
+        pid = Process.spawn({}, command, "http://#{instances[i].address}/searches/#{search.id}")
+        # Process.detach pid
+        pids << pid
       end
       loop do
         print "."
@@ -40,7 +50,11 @@ namespace :experiment do
         if search_completed
           puts "#{"%03d" % (index + 1)}. search '#{keywords}' with profile '#{search.profile.try(:name) || "[no_profile]"}'"
           puts "Killing browsers..."
-          `killall firefox`
+          pids.each do |pid|
+            `kill #{pid}`
+          end
+          pids.clear
+          break
         end
       end
     end
