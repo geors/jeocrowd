@@ -4,7 +4,8 @@
   <% all_keywords.each do |keywords| %>
     <tr>
       <td><%= keywords %></td>
-      <td><%= Search.where(:keywords => keywords, :completed_at.ne => nil).collect(&:profile).map(&:name) %></td>
+      <td><%= Search.where(:keywords => keywords, :completed_at.ne => nil).
+              collect(&:profile).sort{ |a, b| a.browsers <=> b.browsers }.map(&:name) %></td>
     </tr>
   <% end %>
   <% end%>
