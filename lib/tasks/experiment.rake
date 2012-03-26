@@ -19,19 +19,19 @@ namespace :experiment do
           remaining_profiles.each_with_index do |remaining_profile, index|
             puts "#{"%03d" % (index + 1)}. will search '#{keywords}' with profile '#{remaining_profile.name}'"
             search = Search.find_or_create_by_keywords_and_profile_id keywords, remaining_profile.id
-            search.xp_reset
             new_searches << search
           end
           instances = Instance.all
           pids = []
           new_searches.each_with_index do |search, index|
             puts "Launching #{search.profile.browsers} browsers"
+            search.xp_reset
             search.profile.browsers.times do |i|
               command = browsers[i]
               pid = Process.spawn({}, browsers[i], "http://#{instances[i].address}/searches/#{search.id}")
               Process.detach pid
               pids << pid
-              sleep(0.5)
+              sleep(0.25)
             end
             loop do
               print "."
