@@ -28,14 +28,14 @@ namespace :experiment do
     end
     instances = Instance.all
     pids = []
-    browsers = ["firefox", "google-chrome", "chromium-browser", "arora"]
+    browsers = ["google-chrome", "chromium-browser"]
     browsers.each do |b|
       pid = Process.spawn({}, b)
       Process.detach pid
       pids << pid
     end
     sleep(1)
-    browsers = browsers * 4
+    browsers = browsers * 8
     Search.where(:keywords => Regexp.new(keywords, "i"), :profile_id.in => remaining_profiles.map(&:id)).each_with_index do |search, index|
       puts "Launching #{search.profile.browsers} browsers"
       search.profile.browsers.times do |i|
@@ -43,7 +43,6 @@ namespace :experiment do
         pid = Process.spawn({}, command, "http://#{instances[i].address}/searches/#{search.id}")
         Process.detach pid
         pids << pid
-        sleep(0.5)
       end
       loop do
         print "."
