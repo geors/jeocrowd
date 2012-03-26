@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  before_filter :authenticate, :if => lambda { |x| !Rails.env.development? }
+  # before_filter :authenticate, :if => lambda { |x| !Rails.env.development? }
   before_filter :set_session_vars
   
   private

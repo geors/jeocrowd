@@ -38,8 +38,9 @@ window.Benchmark =
         if data.benchmarks
           for name, duration of data.benchmarks
             b = @retrieve(name)
-            b.timeInServer = duration
-            b.display()
+            if b?
+              b.timeInServer = duration
+              b.display()
       'complete': (jqXHR, textStatus) =>
         console.log textStatus if textStatus != 'success'
     }

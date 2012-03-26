@@ -1,5 +1,5 @@
 namespace :experiment do
-  
+
   desc "Run the experiments"
   task :run, [:keywords, :category] => :environment do |t, args|
     puts "---------------------------------------------------"
@@ -10,7 +10,8 @@ namespace :experiment do
     if existing_searches.any?
       puts "\nFound #{existing_searches.count} existing searches..."
       existing_searches.each_with_index do |existing_search, index|
-        puts "#{"%03d" % (index + 1)}. searching '#{keywords}' with profile '#{existing_search.profile.try(:name) || "[no_profile]"}' [#{existing_search.completed_at.nil? ? "incomplete" : "completed"}]"
+        puts "#{"%03d" % (index + 1)}. searching '#{keywords}' with profile '#{existing_search.profile.try(:name) ||
+              "[no_profile]"}' [#{existing_search.completed_at.nil? ? "incomplete" : "completed"}]"
       end
     end
     existing_profiles = Search.completed.where(:keywords => Regexp.new(keywords, "i")).map(&:profile)
@@ -27,21 +28,22 @@ namespace :experiment do
     end
     instances = Instance.all
     pids = []
+    browsers = ["firefox", "google-chrome", "chromium-browser", "arora"]
+    browsers.each do |b|
+      pid = Process.spawn({}, b)
+      Process.detach pid
+      pids << pid
+    end
+    sleep(1)
+    browsers = browsers * 4
     Search.where(:keywords => Regexp.new(keywords, "i"), :profile_id.in => remaining_profiles.map(&:id)).each_with_index do |search, index|
       puts "Launching #{search.profile.browsers} browsers"
       search.profile.browsers.times do |i|
-        # `firefox http://#{instances[i].address}/searches/#{search.id}`
-        command = if OsFunctions.is_mac?
-          "open"
-        elsif OsFunctions.is_linux?
-          "gnome-open"
-        else
-          puts "Could not find applicable operating system... Exit"
-          exit 0
-        end
+        command = browsers[i]
         pid = Process.spawn({}, command, "http://#{instances[i].address}/searches/#{search.id}")
-        # Process.detach pid
+        Process.detach pid
         pids << pid
+        sleep(0.5)
       end
       loop do
         print "."
@@ -51,7 +53,7 @@ namespace :experiment do
           puts "\n#{"%03d" % (index + 1)}. search '#{keywords}' with profile '#{search.profile.try(:name) || "[no_profile]"}' COMPLETED"
           puts "Killing browsers..."
           pids.each do |pid|
-            Process.kill("KILL", pid)
+            Process.kill("KILL", pid) rescue nil
           end
           pids.clear
           break
