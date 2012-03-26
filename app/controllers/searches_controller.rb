@@ -49,6 +49,10 @@ class SearchesController < ApplicationController
     redirect_to :back
   end
   
+  def status
+    @experiments = YAML.load_file(File.join(Rails.root, "test", "fixtures", "xps.yml"))
+  end
+  
   def export
     params[:m] ||= "total_running_time"
     methods = params[:m].split(".")
