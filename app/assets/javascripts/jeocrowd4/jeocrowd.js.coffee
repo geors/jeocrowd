@@ -231,7 +231,7 @@ window.Jeocrowd =
     Benchmark.start('refinementClientProcessing')
     @maxLevel = @calculateMaxLevel()
     @grids(@maxLevel).growUp Tile.prototype.atLeastOne
-    if @grids(@maxLevel).isSparse() && Jeocrowd.DETECT_SPARSE_GRIDS
+    if (@grids(@maxLevel).isSparse() && Jeocrowd.DETECT_SPARSE_GRIDS) || (@maxLevel == Jeocrowd.FINISH_LEVEL)
       console.log 'sparse grid detected...'
       @sparseGrid = true
       @maxLevel += 1
