@@ -3,7 +3,7 @@ class SearchesController < ApplicationController
   def index
     @searches = Search.sort(:keywords, :profile_id)
     @searches = !params[:profile].blank? ? @searches.find_all_by_profile_id(params[:profile]) : 
-      params[:keywords].blank? ? @searches.all : @searches.find_all_by_keywords(params[:keywords])
+      params[:keywords].blank? ? [] : @searches.find_all_by_keywords(params[:keywords])
   end
 
   def show
@@ -46,7 +46,11 @@ class SearchesController < ApplicationController
   def destroy
     @search = Search.find(params[:id])
     @search.destroy
-    redirect_to searches_url
+    redirect_to :back
+  end
+  
+  def status
+    @experiments = YAML.load_file(File.join(Rails.root, "test", "fixtures", "xps.yml"))
   end
   
   def export

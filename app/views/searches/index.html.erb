@@ -6,7 +6,7 @@
       for keywords <%= params[:keywords] %> | <%= link_to "View all", searches_path %>
     <% else %>
       with profile
-      <%= select_tag :profile, options_for_select(Profile.all.map{ |p| [p.name, p.id]}, params[:profile]),
+      <%= select_tag :profile, options_for_select(Profile.sort([:browsers, 'asc']).sort([:name, 'asc']).all.map{ |p| [p.name, p.id]}, params[:profile]),
         :include_blank => true, :id => "pr", :class => "reload_on_change" %>
     <% end %>
   </h1>
@@ -31,7 +31,11 @@
   Active profile: <%= Profile.where(:active => true ).first.try(:name) %>
 </div>
 <div class="searches_list">
+  <% if @searches.any? %>
   <% @searches.each do |search| %>
     <%= render search %>
+  <% end %>
+  <% else %>
+    No searches found. Select a profile or type in a keyword.
   <% end %>
 </div>

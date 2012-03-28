@@ -1,0 +1,12 @@
+<table>
+  <% @experiments.each_pair do |category, all_keywords| %>
+  <tr><td colspan="2"><%= category %></td></tr>
+  <% all_keywords.each do |keywords| %>
+    <tr>
+      <td><%= link_to keywords, searches_path(:keywords => keywords) %></td>
+      <td><%= Search.where(:keywords => keywords, :completed_at.ne => nil).
+              collect(&:profile).sort{ |a, b| a.browsers <=> b.browsers }.map(&:name) %></td>
+    </tr>
+  <% end %>
+  <% end%>
+</table>

@@ -160,6 +160,10 @@ class Search
     refinement_from_provider_data / from_provider_data.to_f * 100 rescue "NaN"
   end
   
+  def total_available_points
+    statistics[:total_available_points]
+  end
+  
   (0..6).each do |i|
     define_method "fc#{i}" do
       begin

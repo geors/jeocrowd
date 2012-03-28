@@ -21,6 +21,11 @@ class Profile
   many :searches
   
   
+  def category
+    name.gsub(/ \(\d+\)$/, "")
+  end
+  
+  
   private
   
   def update_others_if_active
