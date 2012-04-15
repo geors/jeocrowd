@@ -124,6 +124,14 @@ class Search
     benchmarks.reject{ |k, v| k.index("refinement").nil? }
   end
   
+  def total_xp_time
+    xp_benchmarks.values.sum
+  end
+
+  def total_rf_time
+    rf_benchmarks.values.sum
+  end
+  
   def total_provider_data
     to_provider_data + from_provider_data
   end
