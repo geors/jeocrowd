@@ -14,7 +14,7 @@
 begin
   MongoMapper.connection = Mongo::Connection.new('localhost', 27017,
     { :logger => Rails.logger })
-  MongoMapper.database = 'jeocrowd4s_development'
+  MongoMapper.database = 'jeocrowd4s_good_development'
   # MongoMapper.database.authenticate('admin', 'sekret')
 rescue
   MongoMapper.connection = Mongo::Connection.new('staff.mongohq.com', '10034',
