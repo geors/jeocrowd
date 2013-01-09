@@ -88,7 +88,7 @@ window.Jeocrowd =
       
   loadConfiguration: ->
     c = $('#jeocrowd_config')
-    if c
+    if c.length
       @config.timestamp = c.data('timestamp')
       @config.search = JSON.parse c.html()
     if @config.search
