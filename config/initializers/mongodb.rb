@@ -13,13 +13,13 @@
 
 begin
   MongoMapper.connection = Mongo::Connection.new('localhost', 27017, { :logger => Rails.logger })
-  MongoMapper.database = 'jeocrowd4s_good_development'
-  # MongoMapper.database.authenticate('admin', 'sekret')
+  MongoMapper.database = "jeocrowd_#{Rails.env}"
+  MongoMapper.database.authenticate('user', '-wee')
 rescue
-  MongoMapper.connection = Mongo::Connection.new('projects.giorgos.me', '27017',
-    { :logger => Rails.logger })
-  MongoMapper.database = 'jeocrowd4s_good_development'
-  # MongoMapper.database.authenticate('admin', 'sekret')
+  MongoMapper.connection = Mongo::Connection.new('projects.giorgos.me', 27017,
+                                                 { :logger => Rails.logger })
+  MongoMapper.database = "jeocrowd_production"
+  MongoMapper.database.authenticate('user', '-wee')
 end
 
 
