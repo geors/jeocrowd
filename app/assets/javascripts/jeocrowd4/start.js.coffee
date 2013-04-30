@@ -40,7 +40,7 @@ giveLifeToPage = ->
   $('#running').change ->
     if $(this).attr('checked')
       Jeocrowd.resumeSearch()
-  $('.pan_map_to_href').live('click', ->
+  $(document).on('click', '.pan_map_to_href', ->
     href = $(this).attr('href')
     [lat, lon] = href.replace('#', '').split(Jeocrowd.COORDINATE_SEPARATOR)
     [lat, lon] = [parseFloat(lat), parseFloat(lon)]
