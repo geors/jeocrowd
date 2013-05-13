@@ -71,7 +71,7 @@ class window.Provider
       Jeocrowd.provider().exploratoryCallback data, page, callback
     .error (jqXHR, textStatus, errorThrown) ->
       console.log errorThrown
-      Jeocrowd.provider().refinementSearch keywords, callback
+      Jeocrowd.provider().exploratorySearch keywords, callback
     
   refinementSearch: (keywords, level, callback) ->
     return null if (tile = @computeNextBox(level)) == null
