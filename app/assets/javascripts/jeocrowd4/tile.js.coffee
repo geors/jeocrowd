@@ -209,10 +209,7 @@ class window.Tile
     if @degree < 0
       0.5
     else if Jeocrowd.visibleLayer() == 'degree'
-      if @degree > 500
-        1
-      else
-        @degree / 500.0
+      @degree / @grid.getHottestTilesAverageDegree()
     else
       0.75
 
