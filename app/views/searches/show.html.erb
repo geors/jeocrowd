@@ -2,13 +2,15 @@
   <div class="search_controls">
     
     <div id="keywords_option" class="option">
-      <%= form_for Search.new(:keywords => @search.keywords) do |f| %>
+      <%= form_for @search, :url => searches_path, :method => :post do |f| %>
         <div id="keywords_label" class="label">
           <%= f.label :keywords %>
         </div>
         <div id="keywords_control" class="value" style="width: 180px;">
           <div>
             <%= f.text_field :keywords, :class => "text_box" %>
+            <%= f.hidden_field :min_date %>
+            <%= f.hidden_field :max_date %>
             <%= f.submit "Search" %>
           </div>
         </div>
@@ -158,7 +160,6 @@
     var browsers = <%= @search.profile.browsers %>;
     var websites = <%= Instance.websites.to_json.html_safe %>;
     websites.splice(websites.indexOf(window.location.host), 1);
-    console.log(websites);
     for (i = 0; i < browsers - 1; i++) {
       window.open('http://' + websites[i % websites.length] + window.location.pathname, "_blank", "location=yes,menubar=yes,resizeable=yes,scrollbars=yes,titlebar=yes,toolbar=yes,newtab=yes");
     }

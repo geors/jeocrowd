@@ -178,13 +178,13 @@ window.Jeocrowd =
     return if !@running()
     if @config.search.phase == 'exploratory'
       Benchmark.start('exploratoryLoading')
-      next = @provider().exploratorySearch @config.search.keywords, @receiveResults
+      next = @provider().exploratorySearch @config.search, @receiveResults
       if next == null
         Benchmark.finish('exploratoryLoading')
         @switchToRefinementPhase()
     else if @config.search.phase == 'refinement'
       Benchmark.start('refinementLoading')
-      next = @provider().refinementSearch @config.search.keywords, @refinementLevel, @receiveResults
+      next = @provider().refinementSearch @config.search, @refinementLevel, @receiveResults
       if next == null
         Benchmark.finish('refinementLoading')
         @gotoBelowLevel()

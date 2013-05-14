@@ -23,7 +23,17 @@ class SearchesController < ApplicationController
 
   def create
     active_profile_id = Profile.find_by_active(true).try(:id)
-    @search = Search.find_by_keywords_and_profile_id(params[:search][:keywords], active_profile_id) || Search.new(params[:search])
+    Time.zone = "UTC"
+    params[:search][:min_date] ||= Time.parse((1..3).map { |i|
+        params[:search].delete(:"min_date(#{i}i)")
+    }. join("-")).to_date.to_s rescue params[:search][:min_date] = nil
+    params[:search][:max_date] ||= Time.parse((1..3).map { |i|
+                                    params[:search].delete(:"max_date(#{i}i)")
+    }. join("-")).to_date.to_s rescue params[:search][:max_date] = nil
+    @search = Search.find_by_keywords_and_profile_id_and_min_date_and_max_date(
+                  params[:search][:keywords], active_profile_id,
+                  params[:search][:min_date], params[:search][:max_date]
+              ) || Search.new(params[:search])
     @search.profile_id = active_profile_id
     if @search.save :safe => true
       redirect_to search_url(@search, :init => 1)

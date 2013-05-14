@@ -3,6 +3,9 @@
     <div class="grid_11">
       <div class="keywords">
         <%= search.keywords %>
+        <% if search.min_date && search.max_date %>
+          <br/><%= search.min_date %> - <%= search.max_date %>
+        <% end %>
         <% if search.profile_change %>
           <span class="red_bubble">Profile changed</span>
         <% end %>

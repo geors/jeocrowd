@@ -10,6 +10,8 @@ class Search
   attr_accessor :new_block
   
   key :keywords,                            String
+  key :min_date,                            String
+  key :max_date,                            String
   key :phase,                               String, :default => "exploratory"
   key :pages,                               Array,  :default => []   # Array of Fixnum
   (0..15).each do |i|                       
@@ -44,6 +46,7 @@ class Search
   ensure_index :keywords
   ensure_index :profile_id
   ensure_index [[:keywords, 1], [:profile_id, 1]]
+  ensure_index [[:keywords, 1], [:profile_id, 1], [:min_date, 1], [:max_date, 1]]
   ensure_index :created_at
   
   scope :incomplete, where(:completed_at => nil)

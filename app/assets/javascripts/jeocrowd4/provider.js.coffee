@@ -2,10 +2,6 @@
 
 class window.Provider
   
-  min_taken_date: '2011-07-01'
-  
-  max_taken_date: '2011-12-31'
-  
   constructor: (@name, url, search, @timestamp) ->
     @apiURL = window.Providers[@name].apiURL
     @params = jQuery.extend {}, window.Providers[@name].params
@@ -64,12 +60,13 @@ class window.Provider
     # returns the first element of the array and removes it from the assignedTiles list
     result = if @assignedTiles? then @assignedTiles.splice(0, 1) else null
 
-  exploratorySearch: (keywords, callback) ->
+  exploratorySearch: (config, callback) ->
+    keywords = config.keywords
     return null if (page = @computeNextPage()) == null
     @params.page = page + 1
     @params.text = keywords
-    @params.min_taken_date = @min_taken_date
-    @params.max_taken_date = @max_taken_date
+    @params.min_taken_date = config.min_date if config.min_date
+    @params.max_taken_date = config.max_date if config.max_date
     request = @apiURL + "?" + jQuery.param(@params)
     @dataSentToProvider = JSON.stringify(request).length
     jQuery.getJSON(request)
@@ -77,9 +74,10 @@ class window.Provider
       Jeocrowd.provider().exploratoryCallback data, page, callback
     .error (jqXHR, textStatus, errorThrown) ->
       console.log errorThrown
-      Jeocrowd.provider().exploratorySearch keywords, callback
+      Jeocrowd.provider().exploratorySearch config, callback
     
-  refinementSearch: (keywords, level, callback) ->
+  refinementSearch: (config, level, callback) ->
+    keywords = config.keywords
     return null if (tile = @computeNextBox(level)) == null
     if tile.length == 0
       callback.apply Jeocrowd, [null, level, null]
@@ -97,8 +95,8 @@ class window.Provider
     @params.bbox = box.getBoundingBoxString()
     @params.text = keywords
     @params.per_page = 1
-    @params.min_taken_date = @min_taken_date
-    @params.max_taken_date = @max_taken_date
+    @params.min_taken_date = config.min_date if config.min_date
+    @params.max_taken_date = config.max_date if config.max_date
     request = @apiURL + "?" + jQuery.param(@params)
     @dataSentToProvider += JSON.stringify(request).length
     jQuery.getJSON(request)
@@ -107,7 +105,7 @@ class window.Provider
     .error (jqXHR, textStatus, errorThrown) ->
       console.log errorThrown
       Jeocrowd.provider().assignedTiles.push(tile[0])
-      Jeocrowd.provider().refinementSearch keywords, level, callback
+      Jeocrowd.provider().refinementSearch config, level, callback
 
   exploratoryCallback: (data, page, callback) ->
     @dataReceivedFromProvider = JSON.stringify(data).length

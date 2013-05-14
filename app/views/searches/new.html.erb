@@ -1,5 +1,9 @@
 <div class="searches_header">
   <h1>New search</h1>
+  <h2>
+    <%= link_to_if params[:dates].to_s.to_i != 1, 'with', :dates => "1" %> or
+    <%= link_to_if params[:dates].to_s.to_i != 0, 'without', :dates => nil %> dates
+  </h2>
 </div>
 
 <div class="searches_list">

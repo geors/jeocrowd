@@ -12,6 +12,10 @@
   <% end %>
   
   <p>Keywords <%= f.text_field :keywords %></p>
+  <% if params[:dates].to_s.to_i == 1 %>
+    <p>From date taken <%= f.date_select :min_date %></p>
+    <p>Until date taken <%= f.date_select :max_date %></p>
+  <% end %>
 
   <div class="actions">
     <%= f.submit %>
