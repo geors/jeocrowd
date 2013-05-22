@@ -239,7 +239,7 @@ window.Jeocrowd =
     Benchmark.finish('refinementClientProcessing')
     $('#level_label label').text('max: ' + @maxLevel)
     @visibleLevel(@maxLevel)
-    @map.panTo @visibleGrid().hottestTile.getCenter()
+    @map.panTo @visibleGrid().hottestTile.getCenter() if @visibleGrid().hottestTile
     for grid in @_grids
       delete(@_grids[grid.level]) if grid.level != @maxLevel
     @levels = []
