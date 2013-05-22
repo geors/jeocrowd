@@ -129,10 +129,12 @@ class window.Grid
     hottestTiles = @tiles.valuesOrderedBy((a, b) -> return b.degree - a.degree).splice(0, Jeocrowd.HOT_TILES_COUNT_AVERAGE)
     # calculate average distances
     averages = {}
-    for i in [0..Jeocrowd.HOT_TILES_COUNT_AVERAGE - 1]
-      if i + 1 < Jeocrowd.HOT_TILES_COUNT_AVERAGE
-        for j in [i + 1..Jeocrowd.HOT_TILES_COUNT_AVERAGE - 1]
-          averages[i + ',' + j] = google.maps.geometry.spherical.computeDistanceBetween(hottestTiles[i].getCenter(), hottestTiles[j].getCenter())
+    upto = Math.min(hottestTiles.length, Jeocrowd.HOT_TILES_COUNT_AVERAGE)
+    for i in [0..upto - 1]
+      if i + 1 < upto
+        for j in [i + 1..upto - 1]
+          averages[i + ',' + j] = google.maps.geometry.spherical.computeDistanceBetween(
+                                      hottestTiles[i].getCenter(), hottestTiles[j].getCenter())
     sum = count = 0
     for id, d of averages
       sum += d
