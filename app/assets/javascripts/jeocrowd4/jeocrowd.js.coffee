@@ -26,6 +26,11 @@ window.Jeocrowd =
   WAITING_ON_RELOAD: 10000 #in ms
   
   config: {}
+  
+  featureOpts: {
+    "pale_down" : [{"featureType":"water","stylers":[{"visibility":"on"},{"color":"#acbcc9"}]},{"featureType":"landscape","stylers":[{"color":"#f2e5d4"}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"color":"#c5c6c6"}]},{"featureType":"road.arterial","elementType":"geometry","stylers":[{"color":"#e4d7c6"}]},{"featureType":"road.local","elementType":"geometry","stylers":[{"color":"#fbfaf7"}]},{"featureType":"poi.park","elementType":"geometry","stylers":[{"color":"#c5dac6"}]},{"featureType":"administrative","stylers":[{"visibility":"on"},{"lightness":33}]},{"featureType":"road"},{"featureType":"poi.park","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":20}]},{},{"featureType":"road","stylers":[{"lightness":20}]}];
+    "subtle_grayscale" : [{"featureType":"landscape","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"poi","stylers":[{"saturation":-100},{"lightness":51},{"visibility":"simplified"}]},{"featureType":"road.highway","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"road.arterial","stylers":[{"saturation":-100},{"lightness":30},{"visibility":"on"}]},{"featureType":"road.local","stylers":[{"saturation":-100},{"lightness":40},{"visibility":"on"}]},{"featureType":"transit","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"administrative.province","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"geometry","stylers":[{"hue":"#ffff00"},{"lightness":-25},{"saturation":-97}]}]
+  }
     
   _grids: null
   grids: (level) ->
@@ -79,13 +84,19 @@ window.Jeocrowd =
     @maxLevel - level < Jeocrowd.FULL_SEARCH_TIMES
   
   buildMap: (div) ->
-    initialOptions = { zoom: 10, mapTypeId: google.maps.MapTypeId.ROADMAP, disableDoubleClickZoom: true }
+    initialOptions = { zoom: 10, mapTypeId: "subtle_grayscale", disableDoubleClickZoom: true }
     initialLocation = new google.maps.LatLng 37.97918, 23.716647
     if placeholder = document.getElementById div 
       @map = new google.maps.Map placeholder, initialOptions 
+      @changeToSimpleStyle("subtle_grayscale")
       @map.setCenter initialLocation 
       return @map
-      
+  
+  changeToSimpleStyle: (styleName) ->
+    console.log @featureOpts[styleName]
+    customMapType = new google.maps.StyledMapType(@featureOpts[styleName], {name: styleName});
+    @map.mapTypes.set(styleName, customMapType);
+  
   loadConfiguration: ->
     c = $('#jeocrowd_config')
     if c.length
