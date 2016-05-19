@@ -1,7 +1,7 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 class window.Provider
-  
+
   constructor: (@name, url, search, @timestamp) ->
     @apiURL = window.Providers[@name].apiURL
     @params = jQuery.extend {}, window.Providers[@name].params
@@ -13,11 +13,11 @@ class window.Provider
     @dataSentToProvider = 0
     @dataReceivedFromProvider = 0
     @className = 'Provider'
-    
+
   callbacks: {}
-    
+
   # Jeocrowd -> provider -> fetchNextPage -> <exploratory, refinement>Callback ->
-  # Jeocrowd -> save<Exploratory, Refinement>Results -> 
+  # Jeocrowd -> save<Exploratory, Refinement>Results ->
 
   updatePages: (page) ->
     if typeof page == 'number'
@@ -25,7 +25,7 @@ class window.Provider
     else if typeof page == 'object'
       @pages = page
     $('#exploratory_pages_value').text(JSON.stringify @pages)
-    
+
   allPagesCompleted: ->
     @pages.length == Jeocrowd.MAX_XP_PAGES && @pages.every((page) -> page < Jeocrowd.MAX_XP_PAGES)
 
@@ -36,7 +36,7 @@ class window.Provider
 
   computeNextPage: ->
     Util.firstWithTimestamp @pages, @timestamp
-  
+
   updateAssignedTiles: (tiles, level) ->
     t = @timestamp
     @assignedTiles = (if tiles? then tiles else null) # makes undefined -> null
@@ -45,17 +45,17 @@ class window.Provider
       @assignedTilesCollection.copyFrom @assignedTiles, Jeocrowd.grids(level).tiles
       @assignedTilesCollection.each(-> @degree = -t)
     @assingedTiles
-    
+
   allBoxesCompleted: (level) ->
     Jeocrowd.grids(level).tiles.filter(-> @degree < 0).size() == 0
-    
+
   noBoxForMe: (level) ->
     t = @timestamp
     Jeocrowd.grids(level).tiles.filter(-> @degree == -t).size() == 0
-  
+
   continueRefinementBlock: ->
     @assignedTiles.length > 0
-  
+
   computeNextBox: (level) ->
     # returns the first element of the array and removes it from the assignedTiles list
     result = if @assignedTiles? then @assignedTiles.splice(0, 1) else null
@@ -75,7 +75,7 @@ class window.Provider
     .error (jqXHR, textStatus, errorThrown) ->
       console.log errorThrown
       Jeocrowd.provider().exploratorySearch config, callback
-    
+
   refinementSearch: (config, level, callback) ->
     keywords = config.keywords
     return null if (tile = @computeNextBox(level)) == null
@@ -144,13 +144,13 @@ class window.Provider
       'complete': (jqXHR, textStatus) ->
         console.log textStatus if textStatus != 'success'
     }
-    
+
   saveRefinementResults: (results, level, callback) ->
     data = {}
     data['rfTiles'] = results
     data['level'] = level
     if level + 1 == Jeocrowd.maxLevel
-      data['phase'] = 'refinement' 
+      data['phase'] = 'refinement'
       data['maxLevel'] = Jeocrowd.maxLevel
     data['data_counters'] = {}
     data['data_counters']['refinement_to_provider_data'] = @dataSentToProvider
@@ -169,7 +169,7 @@ class window.Provider
 
   saveTotalAvailablePoints: (total) ->
     @storeSimpleKeyValue({'total_available_points': total})
-  
+
   convertData: (data) ->
     if data && data.photos && data.photos.photo
       points = data.photos.photo.map (p) ->
@@ -181,7 +181,7 @@ class window.Provider
         point
     else
       []
-      
+
   storeSimpleKeyValue: (data, callback) ->
     jQuery.ajax({
       'url': @serverURL,
@@ -193,15 +193,15 @@ class window.Provider
       'complete': (jqXHR, textStatus) ->
         console.log textStatus if textStatus != 'success'
     })
-    
+
 # different providers for later expansion
-    
+
 window.Providers =
   Flickr: {
-    apiURL: "http://api.flickr.com/services/rest/",
+    apiURL: "https://api.flickr.com/services/rest/",
     params: {
       method:   "flickr.photos.search",
-      api_key:  "656222a441d1f6305791eeee478796d0",
+      api_key:  "8e955b89b873ac667f61e7d49749e131",
       has_geo:  true,
       accuracy: 12,
       extras:   "geo",
