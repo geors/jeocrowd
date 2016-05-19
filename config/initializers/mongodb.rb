@@ -16,7 +16,7 @@ begin
   MongoMapper.database = "jeocrowd_#{Rails.env}"
   # MongoMapper.database.authenticate('user', '-wee')
 rescue
-  MongoMapper.connection = Mongo::Connection.new('projects.giorgos.me', 27017,
+  MongoMapper.connection = Mongo::Connection.new('192.168.56.1', 27017,
                                                  { :logger => Rails.logger })
   MongoMapper.database = "jeocrowd_production"
   # MongoMapper.database.authenticate('user', '-wee')
